@@ -1,214 +1,101 @@
-# DWM YES
+# dwm 
 
-dwm 是一个非常快速, 小巧并使用动态管理窗口的窗口管理器
+- 1.在有全屏窗口下打开一个非悬浮窗口，全屏窗口会自动退出全屏参与平铺，原版全屏会遮住后面打开的窗口
 
-[展示视频: BV1Ef4y1Z7kA](https://www.bilibili.com/video/BV1Ef4y1Z7kA/)
+- 2.全屏状态下退出窗口，状态栏依旧会在，原版全屏窗口退出之后，状态栏会消失
 
-## 功能
+- 3.动画优化，左tag的窗口会从左滑回来，右tag的窗口会从右边滑回来，原版都只能从左边滑回来
 
-- 支持布局 tile(磁块)、magicgrid(进阶的网格布局)
-- 键盘移动/调整窗口大小 且移动/调整时有窗口间吸附效果
-- 窗口隐藏
-- 窗口可自定义是否全局(在所有tag内展示)
-- 更好的浮动窗口支持
-- 优化后的status2d 状态栏，可用鼠标点击操作
-- 系统托盘支持
-- overview
-- mod + tab, 在窗口间切换 有浮动窗口时仅在浮动窗口切换
-- mod + [tag], 切换tag到指定目录时 可指定一个cmd，若目标tag无窗口 则执行该tag
+- 4.bar栏优化，这个改动太多，不好说，直观就是外观颜色的变化和多了网速查看和亮度控制功能
 
-## 安装
+- 5.增加热区功能，鼠标移动到左下角可以全局触发预览视图，并且可以用鼠标左键点击窗口跳转到窗口所在tag
 
-```plaintext
-  !!!首次使用 请 cp -r DEF/* .
+- 6.增加鼠标中键触发全屏切换的功能
 
-  每次修改源代码后都需要执行
-  sudo make clean install
+- 7.增加鼠标滑轮加super按键可以切换工作区功能
+
+- 8.增加单窗口barder可显示功能
+
+![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/cb62f0dc-088c-4ffd-a1c8-d0d3c82a2142)
+
+
+
+https://github.com/DreamMaoMao/superdwm/assets/30348075/b6b0291a-1e5a-4be0-906e-9094839a68b3
+
+
+
+
+# dependcy
+```
+acpi
+alsa-utils
+blueman-manager(bluez bluez-utils)
+gnome-system-monitor
+light
+sar
+numlockx
+xorg-xsetroot
+xss-lock 
+lemonade
+nemo
+dunst
+flameshot
+feh
+imagemagick
+jq
+gnome-terminal
+brightnessctl
+lm_sensors
+lxappearance
+mantablockscreen
+network-manager-applet
+playerctl
+polkit-gnome
+python3
+rofi
+rofi-blocks-git
+xrdb
+parcellite
+sxhkd
+sysstat
+tumbler
+wmctrl
+redshift
+xdotool
+i3lock
+i3lock-color
+xprintidle
+xorg
+xorg-xinit
+upower
+sensors
+pactl
+xwininfo
+```
+# 安装特定版本的picom
+```
+cd ~/Downloads
+git clone https://github.com/yaocccc/picom.git
+cd picom/
+meson --buildtype=release . build --prefix=/usr -Dwith_docs=true
+sudo ninja -C build install
 ```
 
-## !!!运行 dwm!!!
 
-请确保你已配置 ~/.xinitrc 文件, DWM指向你的dwm仓库所在路径
+# install
+```
+cd ~/.config
+git clone https://github.com/DreamMaoMao/dwm.git
+cd dwm
+cp scripts -r ~/
+cp rofi -r ~/.config/
+cp dunst -r ~/.config/
+sed -i s#/home/user#$HOME# dwm.desktop
+sudo cp dwm.desktop /usr/share/xsession/
 
-```plaintext
-export DWM=~/workspace/dwm
-exec dwm
+sudo make clean install
 ```
 
-tty中执行 `startx` 启动
 
-如果想在tty1中自动执行startx可在你的bash或zsh配置中添加
-
-```plaintext
-  [ $(tty) = "/dev/tty1" ] && cd ~ && startx
-```
-
-## !!!关于fork配置!!!
-
-```plaintext
-  本仓库默认集成了 `DEF/` 目录，该目录为作者本人使用的配置
-  DEF: 推荐配置 亦是 作者本人使用的配置
-
-  首次运行 可自行 `cp -r DEF/* .`
-
-  后续请用户自行维护 ./config.h ./statusbar ./autostart.sh 文件
-  且此部分文件已被 gitignore
-
-  即用户可始终保持yaocccc/dwm仓库代码最新版而不受影响
-
-  较推荐的fork方式
-
-  1. fork本代码仓库
-  2. 自行维护fork后的仓库相关的配置文件: ./config.h ./statusbar ./autostart.sh
-  3. 注释掉fork后仓库中 .gitignore 的前三行
-  4. 定期在github页面sync yaocccc/dwm 仓库保持最新
-```
-
-### Nix Flake
-
-下面是在 nixos configuration 中使用它的示例
-```nix
-{
-  description = "My configuration";
-
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    dwm.url = "github:yaocccc/dwm";
-  };
-
-  outputs = { nixpkgs, dwm, ... }:
-    {
-      nixosConfigurations = {
-        hostname = nixpkgs.lib.nixosSystem
-          {
-            system = "x86_64-linux";
-            modules = [
-              {
-                nixpkgs.overlays = [ dwm.overlays.default ];
-              }
-            ];
-          };
-      };
-    };
-}
-```
-
-## 状态栏
-
-请将每一个块置为下列样式, 可直接使用本仓库statusbar相关脚本 或参考使用
-
-```plaintext
-  ^sdate^^c#2D1B46^^b#335566^  11/04 00:42 ^d^
-
-  ^s?????^ => 点击时的信号值
-  ^c?????^ => 前景色
-  ^b?????^ => 背景色
-  ^d^      => 重置颜色
-
-  也可以直接从^c ^b 定义前景色 后景色透明度
-  ^c#??????0xff^ => 0xff 前景色透明度
-  ^b#??????0x11^ => 0x11 后景色透明度
-
-  本仓库维护了 statusbar脚本 入口为 ./statusbar/statusbar.sh
-  
-  模块列表见 ./statusbar/packages
-  
-  若需要使用 请逐个去查看 修改packages中的脚本文件
-  
-  请在dwm启动时 调用 $DWM/statusbar/statusbar.sh cron
-
-  注意 ~/.profile中需要有 该环境变量为强依赖关系
-  export DWM=~/workspace/dwm
-
-  点击事件发生时 会调用 $DWM/statusbar/statusbar.sh 并传入信号值 请自行处理
-  例如 $DWM/statusbar/statusbar.sh date L  # 其中date为信号值 L为按键 (L左键 M中键 R右键)
-
-  可执行 $DWM/statusbar/statusbar.sh check 检查是否有模块存在问题
-```
-
-## 随DWM启动的自启动命令
-
-dwm启动时会去调用 $DWM/autostart.sh 脚本
-
-可参考 [autostart脚本](https://github.com/yaocccc/dwm/blob/master/DEF/autostart.sh)
-
-## Q & A
-
-1. 如何启动dwm？
-
-确保 ~/.xinitrc 中有 exec dwm。在tty中使用 startx 命令启动
-
-2. 进入后是黑屏啥都没
-
-壁纸需要用类似feh的软件设置 `feh --randomize --bg-fill ~/pictures/*.png`
-
-3. 打不开终端
-
-务必先修改config.h中启动终端的快捷键，本项目的config.h是我自用的配置 你需要手动修改
-
-例如 可以修改以下部分(如果你用的终端是st的话) 
-
-```plaintext
-    /* spawn + SHCMD 执行对应命令 */
-    { MODKEY,              XK_Return,       spawn,            SHCMD("st") },
-```
-
-4. 字体显示不全
-
-请自行安装字体 仅以archlinux举例
-
-```shell
-yay -S nerd-fonts-jetbrains-mono
-yay -S ttf-material-design-icons
-yay -S ttf-joypixels
-yay -S wqy-microhei
-```
-
-5. 如果想使用tabbed管理st
-
-推荐以下按键配置
-
-关联链接  
-[极简终端: https://github.com/yaocccc/st](https://github.com/yaocccc/st)  
-[多tab管理: https://github.com/yaocccc/st](https://github.com/yaocccc/tabbed)  
-
-```c
-    { MODKEY,              XK_s,      togglescratch, SHCMD("tabbed -n scratchpad -c -r 2 st -w ''") },          /* super s          | 打开st scratchpad      */
-    { MODKEY,              XK_Return, spawn, SHCMD("tabbed -n st -C tabbed -c -r 2 st -w ''") },                /* super enter      | 打开st                 */
-    { MODKEY,              XK_minus,  spawn, SHCMD("tabbed -n st -C FG -c -r 2 st -w ''") },                    /* super +          | 打开全局st终端         */
-    { MODKEY,              XK_space,  spawn, SHCMD("tabbed -n st -C float -c -r 2 st -w ''") },                 /* super space      | 打开浮动st终端         */
-```
-
-6. 为什么我的st各种奇怪问题
-
-可以考虑先用我的 [yaocccc/st](https://github.com/yaocccc/st)
-
-7. 自启动脚本没启动
-
-请检查DWM变量是否正确设置，如果实在不行了，可以直接强制改config.h 里的 autostartscript 和 statusbarscript 变量
-
-## 贡献者 THX 🌻
-
-- [yaocccc](https://github.com/yaocccc)
-  - [MASTER](#TOP)
-- [p3psi-boo](https://github.com/p3psi-boo)
-  - [PR#4 添加 Nix Flake 支持](https://github.com/yaocccc/dwm/pull/4)
-- [gxt-kt](https://github.com/gxt-kt)
-  - [PR#7 修复hide/show窗口栈索引带来的无法恢复窗口的bug](https://github.com/yaocccc/dwm/pull/7)
-  - [PR#19 二维选中、交换窗口](https://github.com/yaocccc/dwm/pull/19)
-- [Ruixi-rebirth](https://github.com/Ruixi-rebirth)
-  - [PR#12 优化flake](https://github.com/yaocccc/dwm/pull/12)
-  - [PR#16 优化flake](https://github.com/yaocccc/dwm/pull/16)
-- [Int-0X7FFFFFFF](https://github.com/Int-0X7FFFFFFF)
-  - [PR#20 修复了音量在中文环境下一直显示静音的错误](https://github.com/yaocccc/dwm/pull/20)
-- [zainmiku](https://github.com/zainmiku)
-  - [PR#25 音乐标题包含"'时的处理](https://github.com/yaocccc/dwm/pull/25)
-  - [PR#29 音乐标题包含空格时的处理](https://github.com/yaocccc/dwm/pull/29)
-
-## ENJOY IT 😃
-
-## Support: buy me a coffee
-
-<a href="https://www.buymeacoffee.com/yaocccc" target="_blank">
-  <img src="https://github.com/yaocccc/yaocccc/raw/master/qr.png">
-</a>
+# reference
+https://github.com/yaocccc/dwm

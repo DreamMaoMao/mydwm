@@ -33,3 +33,14 @@ die(const char *fmt, ...) {
 
 	exit(1);
 }
+
+
+unsigned int get_tag_bit_position(unsigned int tags) {
+	unsigned int i;
+	for(i=0;i<=31;i++) {
+		if (tags & 1 << i) {
+			return i+1;
+		}
+	}
+	return 0;
+}

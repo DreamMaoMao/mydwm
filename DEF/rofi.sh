@@ -1,3 +1,4 @@
+#!/usr/bin/bash
 # 打印菜单
 call_menu() {
     echo ' set wallpaper'

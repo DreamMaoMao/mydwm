@@ -1,0 +1,7 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=dwm
+Comment=Dynamic window manager
+Exec=env DWM=/home/user/.config/dwm dwm
+Icon=dwm
+Type=XSession

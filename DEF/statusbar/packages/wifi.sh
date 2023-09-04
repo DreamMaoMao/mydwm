@@ -21,7 +21,7 @@ if [ "$LANG" != "zh_CN.UTF-8" ]; then
 fi
 
 update() {
-    wifi_icon="褐"
+    wifi_icon=""
     wifi_text=$(nmcli | grep "$wifi_grep_keyword" | awk -F "$wifi_grep_keyword" '{print $2}')
     [ "$wifi_text" = "" ] && wifi_text=$wifi_disconnected
 

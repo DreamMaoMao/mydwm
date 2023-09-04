@@ -17,7 +17,7 @@ with_temp() {
 } 
 
 update() {
-    cpu_icon="閭"
+    cpu_icon="󰻠"
     cpu_text=$(top -n 1 -b | sed -n '3p' | awk '{printf "%02d%", 100 - $8}')
 
     icon=" $cpu_icon "
@@ -30,7 +30,7 @@ update() {
 }
 
 notify() {
-    notify-send "閭 CPU tops" "\n$(ps axch -o cmd:15,%cpu --sort=-%cpu | head)\\n\\n(100% per core)" -r 9527
+    notify-send "󰻠 CPU tops" "\n$(ps axch -o cmd:15,%cpu --sort=-%cpu | head)\\n\\n(100% per core)" -r 9527
 }
 
 call_btop() {
