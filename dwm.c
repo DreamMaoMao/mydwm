@@ -1917,12 +1917,14 @@ void motionnotify(XEvent *e) {
     return;
 
   //左下角热区触发
-  unsigned hx = hotarea_size;
-  unsigned hy = hotarea_high - hotarea_size;
-  if(enable_hotarea == 1 && ev->y_root > hy && ev->x_root < hx && selmon->is_in_hotarea == 0){
+  unsigned hx = selmon->mx + hotarea_size;
+  unsigned hy = selmon->my + selmon->mh - hotarea_size;
+
+
+  if(enable_hotarea == 1 &&  selmon->is_in_hotarea == 0 && ev->y_root > hy && ev->x_root < hx && ev->x_root >= selmon->mx && ev->y_root <= (selmon->my +selmon->mh) ){
       toggleoverview(&arg);
       selmon->is_in_hotarea = 1;   
-  } else if (enable_hotarea == 1 && selmon->is_in_hotarea == 1 && (ev->y_root <= hy || ev->x_root >= hx)) {
+  } else if(enable_hotarea == 1 && selmon->is_in_hotarea == 1 && (ev->y_root <= hy || ev->x_root >= hx || ev->x_root < selmon->mx || ev->y_root > (selmon->my +selmon->mh) ) ) {
       selmon->is_in_hotarea = 0;
   }
 
