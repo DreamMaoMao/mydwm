@@ -350,8 +350,6 @@ static void toggleallfloating(const Arg *arg);
 static void togglescratch(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void toggleoverview(const Arg *arg);
-static void mouseClick_exit_overview(const Arg *arg);
-static void killwindow_in_overview(const Arg *arg);
 static void togglewin(const Arg *arg);
 static void toggleglobal(const Arg *arg);
 static void toggleborder(const Arg *arg);
@@ -3402,20 +3400,6 @@ void toggleoverview(const Arg *arg) {
   selmon->isoverview ^= 1;
   view(&(Arg){.ui = target});
   // pointerfocuswin(selmon->sel); //我不需要自动鼠标跳转窗口
-}
-
-// 用于在overview视图用鼠标左键跳转到窗口所在tag
-void mouseClick_exit_overview(const Arg *arg) {
-  if (selmon->isoverview) {
-    toggleoverview(arg);
-  }
-}
-
-// 用于在overview视图用鼠标右键关闭窗口
-void killwindow_in_overview(const Arg *arg) {
-  if (selmon->isoverview) {
-    killclient(arg);
-  }
 }
 
 void viewtoleft(const Arg *arg) {

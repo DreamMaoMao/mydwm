@@ -20,22 +20,26 @@ window)
 	xdotool keydown Tab
 	;;
 outopts)
-	option=$(printf "\n\n⏻\n" |
-		/usr/bin/rofi -config $roficonf/logoutdwm.rasi -dmenu -p "Select logout" -font "Caskaydia Cove Nerd Font 18")
+	option=$(printf "\n\n⏻\n\n󰌾\n󰒲\n" |
+		/usr/bin/rofi -config $roficonf/logoutdwm.rasi -dmenu -p "Select logout" -font "JetBrainsMono Nerd Font 18")
 	case $option in
 	"")
-		bspc wm -r
+		sudo reboot
 		;;
 	"")
 		sudo pkill dwm
 		;;
-	"")
-		confirm=$(printf "Confirm reboot" | rofi -config $roficonf/logout.rasi -dmenu -font "Iosevka Curly 16")
-		[[ $confirm == "Confirm reboot" ]] && reboot
+	"")
+		sudo systemclt suspend
 		;;
 	"⏻")
-		confirm=$(printf "Confirm shut down" | rofi -config $roficonf/logout.rasi -dmenu -font "Iosevka Curly 16")
-		[[ $confirm == "Confirm shut down" ]] && shutdown now
+		sudo shutdown -h now
+		;;
+	"󰌾")
+		$DWM/DEF/blurlock.sh
+		;;
+	"󰒲")
+		sudo systemctl hibernate
 		;;
 	esac
 	;;

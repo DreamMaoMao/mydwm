@@ -265,8 +265,8 @@ static Button buttons[] = {
     { ClkClientWin,        0,               Button2,          fullscreen,    {0} },                                   // super+中键  |  点击窗口     |  窗口全屏
     { ClkClientWin,        SuperMask,       Button4,          viewtoleft,{0} },                                       // super+鼠标滚轮上  |  鼠标滚轮上         
     { ClkClientWin,        SuperMask,       Button5,          viewtoright,{0} },                                      // super+鼠标滚轮下  |  鼠标滚轮 下
-    { ClkClientWin,        0,               Button1,          mouseClick_exit_overview,     {0} },                    //左键  |  overview视图点击窗口 |退出overview跳转到窗口所在tag 
-    { ClkClientWin,        0,               Button3,          killwindow_in_overview,       {0} },                    //右键  |  overview视图点击窗口 |关闭该窗口
+    { ClkClientWin,        0,               Button1,          toggleoverview,     {0} },                    //左键  |  overview视图点击窗口 |退出overview跳转到窗口所在tag 
+    { ClkClientWin,        0,               Button3,          killclient,       {0} },                    //右键  |  overview视图点击窗口 |关闭该窗口
 
     { ClkRootWin,          SuperMask,       Button4,          viewtoleft,{0} },                                       // super+鼠标滚轮上  |  鼠标滚轮上         
     { ClkRootWin,          SuperMask,       Button5,          viewtoright,{0} }, 
