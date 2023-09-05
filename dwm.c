@@ -232,6 +232,7 @@ static void lognumtofile(unsigned int num);
 
 
 static void tile(Monitor *m);
+static void rtile(Monitor *m);
 static void magicgrid(Monitor *m);
 static void overview(Monitor *m);
 static void grid(Monitor *m, uint gappo, uint uappi);
@@ -450,7 +451,7 @@ struct Pertag {
   int showbars[LENGTH(tags) + 1];   /* display bar for the current tag */
 };
 
-/* function implementations */
+/* function implementations */ 
 void logtofile(const char *fmt, ...) {
   char buf[256];
   char cmd[256];
@@ -490,11 +491,15 @@ void applyrules(Client *c) {
   instance = ch.res_name ? ch.res_name : broken;
 
   for (i = 0; i < LENGTH(rules); i++) {
+
     r = &rules[i];
+
+
     // 当rule中定义了一个或多个属性时，只要有一个属性匹配，就认为匹配成功
     if ((r->title && strstr(c->name, r->title)) ||
         (r->class && strstr(class, r->class)) ||
         (r->instance && strstr(instance, r->instance))) {
+
       c->isfloating = r->isfloating;
       c->isglobal = r->isglobal;
       c->isnoborder = r->isnoborder;
@@ -1832,6 +1837,7 @@ void manage(Window w, XWindowAttributes *wa) {
   c->bw = borderpx;
 
   updatetitle(c);
+
   if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
     c->mon = t->mon;
     c->tags = t->tags;
@@ -3472,6 +3478,7 @@ void clear_fullscreen_flag(Client *c) {
 }
 
 void tile(Monitor *m) {
+  newclientathead = 1; //头部入栈
   unsigned int i, n, mw, mh, sh, my,
       sy; // mw: master的宽度, mh: master的高度, sh: stack的高度, my:
           // master的y坐标, sy: stack的y坐标
@@ -3511,6 +3518,49 @@ void tile(Monitor *m) {
   }
 
 }
+
+void rtile(Monitor *m) {
+  newclientathead = 0; //尾部入栈
+  unsigned int i, n, mw, mh, sh, my,
+      sy; // mw: master的宽度, mh: master的高度, sh: stack的高度, my:
+          // master的y坐标, sy: stack的y坐标
+  Client *c;
+
+  for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++)
+    ;
+  if (n == 0)
+    return;
+
+  if (n > m->nmaster)
+    mw = m->nmaster ? (m->ww + gappi) * m->mfact : 0;
+  else
+    mw = m->ww - 2 * gappo + gappi;
+
+  mh = m->nmaster == 0 ? 0
+                       : (m->wh - 2 * gappo - gappi * (m->nmaster - 1)) /
+                             m->nmaster; // 单个master的高度
+  sh = n == m->nmaster ? 0
+                       : (m->wh - 2 * gappo - gappi * (n - m->nmaster - 1)) /
+                             (n - m->nmaster); // 单个stack的高度
+
+  for (i = 0, my = sy = gappo, c = nexttiled(m->clients); c;
+       c = nexttiled(c->next), i++) {
+    // 全屏窗口参与平铺布局前清除全屏标志,还原全屏时清0的border
+    clear_fullscreen_flag(c);
+    
+    if (i < m->nmaster) {
+      resize(c, m->wx + gappo, m->wy + my, mw - 2 * c->bw - gappi,
+             mh - 2 * c->bw, 0);
+      my += HEIGHT(c) + gappi;
+    } else {
+      resize(c, m->wx + mw + gappo, m->wy + sy,
+             m->ww - mw - 2 * c->bw - 2 * gappo, sh - 2 * c->bw, 0);
+      sy += HEIGHT(c) + gappi;
+    }
+  }
+
+}
+
 
 void magicgrid(Monitor *m) { grid(m, gappo, gappi); }
 

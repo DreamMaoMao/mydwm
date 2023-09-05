@@ -43,6 +43,8 @@
 
 - 10.右边数字键盘keycode转keysym异常修复,修正x11无法使用右边的数字键盘设置快捷键
 
+- 11.增加左键点击布局图表切换到网格布局,右键切换栈布局是从上入栈还是从下入栈 
+
 ![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/cb62f0dc-088c-4ffd-a1c8-d0d3c82a2142)
 
 

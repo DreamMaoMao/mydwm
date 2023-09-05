@@ -5,7 +5,7 @@ static int hotarea_size = 10;           /* 热区大小10x10 */
 
 static int no_stack_show_border = 1;           /* 一个窗口也显示border */
 static int showsystray = 1;           /* 是否显示托盘栏 */
-static const int newclientathead = 0; /* 定义新窗口在栈顶还是栈底 */
+int newclientathead = 1; /* 定义新窗口在栈顶还是栈底 */
 static const unsigned int borderpx = 5; /* 窗口边框大小 */
 static const unsigned int systraypinning =
     1; /* 托盘跟随的显示器 0代表不指定显示器 */
@@ -98,7 +98,8 @@ static const Rule rules[] = {
     {"obs",                  NULL,                 NULL,             1 << 5,       0,          0,          0,        -1,      0,            0,       0},       // obs        tag6 
     {"chrome",               NULL,                 NULL,             1 << 3,       0,          0,          0,        -1,      0,            0,       0},       // chrome     tag4 
     {"music",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1200,       800},  // music      浮动
-    { NULL,                  "qq",                 NULL,             1 << 2,       0,          0,          0,        -1,      0,            0,       0},       // qq         tag3 
+    {"kitty",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1500,       800},  // music      浮动
+    {NULL,                  "qq",                 NULL,             1 << 2,       0,          0,          0,        -1,      0,            0,       0},       // qq         tag3 
     {"flameshot",            NULL,                 NULL,             0,            1,          0,          0,        -1,      0,            0,       0},       // 火焰截图            浮动
     {"Blueman-manager",      NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // blueman            浮动
     {"thunder",              NULL,                 NULL,             1 << 4,       1,          0,          0,        -1,      5,            0,       0},       // 迅雷            浮动
@@ -117,6 +118,7 @@ static const Layout overviewlayout = { "󰃇",  overview };
 static const Layout layouts[] = {
     { "󰘍",  tile },         /* 主次栈 */
     { "﩯",  magicgrid },    /* 网格 */
+    { "󰘌",  rtile },         /* 主次栈,尾部入栈 */
 };
 
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
@@ -209,7 +211,7 @@ static Key keys[] = {
     { ControlMask,              XK_Return, spawn, SHCMD("bash ~/tool/clash.sh") },                                                                                              /* super enter      | 打开终端             */
     { SuperMask,                XK_d,      spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/dwmdrun.rasi -show run") },                                                       /* super d          | rofi: 执行run          */
     { AltMask,                  XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/dwmdrun.rasi -show drun") },                                                      /* alt space        | rofi: 执行drun          */
-    { SuperMask|ControlMask,    XK_Return, spawn, SHCMD("nemo") },                                                                                                          /* ctrl win enter   | rofi: nautilus 文件浏览器          */
+    { SuperMask|ControlMask,    XK_Return, spawn, SHCMD("konsole -e  /usr/local/bin/yazi") },                                                                                                          /* ctrl win enter   | rofi: nautilus 文件浏览器          */
     { ControlMask,              XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },              /* ctrl space       | rofi: 执行自定义脚本   */
     { SuperMask,                XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },     /* super space      | rofi: 执行自定义脚本   */
     { SuperMask,                XK_l,      spawn, SHCMD("$DWM/scripts/blurlock.sh") },                                   /* super l     | 锁定屏幕               */
@@ -284,6 +286,7 @@ static Button buttons[] = {
     { ClkStatusText,       0,               Button5,          clickstatusbar,{0} },                                   // 鼠标滚轮下  |  状态栏       |  根据状态栏的信号执行 $DWM/scripts/dwmstatusbar.sh $signal D
     /*点击布局图标*/
     { ClkLtSymbol,           0,             Button1,          selectlayout,{.v = &layouts[1]} },                                                        // 左键        |  点击tag      |  切换tag                                                                                                      //
+    { ClkLtSymbol,           0,             Button3,          selectlayout,{.v = &layouts[2]} },                                                        // 右键        |  点击tag      |  切换tag                                                                                                      //
     /* 点击bar空白处 */
     { ClkBarEmpty,         0,               Button1,          spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/dwmwin.rasi -show window") },         // 左键        |  bar空白处    |  rofi 执行 window
     { ClkBarEmpty,         0,               Button3,          spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/all.rasi -show drun") },               // 右键        |  bar空白处    |  rofi 执行 drun
