@@ -12,6 +12,7 @@ CursorShape=1
 [General]
 Name=Profile 1
 Parent=FALLBACK/
+ShowTerminalSizeHint=false
 TerminalCenter=false
 
 [Keyboard]
