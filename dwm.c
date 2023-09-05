@@ -216,6 +216,8 @@ typedef struct {
   int isnoborder;
   int monitor;
   uint floatposition;
+  uint width;
+  uint high;
 } Rule;
 
 typedef struct Systray Systray;
@@ -349,6 +351,7 @@ static void togglescratch(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void toggleoverview(const Arg *arg);
 static void mouseClick_exit_overview(const Arg *arg);
+static void killwindow_in_overview(const Arg *arg);
 static void togglewin(const Arg *arg);
 static void toggleglobal(const Arg *arg);
 static void toggleborder(const Arg *arg);
@@ -500,8 +503,15 @@ void applyrules(Client *c) {
         ;
       if (m)
         c->mon = m;
+
+      // 如果设定了floatposition 且设置窗口的长和宽
+      if (r->isfloating && r->width != 0 && r->high != 0) {
+          c->w = r->width;
+          c->h = r->high;
+      }        
+  
       // 如果设定了floatposition 且未指定xy，设定窗口位置
-      if (r->isfloating && c->x == 0 && c->y == 0) {
+      if (r->isfloating && r->floatposition != 0) {
         switch (r->floatposition) {
         case 1:
           c->x = selmon->wx + gappo;
@@ -542,6 +552,7 @@ void applyrules(Client *c) {
           break; // 右下
         }
       }
+
       break; // 有且只会匹配一个第一个符合的rule
     }
   }
@@ -1919,7 +1930,6 @@ void motionnotify(XEvent *e) {
   //左下角热区触发
   unsigned hx = selmon->mx + hotarea_size;
   unsigned hy = selmon->my + selmon->mh - hotarea_size;
-
 
   if(enable_hotarea == 1 &&  selmon->is_in_hotarea == 0 && ev->y_root > hy && ev->x_root < hx && ev->x_root >= selmon->mx && ev->y_root <= (selmon->my +selmon->mh) ){
       toggleoverview(&arg);
@@ -3398,6 +3408,13 @@ void toggleoverview(const Arg *arg) {
 void mouseClick_exit_overview(const Arg *arg) {
   if (selmon->isoverview) {
     toggleoverview(arg);
+  }
+}
+
+// 用于在overview视图用鼠标右键关闭窗口
+void killwindow_in_overview(const Arg *arg) {
+  if (selmon->isoverview) {
+    killclient(arg);
   }
 }
 
