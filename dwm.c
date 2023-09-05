@@ -502,13 +502,13 @@ void applyrules(Client *c) {
       if (m)
         c->mon = m;
 
-      // 如果设定了floatposition 且设置窗口的长和宽
+      // 如果设定了isfloating 且设置窗口的长和宽
       if (r->isfloating && r->width != 0 && r->high != 0) {
           c->w = r->width;
           c->h = r->high;
       }        
   
-      // 如果设定了floatposition 且未指定xy，设定窗口位置
+      // 如果设定了floatposition 设定窗口位置
       if (r->isfloating && r->floatposition != 0) {
         switch (r->floatposition) {
         case 1:

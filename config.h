@@ -212,15 +212,15 @@ static Key keys[] = {
     { SuperMask|ControlMask,    XK_Return, spawn, SHCMD("nemo") },                                                                                                          /* ctrl win enter   | rofi: nautilus 文件浏览器          */
     { ControlMask,              XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },              /* ctrl space       | rofi: 执行自定义脚本   */
     { SuperMask,                XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },     /* super space      | rofi: 执行自定义脚本   */
-    { SuperMask,                XK_l,      spawn, SHCMD("$DWM/DEF/blurlock.sh") },                                   /* super l     | 锁定屏幕               */
-    { AltMask,                  XK_period, spawn, SHCMD("~/scripts/volume.sh up") },                                 /* alt >       | 音量加                 */
-    { AltMask,                  XK_comma,  spawn, SHCMD("~/scripts/volume.sh down") },                               /* alt <       | 音量减                 */
-    { ControlMask,              XK_period, spawn, SHCMD("~/scripts/brightness.sh up") },                             /* ctrl >      | 亮度加                 */
-    { ControlMask,              XK_comma,  spawn, SHCMD("~/scripts/brightness.sh down") },                           /* ctrl <      | 亮度减    */
+    { SuperMask,                XK_l,      spawn, SHCMD("$DWM/scripts/blurlock.sh") },                                   /* super l     | 锁定屏幕               */
+    { AltMask,                  XK_period, spawn, SHCMD("$DWM/scripts/volume.sh up") },                                 /* alt >       | 音量加                 */
+    { AltMask,                  XK_comma,  spawn, SHCMD("$DWM/scripts/volume.sh down") },                               /* alt <       | 音量减                 */
+    { ControlMask,              XK_period, spawn, SHCMD("$DWM/scripts/brightness.sh up") },                             /* ctrl >      | 亮度加                 */
+    { ControlMask,              XK_comma,  spawn, SHCMD("$DWM/scripts/brightness.sh down") },                           /* ctrl <      | 亮度减    */
     { AltMask|ControlMask,      XK_a,      spawn, SHCMD("flameshot gui -c -p ~/Pictures/screenshots") },             /* ctrl alt a  | 截图                   */
     { AltMask|SuperMask,        XK_q,      spawn, SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") }, /* super alt q | 选中某个窗口并强制kill */
-    { SuperMask,                XK_p,      spawn, SHCMD("bash ~/scripts/monitor.sh") },                              /* super p     | 关闭内部显示器 */
-    { SuperMask|ControlMask,    XK_m,      spawn, SHCMD("~/scripts/rofidwm.sh outopts") },
+    { SuperMask,                XK_p,      spawn, SHCMD("bash $DWM/scripts/monitor.sh") },                              /* super p     | 关闭内部显示器 */
+    { SuperMask|ControlMask,    XK_m,      spawn, SHCMD("$DWM/scripts/rofidwm.sh outopts") },
     { AltMask|ControlMask,      XK_Return, spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/dwmwin.rasi -show window") },
 
 
@@ -247,7 +247,7 @@ static Key keys[] = {
     TAGKEYS(XK_KP_9, 8, 0)
     // TAGKEYS(XK_9, 3, "obs")  ,后面产生表示跳转到tab并打开一个应用
     // TAGKEYS(XK_c, 4, "google-chrome-stable")
-    // TAGKEYS(XK_m, 5, "~/scripts/music_player.sh")
+    // TAGKEYS(XK_m, 5, "$DWM/scripts/music_player.sh")
     // TAGKEYS(XK_0, 6, "linuxqq")
     // TAGKEYS(XK_w, 7, "/opt/apps/com.qq.weixin.deepin/files/run.sh")
     // TAGKEYS(XK_y, 8, "/opt/apps/com.qq.weixin.work.deepin/files/run.sh")
@@ -277,11 +277,11 @@ static Button buttons[] = {
     { ClkTagBar,           0,               Button4,          viewtoleft,    {0} },                                   // 鼠标滚轮上  |  tag          |  向前切换tag
 	{ ClkTagBar,           0,               Button5,          viewtoright,   {0} },                                   // 鼠标滚轮下  |  tag          |  向后切换tag
     /* 点击状态栏操作 */
-    { ClkStatusText,       0,               Button1,          clickstatusbar,{0} },                                   // 左键        |  点击状态栏   |  根据状态栏的信号执行 ~/scripts/dwmstatusbar.sh $signal L
-    { ClkStatusText,       0,               Button2,          clickstatusbar,{0} },                                   // 中键        |  点击状态栏   |  根据状态栏的信号执行 ~/scripts/dwmstatusbar.sh $signal M
-    { ClkStatusText,       0,               Button3,          clickstatusbar,{0} },                                   // 右键        |  点击状态栏   |  根据状态栏的信号执行 ~/scripts/dwmstatusbar.sh $signal R
-    { ClkStatusText,       0,               Button4,          clickstatusbar,{0} },                                   // 鼠标滚轮上  |  状态栏       |  根据状态栏的信号执行 ~/scripts/dwmstatusbar.sh $signal U
-    { ClkStatusText,       0,               Button5,          clickstatusbar,{0} },                                   // 鼠标滚轮下  |  状态栏       |  根据状态栏的信号执行 ~/scripts/dwmstatusbar.sh $signal D
+    { ClkStatusText,       0,               Button1,          clickstatusbar,{0} },                                   // 左键        |  点击状态栏   |  根据状态栏的信号执行 $DWM/scripts/dwmstatusbar.sh $signal L
+    { ClkStatusText,       0,               Button2,          clickstatusbar,{0} },                                   // 中键        |  点击状态栏   |  根据状态栏的信号执行 $DWM/scripts/dwmstatusbar.sh $signal M
+    { ClkStatusText,       0,               Button3,          clickstatusbar,{0} },                                   // 右键        |  点击状态栏   |  根据状态栏的信号执行 $DWM/scripts/dwmstatusbar.sh $signal R
+    { ClkStatusText,       0,               Button4,          clickstatusbar,{0} },                                   // 鼠标滚轮上  |  状态栏       |  根据状态栏的信号执行 $DWM/scripts/dwmstatusbar.sh $signal U
+    { ClkStatusText,       0,               Button5,          clickstatusbar,{0} },                                   // 鼠标滚轮下  |  状态栏       |  根据状态栏的信号执行 $DWM/scripts/dwmstatusbar.sh $signal D
     /*点击布局图标*/
     { ClkLtSymbol,           0,             Button1,          selectlayout,{.v = &layouts[1]} },                                                        // 左键        |  点击tag      |  切换tag                                                                                                      //
     /* 点击bar空白处 */

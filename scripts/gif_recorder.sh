@@ -7,7 +7,7 @@
 
 gif_file=~/show.gif
 let x y w h
-source ~/scripts/lib/menu
+source $DWM/scripts/lib/menu
 
 getwin() {
     XWININFO=$(xwininfo)

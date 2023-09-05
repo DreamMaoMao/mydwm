@@ -57,7 +57,7 @@ notify() {
 
 click() {
     case "$1" in
-        L) ~/scripts/rofidwm.sh outopts;;
+        L) $DWM/scripts/rofidwm.sh outopts;;
         R) ;;
     esac
 }

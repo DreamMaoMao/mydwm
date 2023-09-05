@@ -36,7 +36,7 @@ outopts)
 		sudo shutdown -h now
 		;;
 	"󰌾")
-		$DWM/DEF/blurlock.sh
+		$DWM/scripts/blurlock.sh
 		;;
 	"󰒲")
 		sudo systemctl hibernate

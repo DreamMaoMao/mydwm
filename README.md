@@ -29,52 +29,27 @@ https://github.com/DreamMaoMao/superdwm/assets/30348075/b6b0291a-1e5a-4be0-906e-
 
 
 
+
+
 # dependcy
 ```
-acpi
-alsa-utils
-blueman-manager(bluez bluez-utils)
-gnome-system-monitor
-light
-sar
-numlockx
-xorg-xsetroot
-xss-lock 
-lemonade
-nemo
-dunst
-flameshot
-feh
-imagemagick
-jq
-gnome-terminal
-brightnessctl
-lm_sensors
-lxappearance
-mantablockscreen
-network-manager-applet
-playerctl
-polkit-gnome
-python3
-rofi
-rofi-blocks-git
-xrdb
-parcellite
-sxhkd
-sysstat
-tumbler
-wmctrl
-redshift
-xdotool
-i3lock
-i3lock-color
-xprintidle
-xorg
-xorg-xinit
-upower
-sensors
-pactl
-xwininfo
+sudo pacman -S network-manager-applet
+sudo pacman -S nemo
+sudo pacman -S rofi
+sudo pacman -S konsole
+sudo pacman -S gnome-system-monitor 
+sudo pacman -S fcitx-qt5 fcitx fcitx-configtool
+sudo pacman -S xorg-xrdb
+sudo pacman -S brightnessctl 
+sudo pacman -S bluez bluez-utils
+sudo pacman -S sysstat
+sudo pacman -S xorg-xsetroot
+sudo pacman -S xss-lock 
+sudo pacman -S libpulse
+
+yay -S acpi dunst jq alsa-utils polkit-gnome  rofi-blocks-git light numlockx nemo flameshot feh lm_sensors i3lock i3lock-color mantablockscreen network-manager-applet playerctl python3 parcellite redshift upower xorg-xinit xprintidle xorg wmctrl xdotool tumbler
+
+
 ```
 # 安装特定版本的picom
 ```
@@ -89,9 +64,8 @@ sudo ninja -C build install
 # install
 ```
 cd ~/.config
-git clone https://github.com/DreamMaoMao/dwm.git
-cd dwm
-cp scripts -r ~/
+git clone https://github.com/DreamMaoMao/superdwm.git
+cd superdwm
 cp rofi -r ~/.config/
 cp dunst -r ~/.config/
 sed -i s#/home/user#$HOME# dwm.desktop
@@ -100,6 +74,7 @@ sudo cp dwm.desktop /usr/share/xsession/
 sudo make clean install
 ```
 
+# 按键配置请查看config.h里的注释
 
 # reference
 https://github.com/yaocccc/dwm

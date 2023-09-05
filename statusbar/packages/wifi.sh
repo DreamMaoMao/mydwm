@@ -43,7 +43,6 @@ update() {
     #避免切换之前已经有个线程在跑了
     is_net=$( cat $DWM/statusbar/netflag )
     is_show_net=$( echo $wifi_text| grep  )
-    # echo "is_net:$is_net,show:$is_show_net\n" >> /home/wrq/test.txt
     if [[ "$is_net" == "" && "$is_show_net" != "" ]]; then
         :
     else
