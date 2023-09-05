@@ -9,4 +9,4 @@ EXTERNAL_MONITOR=$(xrandr -q | grep connected | grep -v primary | cut -d " " -f 
 xrandr --output $INTERNAL_MONITOR --off
 
 sudo pkill feh
-feh --randomize --bg-fill ~/Images/caoyuan.jpg & 
+feh --randomize --bg-fill $DWM/wallpaper/caoyuan.jpg & 
