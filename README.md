@@ -33,7 +33,7 @@
 
 - 5.增加热区功能，鼠标移动到左下角可以全局触发预览视图，并且可以用鼠标左键点击窗口跳转到窗口所在tag，右键在overview下关闭窗口
 
-- 6.增加鼠标中键触发全屏切换的功能
+- 6.增加鼠标中键点击窗口触发窗口全屏切换的功能
 
 - 7.增加鼠标滑轮加super按键可以切换工作区功能
 
@@ -69,6 +69,7 @@ sudo pacman -S sysstat
 sudo pacman -S xorg-xsetroot
 sudo pacman -S xss-lock 
 sudo pacman -S libpulse
+sudo pacman -S fish
 sudo pacman -Sy base-devel
 
 
@@ -93,13 +94,28 @@ git clone https://github.com/DreamMaoMao/superdwm.git
 cd superdwm
 cp rofi -r ~/.config/
 cp dunst -r ~/.config/
+cp fish -r ~/.config/
+cp konsole -r ~/.local/share/
 sed -i s#/home/user#$HOME# dwm.desktop
 sudo cp dwm.desktop /usr/share/xsession/
 
 sudo make clean install
 ```
 
-# 按键配置请查看config.h里的注释
+# 终端设置(默认用的konsole)
+```
+chsh -s /usr/bin/fish
+
+git clone https://github.com/oh-my-fish/oh-my-fish
+cd oh-my-fish
+bin/install --offline
+omf install bira
+
+
+
+```
+
+# 按键配置修改请查看config.h里的注释
 
 # reference
 https://github.com/yaocccc/dwm
