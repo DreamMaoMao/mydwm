@@ -34,7 +34,7 @@ die(const char *fmt, ...) {
 	exit(1);
 }
 
-
+/*从窗口的tags元素变量中解析出当前窗口在哪个tag下面（1-32）*/
 unsigned int get_tag_bit_position(unsigned int tags) {
 	unsigned int i;
 	for(i=0;i<=31;i++) {
