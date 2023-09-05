@@ -390,6 +390,9 @@ static int xerrorstart(Display *dpy, XErrorEvent *ee);
 static void xinitvisual();
 static void zoom(const Arg *arg);
 
+static void inner_overvew_toggleoverview(const Arg *arg);
+static void inner_overvew_killclient(const Arg *arg);
+
 /* variables */
 static Systray *systray = NULL;
 static const char broken[] = "broken";
@@ -3386,6 +3389,21 @@ void view(const Arg *arg) {
     if (n == 0) {
       spawn(&(Arg){.v = (const char *[]){"/bin/sh", "-c", arg->v, NULL}});
     }
+  }
+}
+
+
+/* overview 模式左键跳转窗口 */
+void inner_overvew_toggleoverview(const Arg *arg) {
+  if(selmon->isoverview) {
+    toggleoverview(&arg);
+  }
+}
+
+/* overview 模式右键关闭窗口 */
+void inner_overvew_killclient(const Arg *arg) {
+  if(selmon->isoverview) {
+    killclient(&arg);
   }
 }
 
