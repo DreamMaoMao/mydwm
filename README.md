@@ -1,4 +1,27 @@
-# dwm 
+# 之前就有的功能
+
+
+- 支持布局 tile(磁块)、magicgrid(进阶的网格布局)
+
+- 键盘移动/调整窗口大小 且移动/调整时有窗口间吸附效果
+
+- 窗口隐藏
+
+- 窗口可自定义是否全局(在所有tag内展示)
+
+- 更好的浮动窗口支持
+
+- 优化后的status2d 状态栏，可用鼠标点击操作
+
+- 系统托盘支持
+
+- overview 概述
+
+- mod + tab, 在窗口间切换 有浮动窗口时仅在浮动窗口切换
+
+- mod + [tag], 切换tag到指定目录时 可指定一个cmd，若目标tag无窗口 则执行该tag
+
+# 改动 
 
 - 1.在有全屏窗口下打开一个非悬浮窗口，全屏窗口会自动退出全屏参与平铺，原版全屏会遮住后面打开的窗口
 
@@ -31,7 +54,7 @@ https://github.com/DreamMaoMao/superdwm/assets/30348075/b6b0291a-1e5a-4be0-906e-
 
 
 
-# dependcy
+# 运行需要的相关工具包
 ```
 sudo pacman -S network-manager-applet
 sudo pacman -S nemo
@@ -46,6 +69,8 @@ sudo pacman -S sysstat
 sudo pacman -S xorg-xsetroot
 sudo pacman -S xss-lock 
 sudo pacman -S libpulse
+sudo pacman -Sy base-devel
+
 
 yay -S acpi dunst jq alsa-utils polkit-gnome  rofi-blocks-git light numlockx nemo flameshot feh lm_sensors i3lock i3lock-color mantablockscreen network-manager-applet playerctl python3 parcellite redshift upower xorg-xinit xprintidle xorg wmctrl xdotool tumbler
 
@@ -61,7 +86,7 @@ sudo ninja -C build install
 ```
 
 
-# install
+# 安装dwm
 ```
 cd ~/.config
 git clone https://github.com/DreamMaoMao/superdwm.git
