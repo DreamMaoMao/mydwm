@@ -156,12 +156,13 @@ struct Client {
   float mina, maxa;
   int x, y, w, h;
   int oldx, oldy, oldw, oldh;
+  int overview_backup_x, overview_backup_y, overview_backup_w, overview_backup_h;
   int basew, baseh, incw, inch, maxw, maxh, minw, minh;
   int bw, oldbw;
   int taskw;
   unsigned int tags;
   int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen,
-      isglobal, isnoborder, isscratchpad;
+      isglobal, isnoborder, isscratchpad,isfullscreenbak,isfloatingbak;
   Client *next;
   Client *snext;
   Monitor *mon;
@@ -204,6 +205,7 @@ struct Monitor {
   Pertag *pertag;
   uint isoverview;
   uint is_in_hotarea;
+
 };
 
 typedef struct {
@@ -334,7 +336,7 @@ static void setfocus(Client *c);
 static void selectlayout(const Arg *arg);
 static void setlayout(const Arg *arg);
 
-static void clear_fullscreen_flag(Client *c);
+// static void client_flag_filter(Client *c);
 static void fullscreen(const Arg *arg);
 static void setfullscreen(Client *c);
 static void setmfact(const Arg *arg);
@@ -393,6 +395,7 @@ static void zoom(const Arg *arg);
 
 static void inner_overvew_toggleoverview(const Arg *arg);
 static void inner_overvew_killclient(const Arg *arg);
+static void clear_fullscreen_flag(Client *c);
 
 /* variables */
 static Systray *systray = NULL;
@@ -438,6 +441,12 @@ static Window root, wmcheckwin;
 static int hiddenWinStackTop = -1;
 static Client *hiddenWinStack[100];
 
+static void overview_restore(Client *c);
+static void overivew_backup(Client *c);
+
+// static int is_overview_to_normal = 0; 
+// static int is_normanl_to_overview = 0;
+
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
@@ -482,7 +491,10 @@ void applyrules(Client *c) {
 
   /* rule matching */
   c->isfloating = 0;
+  c->isfloatingbak = 0;
   c->isglobal = 0;
+  c->isfullscreen = 0;
+  c->isfullscreenbak = 0;
   c->isnoborder = 0;
   c->isscratchpad = 0;
   c->tags = 0;
@@ -1829,12 +1841,14 @@ void manage(Window w, XWindowAttributes *wa) {
   c = ecalloc(1, sizeof(Client));
   c->win = w;
   /* geometry */
-  c->x = c->oldx = wa->x;
-  c->y = c->oldy = wa->y;
-  c->w = c->oldw = wa->width;
-  c->h = c->oldh = wa->height;
+  c->x = c->oldx = c->overview_backup_x = wa->x;
+  c->y = c->oldy = c->overview_backup_y = wa->y;
+  c->w = c->oldw = c->overview_backup_w = wa->width;
+  c->h = c->oldh = c->overview_backup_h = wa->height;
   c->oldbw = wa->border_width;
   c->bw = borderpx;
+  c->isfloating = 0;
+  c->isfullscreen = 0;
 
   updatetitle(c);
 
@@ -2172,6 +2186,7 @@ void resizewin(const Arg *arg) {
                c->y + c->h - 2 * c->bw);
   restack(selmon);
 }
+
 
 Client *nexttiled(Client *c) {
   for (; c && (c->isfloating || !ISVISIBLE(c) || HIDDEN(c)); c = c->next)
@@ -2690,10 +2705,11 @@ void showtag(Client *c) {
   if (!c)
     return;
   if (ISVISIBLE(c)) {
+
     /** 将可见的client从屏幕边缘移动到屏幕内 */
     XMoveWindow(dpy, c->win, c->x, c->y);
-    if (c->isfloating && !c->isfullscreen)
-      resize(c, c->x, c->y, c->w, c->h, 0);
+    // if (c->isfloating && !c->isfullscreen)
+    //   resize(c, c->x, c->y, c->w, c->h, 0);
     showtag(c->snext);
   } else {
     /* 将不可见的client移动到屏幕之外 */
@@ -2712,6 +2728,7 @@ void showtag(Client *c) {
     } else {
       XMoveWindow(dpy, c->win, WIDTH(c) * -10, c->y);
     }
+
     // if (c->mon->mx == 0) {
     //   XMoveWindow(dpy, c->win, WIDTH(c) * -1.5, c->y);
     // } else {
@@ -3415,13 +3432,21 @@ void inner_overvew_killclient(const Arg *arg) {
 
 // 显示所有tag 或 跳转到聚焦窗口的tag
 void toggleoverview(const Arg *arg) {
-  // if (selmon->sel &&
-  //     selmon->sel->isfullscreen) /* no support for fullscreen windows */
-  //   return;
 
   uint target = selmon->sel && selmon->sel->tags != TAGMASK ? selmon->sel->tags
                                                             : selmon->seltags;
   selmon->isoverview ^= 1;
+  Client *c;
+  if(selmon->isoverview) {
+    for (c = selmon->clients; c; c = c->next){
+      overview_backup(c);
+    }
+  } else {
+    for (c = selmon->clients; c; c = c->next){
+      overview_restore(c);
+    }
+  }
+
   view(&(Arg){.ui = target});
   // pointerfocuswin(selmon->sel); //我不需要自动鼠标跳转窗口
 }
@@ -3469,13 +3494,45 @@ void viewtoright(const Arg *arg) {
   }
 }
 
-//清除全屏标志,还原全屏时清0的border
+/*清除全屏标志,还原全屏时清0的border*/
 void clear_fullscreen_flag(Client *c) {
   if (c->isfullscreen){
     c->isfullscreen=0;
     c->bw = c->oldbw ;
-  }
+  } 
 }
+
+
+void overview_backup(Client *c) {
+    c->isfloatingbak = c->isfloating;
+    c->isfullscreenbak = c->isfullscreen;
+    c->isfloating = 0;
+    c->isfullscreen = 0;
+    c->overview_backup_x = c->x;
+    c->overview_backup_y = c->y;
+    c->overview_backup_w = c->w;
+    c->overview_backup_h = c->h;
+}
+
+void overview_restore(Client *c) {
+    c->isfloating = c->isfloatingbak;
+    c->isfullscreen = c->isfullscreenbak;
+    c->isfloatingbak  = 0 ;
+    c->isfullscreenbak = 0;
+    if (c->isfloating) {
+      // c->x = selmon->wx + selmon->ww / 6,
+      // c->y = selmon->wy + selmon->wh / 6, managefloating(c);
+      XRaiseWindow(dpy, c->win);
+      resize(c, c->overview_backup_x, c->overview_backup_y,c->overview_backup_w,
+             c->overview_backup_h, 0);  
+      // focus(c);
+    }
+    if (c->isfullscreen) {
+      resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
+      XRaiseWindow(dpy, c->win);
+    }
+}
+
 
 void tile(Monitor *m) {
   newclientathead = 1; //头部入栈
@@ -3591,10 +3648,11 @@ void grid(Monitor *m, uint gappo, uint gappi) {
     clear_fullscreen_flag(c);
     cw = (m->ww - 2 * gappo - gappi) / 2;
     ch = (m->wh - 2 * gappo) * 0.65;
-    resize(c, m->mx + gappo, m->my + (m->mh - ch) / 2 + gappo, cw - 2 * c->bw,
-           ch - 2 * c->bw, 0);
-    resize(nexttiled(c->next), m->mx + cw + gappo + gappi,
+    resize(c, m->mx + cw + gappo + gappi,
            m->my + (m->mh - ch) / 2 + gappo, cw - 2 * c->bw, ch - 2 * c->bw, 0);
+    resize(nexttiled(c->next), m->mx + gappo, m->my + (m->mh - ch) / 2 + gappo, cw - 2 * c->bw,
+           ch - 2 * c->bw, 0);
+
     return;
   }
 
