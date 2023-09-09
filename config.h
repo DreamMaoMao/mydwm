@@ -5,7 +5,7 @@ static int hotarea_size = 10;           /* 热区大小10x10 */
 
 static int no_stack_show_border = 1;           /* 一个窗口也显示border */
 static int showsystray = 1;           /* 是否显示托盘栏 */
-int newclientathead = 1; /* 定义新窗口在栈顶还是栈底 */
+static int newclientathead = 1; /* 定义新窗口在栈顶还是栈底 */
 static const unsigned int borderpx = 5; /* 窗口边框大小 */
 static const unsigned int systraypinning =
     1; /* 托盘跟随的显示器 0代表不指定显示器 */
@@ -34,7 +34,9 @@ static const char *colors[][3] = {
     /* 颜色设置 ColFg, ColBg, ColBorder */
     [SchemeNorm] = {"#ffb871", "#3c2003", "#444444"},
     [SchemeSel] = {"#61370d", "#e9a25c", "#ad741f"},
-    [SchemeSelGlobal] = {"#ffffff", "#37474F", "#FFC0CB"},
+    [SchemeSelGlobal] = {"#ffffff", "#37474F", "#b153a7"},
+    [SchemeSelFakeFull] = {"#ffffff", "#37474F", "#158833"},
+    [SchemeSelFakeFullGLObal] = {"#ffffff", "#37474F", "#881519"},
     [SchemeHid] = {"#462503", NULL, NULL},
     [SchemeSystray] = {NULL, "#000000", NULL},
     [SchemeUnderline] = {"#6f0d62", NULL, NULL},
@@ -47,6 +49,8 @@ static const unsigned int alphas[][3] = {
     [SchemeNorm] = {OPAQUE, baralpha, borderalpha},
     [SchemeSel] = {OPAQUE, baralpha, borderalpha},
     [SchemeSelGlobal] = {OPAQUE, baralpha, borderalpha},
+    [SchemeSelFakeFull] = {OPAQUE, baralpha, borderalpha},
+    [SchemeSelFakeFullGLObal] = {OPAQUE, baralpha, borderalpha},
     [SchemeNormTag] = {OPAQUE, baralpha, borderalpha},
     [SchemeSelTag] = {OPAQUE, baralpha, borderalpha},
     [SchemeBarEmpty] = {NULL, 0x11, NULL},
@@ -99,10 +103,10 @@ static const Rule rules[] = {
     {"chrome",               NULL,                 NULL,             1 << 3,       0,          0,          0,        -1,      0,            0,       0},       // chrome     tag4 
     {"music",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1200,       800},  // music      浮动
     {"kitty",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1500,       800},  // music      浮动
-    {NULL,                  "qq",                 NULL,             1 << 2,       0,          0,          0,        -1,      0,            0,       0},       // qq         tag3 
+    {NULL,                  "qq",                  NULL,             1 << 2,       0,          0,          0,        -1,      0,            0,       0},       // qq         tag3 
     {"flameshot",            NULL,                 NULL,             0,            1,          0,          0,        -1,      0,            0,       0},       // 火焰截图            浮动
     {"Blueman-manager",      NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // blueman            浮动
-    {"thunder",              NULL,                 NULL,             1 << 4,       1,          0,          0,        -1,      5,            0,       0},       // 迅雷            浮动
+    {"thunder",              NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // 迅雷            浮动
     {"Clash for Windows",    NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // clash            浮动
     {"FGN",                  NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // pavucontrol            浮动
 
@@ -114,11 +118,11 @@ static const Rule rules[] = {
 static const char *overviewtag = "OVERVIEW";
 static const Layout overviewlayout = { "󰃇",  overview };
 
-/* 自定义布局 */
+/* 自定义布局  */
 static const Layout layouts[] = {
-    { "󰘍",  tile },         /* 主次栈 */
+    { "󱞬",  tile },         /* 主次栈 */
     { "﩯",  magicgrid },    /* 网格 */
-    { "󰘌",  rtile },         /* 主次栈,尾部入栈 */
+    { "󱟀",  rtile },         /* 主次栈,尾部入栈 */
 };
 
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
@@ -151,9 +155,11 @@ static Key keys[] = {
 
     { AltMask,    XK_s,         zoom,             {0} },                                      /* alt s              |  将当前聚焦窗口置为主窗口 */
 
-    { SuperMask,                XK_s,            togglefloating,   {0} },                     /* super s            |  开启/关闭 聚焦目标的float模式 */
-    { SuperMask|ShiftMask,      XK_s,            toggleallfloating,{0} },                     /* super shift s      |  开启/关闭 全部目标的float模式 */
-    { AltMask,                  XK_a,            fullscreen,       {0} },                     /* alt a              |  开启/关闭 全屏 */                   /* alt a              |  开启/关闭 全屏 */
+    { AltMask,                  XK_backslash,    togglefloating,   {0} },                     /* alt \            |  开启/关闭 聚焦目标的float模式 */
+    { AltMask,                  XK_Caps_Lock,    togglefloating,   {0} },                     /* alt \            |  开启/关闭 聚焦目标的float模式 */
+    { AltMask|ShiftMask,        XK_backslash,    toggleallfloating,{0} },                     /* alt shift \      |  开启/关闭 全部目标的float模式 */
+    { AltMask,                  XK_a,            fake_fullscreen,       {0} },                     /* alt a              |  开启/关闭 全屏 */                   /* alt a              |  开启/关闭 全屏 */
+    { AltMask,                  XK_f,            fullscreen,       {0} },                     /* alt a              |  开启/关闭 全屏 */                   /* alt a              |  开启/关闭 全屏 */
     { SuperMask,                XK_h,            togglebar,        {0} },                     /* super h            |  开启/关闭 状态栏 */
     { SuperMask,                XK_g,            toggleglobal,     {0} },                     /* super g            |  开启/关闭 全局 */
     { SuperMask,                XK_u,            toggleborder,     {0} },                     /* super u            |  开启/关闭 边框 */
@@ -172,6 +178,7 @@ static Key keys[] = {
     { SuperMask,                XK_m,            quit,             {0} },                     /* super m            |  退出dwm */
 
 	{ SuperMask,                XK_n,            selectlayout,     {.v = &layouts[1]} },      /* super n            |  切换到网格布局 */
+	{ SuperMask|ShiftMask,      XK_n,            selectlayout,     {.v = &layouts[2]} },      /* shift super n      |  切换到栈布局入栈方式 */
 	{ SuperMask,                XK_o,            showonlyorall,    {0} },                     /* super o            |  切换 只显示一个窗口 / 全部显示 */
 
     { SuperMask|ControlMask,    XK_equal,        setgap,           {.i = -6} },               /* super ctrl +       |  窗口增大 */
@@ -264,7 +271,7 @@ static Button buttons[] = {
     /* 点击窗口操作 */
     { ClkClientWin,        SuperMask,       Button1,          movemouse,     {0} },                                   // super+左键  |  拖拽窗口     |  拖拽窗口
     { ClkClientWin,        SuperMask,       Button3,          resizemouse,   {0} },                                   // super+右键  |  拖拽窗口     |  改变窗口大小
-    { ClkClientWin,        0,               Button2,          fullscreen,    {0} },                                   // super+中键  |  点击窗口     |  窗口全屏
+    { ClkClientWin,        0,               Button2,          fake_fullscreen,    {0} },                                   // super+中键  |  点击窗口     |  窗口全屏
     { ClkClientWin,        SuperMask,       Button4,          viewtoleft,{0} },                                       // super+鼠标滚轮上  |  鼠标滚轮上         
     { ClkClientWin,        SuperMask,       Button5,          viewtoright,{0} },                                      // super+鼠标滚轮下  |  鼠标滚轮 下
     { ClkClientWin,        0,               Button1,          inner_overvew_toggleoverview,     {0} },                    //左键  |  overview视图点击窗口 |退出overview跳转到窗口所在tag 
