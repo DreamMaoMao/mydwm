@@ -2222,11 +2222,7 @@ Client *nexttiled(Client *c) {
     if(c == NULL){
       return c;
     }
-    if(c->isfullscreen){
-      XRaiseWindow(dpy, c->win);
-      continue;
-    }
-    if(!c->isfloating && ISVISIBLE(c) && !HIDDEN(c)){
+    if(!c->isfullscreen && !c->isfloating && ISVISIBLE(c) && !HIDDEN(c)){
       return c;
     }
   }
@@ -2572,7 +2568,7 @@ void setfullscreen(Client *c) {
   if (!c->isfullscreen) {
     XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
                     PropModeReplace, (unsigned char *)&netatom[NetWMFullscreen],
-                    1);
+                    1); 
     c->isfullscreen = 1;
     c->oldstate = c->isfloating;
     c->oldbw = c->bw;
@@ -2599,9 +2595,9 @@ void setfullscreen(Client *c) {
 void set_fake_fullscreen(Client *c) {
   uint border_type;
   if (!c->isfullscreen) {
-    XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
-                    PropModeReplace, (unsigned char *)&netatom[NetWMFullscreen],
-                    1);
+    // XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
+    //                 PropModeReplace, (unsigned char *)&netatom[NetWMFullscreen],
+    //                 1);
     c->isfullscreen = 1;
     c->oldstate = c->isfloating;
     // c->oldbw = c->bw;
@@ -2615,8 +2611,8 @@ void set_fake_fullscreen(Client *c) {
     XSetWindowBorder(dpy, c->win,scheme[border_type][ColBorder].pixel);
 
   } else {
-    XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
-                    PropModeReplace, (unsigned char *)0, 0);
+    // XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
+    //                 PropModeReplace, (unsigned char *)0, 0);
     c->isfullscreen = 0;
     c->isfloating = c->oldstate;
     c->bw = c->oldbw;
@@ -2866,6 +2862,7 @@ void togglesystray() {
 }
 
 void togglebar(const Arg *arg) {
+  Client *fc;
   selmon->showbar = selmon->pertag->showbars[selmon->pertag->curtag] =
       !selmon->showbar;
   updatebarpos(selmon);
@@ -2881,6 +2878,15 @@ void togglebar(const Arg *arg) {
     }
     XConfigureWindow(dpy, systray->win, CWY, &wc);
   }
+
+  //在bar栏改动后让当前tag的假全屏窗口重新适应屏幕窗口大小
+  for (fc = selmon->clients; fc; fc = fc->next){ 
+    if(fc->isfullscreen && fc->bw != 0) {
+      resizeclient(fc, fc->mon->wx + gappo, fc->mon->wy + gappo, fc->mon->ww-(gappo*2)-gappo, fc->mon->wh-(gappo*2)-gappo);
+      XRaiseWindow(dpy, fc->win); //提升窗口到顶层      
+    }
+  }
+  //非悬浮和全屏窗口也重新调整大小
   arrange(selmon);
   updatesystray();
 }
