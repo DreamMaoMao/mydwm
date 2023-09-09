@@ -414,19 +414,19 @@ static int vp;          /* vertical padding for bar */
 static int sp;          /* side padding for bar */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
-static void (*handler[LASTEvent])(XEvent *) = {
-    [ButtonPress] = buttonpress,
+static void (*handler[LASTEvent])(XEvent *) = { //给捕获的事件定义处理函数,左边是类型,右边是自定义函数
+    [ButtonPress] = buttonpress,      //按键事件
     [ClientMessage] = clientmessage,
     [ConfigureRequest] = configurerequest,
     [ConfigureNotify] = configurenotify,
     [DestroyNotify] = destroynotify,
-    [EnterNotify] = enternotify,
+    [EnterNotify] = enternotify,  //鼠标移动进入窗口事件,比如聚焦的处理
     [Expose] = expose,
     [FocusIn] = focusin,
     [KeyPress] = keypress,
     [MappingNotify] = mappingnotify,
     [MapRequest] = maprequest,
-    [MotionNotify] = motionnotify,
+    [MotionNotify] = motionnotify,  //监视器事件,比如鼠标移动到某个位置的处理
     [PropertyNotify] = propertynotify,
     [ResizeRequest] = resizerequest,
     [UnmapNotify] = unmapnotify};
@@ -487,7 +487,7 @@ void lognumtofile(unsigned int num) {
 }
 
 
-void applyrules(Client *c) {
+void applyrules(Client *c) {   //读取config.h的窗口配置规则处理
   const char *class, *instance;
   unsigned int i;
   const Rule *r;
@@ -657,7 +657,7 @@ int applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact) {
   return *x != c->x || *y != c->y || *w != c->w || *h != c->h;
 }
 
-void arrange(Monitor *m) {
+void arrange(Monitor *m) {  //布局管理
   if (m)
     showtag(m->stack);
   else
@@ -671,7 +671,7 @@ void arrange(Monitor *m) {
       arrangemon(m);
 }
 
-void arrangemon(Monitor *m) {
+void arrangemon(Monitor *m) {  //确认选用的布局
   if (m->isoverview) {
     strncpy(m->ltsymbol, overviewlayout.symbol, sizeof m->ltsymbol);
     overviewlayout.arrange(m);
@@ -681,12 +681,12 @@ void arrangemon(Monitor *m) {
   }
 }
 
-void attach(Client *c) {
+void attach(Client *c) {  //新打开的窗口放入窗口链表中
   Client *fc;
-  for (fc = selmon->clients; fc; fc = fc->next){
+  for (fc = selmon->clients; fc; fc = fc->next){ //如果有窗口全屏,就把他退出全屏参与平铺
     clear_fullscreen_flag(fc);
   }
-  if (!newclientathead) {
+  if (!newclientathead) {  //是否从头部增加新窗口
     Client **tc;
     for (tc = &c->mon->clients; *tc; tc = &(*tc)->next)
       ;
@@ -698,12 +698,12 @@ void attach(Client *c) {
   }
 }
 
-void attachstack(Client *c) {
+void attachstack(Client *c) { //放入栈中
   c->snext = c->mon->stack;
   c->mon->stack = c;
 }
 
-void buttonpress(XEvent *e) {
+void buttonpress(XEvent *e) { //鼠标按键事件处理函数
   unsigned int i, x, click, occ = 0;
   Arg arg = {0};
   Monitor *m;
@@ -1026,7 +1026,7 @@ void configurerequest(XEvent *e) {
   XSync(dpy, False);
 }
 
-Monitor *createmon(void) {
+Monitor *createmon(void) { //初始化新的显示器数据结构
   Monitor *m;
   unsigned int i;
 
@@ -1108,7 +1108,7 @@ Monitor *dirtomon(int dir) {
   return m;
 }
 
-void drawbar(Monitor *m) {
+void drawbar(Monitor *m) {  //绘制bar
   int x, empty_w;
   int w = 0;
   int system_w = 0, tasks_w = 0, status_w;
@@ -1472,6 +1472,7 @@ uint get_border_type(Client *c){
   }
 }
 
+//聚焦函数
 void focus(Client *c) {
   uint border_type = SchemeSel;
   if (!c || !ISVISIBLE(c) || HIDDEN(c))
@@ -1770,6 +1771,7 @@ static int isuniquegeom(XineramaScreenInfo *unique, size_t n,
 }
 #endif /* XINERAMA */
 
+//键盘按键事件处理函数
 void keypress(XEvent *e) {
   unsigned int i;
   KeySym keysym;
@@ -1969,7 +1971,7 @@ void motionnotify(XEvent *e) {
   if (ev->window != root)
     return;
 
-  //左下角热区触发
+  //左下角热区坐标计算,兼容多显示屏
   unsigned hx = selmon->mx + hotarea_size;
   unsigned hy = selmon->my + selmon->mh - hotarea_size;
 
@@ -1988,6 +1990,7 @@ void motionnotify(XEvent *e) {
   mon = m;
 }
 
+//鼠标拖拽窗口
 void movemouse(const Arg *arg) {
   int x, y, ocx, ocy, nx, ny;
   Client *c;
@@ -2053,6 +2056,7 @@ void movemouse(const Arg *arg) {
   }
 }
 
+//窗口位置移动
 void movewin(const Arg *arg) {
   Client *c, *tc;
   int nx, ny;
@@ -2143,6 +2147,7 @@ void movewin(const Arg *arg) {
   restack(selmon);
 }
 
+//窗口大小缩放
 void resizewin(const Arg *arg) {
   Client *c, *tc;
   int nh, nw;
@@ -2208,7 +2213,7 @@ void resizewin(const Arg *arg) {
   restack(selmon);
 }
 
-
+//查找下一个需要布局窗口
 Client *nexttiled(Client *c) {
   // for (; c && (c->isfullscreen || c->isfloating || !ISVISIBLE(c) || HIDDEN(c)); c = c->next)
   //   ;
@@ -2590,6 +2595,7 @@ void setfullscreen(Client *c) {
   }
 }
 
+//假全屏切换
 void set_fake_fullscreen(Client *c) {
   uint border_type;
   if (!c->isfullscreen) {
@@ -2601,9 +2607,11 @@ void set_fake_fullscreen(Client *c) {
     // c->oldbw = c->bw;
     // c->bw = 0;
     c->isfloating = 0; //全屏不浮动才能自动退出全屏参与平铺
+    // 要多减一个gappo,因为mon->wx,wh不包含右边和下边看不见的10px区域
+    //鼠标在屏幕左上都不可以超出去的,右下可以超出10px
     resizeclient(c, c->mon->wx + gappo, c->mon->wy + gappo, c->mon->ww-(gappo*2)-gappo, c->mon->wh-(gappo*2)-gappo);
-    XRaiseWindow(dpy, c->win);
-    border_type = get_border_type(c);
+    XRaiseWindow(dpy, c->win); //提升窗口到顶层
+    border_type = get_border_type(c);  //确认窗口边框的颜色
     XSetWindowBorder(dpy, c->win,scheme[border_type][ColBorder].pixel);
 
   } else {
@@ -2617,7 +2625,7 @@ void set_fake_fullscreen(Client *c) {
     c->w = c->oldw;
     c->h = c->oldh;
     resizeclient(c, c->x, c->y, c->w, c->h);
-    border_type = get_border_type(c);
+    border_type = get_border_type(c);  //确认窗口边框的颜色
     XSetWindowBorder(dpy, c->win,scheme[border_type][ColBorder].pixel);
     arrange(c->mon);
   }
@@ -2626,13 +2634,13 @@ void set_fake_fullscreen(Client *c) {
 
 void fullscreen(const Arg *arg) {
   if (selmon->sel) { //显示器有窗口
-    setfullscreen(selmon->sel); //去掉bar是否隐藏的协助全屏判断
+    setfullscreen(selmon->sel); 
   }
 }
 
 void fake_fullscreen(const Arg *arg) {
   if (selmon->sel) { //显示器有窗口
-    set_fake_fullscreen(selmon->sel); //去掉bar是否隐藏的协助全屏判断
+    set_fake_fullscreen(selmon->sel);
   }
 }
 
@@ -2801,12 +2809,6 @@ void showtag(Client *c) {
     } else {
       XMoveWindow(dpy, c->win, WIDTH(c) * -10, c->y);
     }
-
-    // if (c->mon->mx == 0) {
-    //   XMoveWindow(dpy, c->win, WIDTH(c) * -1.5, c->y);
-    // } else {
-    //   XMoveWindow(dpy, c->win, c->mon->mx + c->mon->mw + WIDTH(c) * 1.5, c->y);
-    // }
   }
 }
 
@@ -3529,18 +3531,28 @@ void toggleoverview(const Arg *arg) {
 void viewtoleft(const Arg *arg) {
   unsigned int target = selmon->tagset[selmon->seltags], pre;
   Client *c;
+  unsigned int circle = 1;
+  unsigned max_target = 1;
+  unsigned tags_num = TAGMASK;
+
   while (1) {
     pre = target;
     target >>= 1;
-    if (target == pre)
-      return;
-
+    if (target == pre){
+      if(circle == 0 || tag_circle == 0){
+        return;
+      }
+      for(tags_num >>= 1;tags_num != 0;tags_num >>= 1){ //计算最大的tag的值
+          max_target <<= 1;
+      }
+      target = max_target;  //向左边尽头找不到有窗口的tag,重新从最右边开始找
+      circle = 0;           //只重新找一次
+    }
     for (c = selmon->clients; c; c = c->next) {
       if (c->isglobal && c->tags == TAGMASK)
         continue;
       if (c->tags & target &&
-          __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1 &&
-          selmon->tagset[selmon->seltags] > 1) {
+          __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1 && (selmon->tagset[selmon->seltags] > 1 || tag_circle == 1)) {
         view(&(Arg){.ui = target});
         return;
       }
@@ -3551,11 +3563,16 @@ void viewtoleft(const Arg *arg) {
 void viewtoright(const Arg *arg) {
   unsigned int target = selmon->tagset[selmon->seltags];
   Client *c;
+  unsigned int circle = 1;
   while (1) {
     target = target == 0 ? 1 : target << 1;
-    if (!(target & TAGMASK))
-      return;
-
+    if (!(target & TAGMASK)){
+      if(circle == 0 || tag_circle == 0){
+        return;
+      }
+      target = 1;  //向右边尽头找不到有窗口的tag,重新从最左边开始找
+      circle = 0;  //只重新找一次
+    }
     for (c = selmon->clients; c; c = c->next) {
       if (c->isglobal && c->tags == TAGMASK)
         continue;
@@ -3577,7 +3594,7 @@ void clear_fullscreen_flag(Client *c) {
   } 
 }
 
-
+//普通视图切换到overview时保存窗口的旧状态
 void overview_backup(Client *c) {
     c->isfloatingbak = c->isfloating;
     c->isfullscreenbak = c->isfullscreen;
@@ -3590,6 +3607,7 @@ void overview_backup(Client *c) {
     c->bw = c->oldbw ;
 }
 
+//overview切回到普通视图还原窗口的状态
 void overview_restore(Client *c) {
     c->isfloating = c->isfloatingbak;
     c->isfullscreen = c->isfullscreenbak;
@@ -3598,7 +3616,7 @@ void overview_restore(Client *c) {
     if (c->isfloating) {
       // c->x = selmon->wx + selmon->ww / 6,
       // c->y = selmon->wy + selmon->wh / 6, managefloating(c);
-      XRaiseWindow(dpy, c->win);
+      XRaiseWindow(dpy, c->win); //提升悬浮窗口到顶层
       resize(c, c->overview_backup_x, c->overview_backup_y,c->overview_backup_w,
              c->overview_backup_h, 0);  
       // focus(c);
@@ -3606,11 +3624,11 @@ void overview_restore(Client *c) {
     if (c->isfullscreen) {
       resizeclient(c, c->overview_backup_x, c->overview_backup_y,c->overview_backup_w,
              c->overview_backup_h);
-      XRaiseWindow(dpy, c->win);
+      XRaiseWindow(dpy, c->win); //提升窗口到顶层
     }
 }
 
-
+//栈底部入栈布局位置大小计算
 void tile(Monitor *m) {
   newclientathead = 1; //头部入栈
   unsigned int i, n, mw, mh, sh, my,
@@ -3637,8 +3655,6 @@ void tile(Monitor *m) {
 
   for (i = 0, my = sy = gappo, c = nexttiled(m->clients); c;
        c = nexttiled(c->next), i++) {
-    // 全屏窗口参与平铺布局前清除全屏标志,还原全屏时清0的border
-    // clear_fullscreen_flag(c);
     
     if (i < m->nmaster) {
       resize(c, m->wx + gappo, m->wy + my, mw - 2 * c->bw - gappi,
@@ -3653,6 +3669,7 @@ void tile(Monitor *m) {
 
 }
 
+//栈头部入栈布局位置大小计算
 void rtile(Monitor *m) {
   newclientathead = 0; //尾部入栈
   unsigned int i, n, mw, mh, sh, my,
@@ -3679,8 +3696,6 @@ void rtile(Monitor *m) {
 
   for (i = 0, my = sy = gappo, c = nexttiled(m->clients); c;
        c = nexttiled(c->next), i++) {
-    // 全屏窗口参与平铺布局前清除全屏标志,还原全屏时清0的border
-    // clear_fullscreen_flag(c);
     
     if (i < m->nmaster) {
       resize(c, m->wx + gappo, m->wy + my, mw - 2 * c->bw - gappi,
@@ -3700,6 +3715,7 @@ void magicgrid(Monitor *m) { grid(m, gappo, gappi); }
 
 void overview(Monitor *m) { grid(m, overviewgappo, overviewgappi); }
 
+//网格布局窗口大小和位置计算
 void grid(Monitor *m, uint gappo, uint gappi) {
   unsigned int i, n;
   unsigned int cx, cy, cw, ch;
@@ -3713,7 +3729,6 @@ void grid(Monitor *m, uint gappo, uint gappi) {
     return;
   if (n == 1) {
     c = nexttiled(m->clients);
-    // clear_fullscreen_flag(c);
     cw = (m->ww - 2 * gappo) * 0.7;
     ch = (m->wh - 2 * gappo) * 0.65;
     resize(c, m->mx + (m->mw - cw) / 2 + gappo,
@@ -3722,7 +3737,6 @@ void grid(Monitor *m, uint gappo, uint gappi) {
   }
   if (n == 2) {
     c = nexttiled(m->clients);
-    // clear_fullscreen_flag(c);
     cw = (m->ww - 2 * gappo - gappi) / 2;
     ch = (m->wh - 2 * gappo) * 0.65;
     resize(c, m->mx + cw + gappo + gappi,
@@ -3744,7 +3758,6 @@ void grid(Monitor *m, uint gappo, uint gappi) {
   if (overcols)
     dx = (m->ww - overcols * cw - (overcols - 1) * gappi) / 2 - gappo;
   for (i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++) {
-    // clear_fullscreen_flag(c);
     cx = m->wx + (i % cols) * (cw + gappi);
     cy = m->wy + (i / cols) * (ch + gappi);
     if (overcols && i >= n - overcols) {

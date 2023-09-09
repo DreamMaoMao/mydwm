@@ -1,5 +1,7 @@
 #include <X11/XF86keysym.h>
 
+
+static int tag_circle = 1;           /* 是否启用工作区循环 */
 static int enable_hotarea = 1;           /* 是否启用热区 */
 static int hotarea_size = 10;           /* 热区大小10x10 */
 
@@ -158,8 +160,8 @@ static Key keys[] = {
     { AltMask,                  XK_backslash,    togglefloating,   {0} },                     /* alt \            |  开启/关闭 聚焦目标的float模式 */
     { AltMask,                  XK_Caps_Lock,    togglefloating,   {0} },                     /* alt \            |  开启/关闭 聚焦目标的float模式 */
     { AltMask|ShiftMask,        XK_backslash,    toggleallfloating,{0} },                     /* alt shift \      |  开启/关闭 全部目标的float模式 */
-    { AltMask,                  XK_a,            fake_fullscreen,       {0} },                     /* alt a              |  开启/关闭 全屏 */                   /* alt a              |  开启/关闭 全屏 */
-    { AltMask,                  XK_f,            fullscreen,       {0} },                     /* alt a              |  开启/关闭 全屏 */                   /* alt a              |  开启/关闭 全屏 */
+    { AltMask,                  XK_a,            fake_fullscreen,       {0} },                /* alt a              |  开启/关闭 假全屏      */
+    { AltMask,                  XK_f,            fullscreen,       {0} },                     /* alt f              |  开启/关闭 全屏   */
     { SuperMask,                XK_h,            togglebar,        {0} },                     /* super h            |  开启/关闭 状态栏 */
     { SuperMask,                XK_g,            toggleglobal,     {0} },                     /* super g            |  开启/关闭 全局 */
     { SuperMask,                XK_u,            toggleborder,     {0} },                     /* super u            |  开启/关闭 边框 */
@@ -271,7 +273,7 @@ static Button buttons[] = {
     /* 点击窗口操作 */
     { ClkClientWin,        SuperMask,       Button1,          movemouse,     {0} },                                   // super+左键  |  拖拽窗口     |  拖拽窗口
     { ClkClientWin,        SuperMask,       Button3,          resizemouse,   {0} },                                   // super+右键  |  拖拽窗口     |  改变窗口大小
-    { ClkClientWin,        0,               Button2,          fake_fullscreen,    {0} },                                   // super+中键  |  点击窗口     |  窗口全屏
+    { ClkClientWin,        0,               Button2,          fake_fullscreen,    {0} },                                   // super+中键  |  点击窗口     |  窗口假全屏
     { ClkClientWin,        SuperMask,       Button4,          viewtoleft,{0} },                                       // super+鼠标滚轮上  |  鼠标滚轮上         
     { ClkClientWin,        SuperMask,       Button5,          viewtoright,{0} },                                      // super+鼠标滚轮下  |  鼠标滚轮 下
     { ClkClientWin,        0,               Button1,          inner_overvew_toggleoverview,     {0} },                    //左键  |  overview视图点击窗口 |退出overview跳转到窗口所在tag 
