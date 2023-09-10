@@ -1,0 +1,15 @@
+sudo pacman -S network-manager-applet
+sudo pacman -S nemo
+sudo pacman -S rofi
+sudo pacman -S konsole
+sudo pacman -S gnome-system-monitor 
+sudo pacman -S fcitx-qt5 fcitx fcitx-configtool
+sudo pacman -S xorg-xrdb
+sudo pacman -S brightnessctl 
+sudo pacman -S bluez bluez-utils
+sudo pacman -S sysstat
+sudo pacman -S xorg-xsetroot
+sudo pacman -S xss-lock 
+sudo pacman -S libpulse
+sudo pacman -S fish
+sudo pacman -Sy base-devel

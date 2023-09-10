@@ -77,16 +77,19 @@ sudo pacman -S gnome-system-monitor
 sudo pacman -S fcitx-qt5 fcitx fcitx-configtool
 sudo pacman -S xorg-xrdb
 sudo pacman -S brightnessctl 
-sudo pacman -S bluez bluez-utils
+sudo pacman -S bluez bluez-utils 
 sudo pacman -S sysstat
 sudo pacman -S xorg-xsetroot
 sudo pacman -S xss-lock 
 sudo pacman -S libpulse
 sudo pacman -S fish
-sudo pacman -Sy base-devel
+sudo pacman -S base-devel
+sudo pacman -S meson ninja
+sudo pacman -S inetutils 
+sudo pacman -S  networkmanager 
+sudo pacman -S  gdm
 
-
-yay -S acpi dunst jq alsa-utils polkit-gnome  rofi-blocks-git light numlockx nemo flameshot feh lm_sensors i3lock i3lock-color mantablockscreen network-manager-applet playerctl python3 parcellite redshift upower xorg-xinit xprintidle xorg wmctrl xdotool tumbler
+yay -S blueman acpi dunst jq alsa-utils polkit-gnome  rofi-blocks-git light numlockx nemo flameshot feh lm_sensors   mantablockscreen network-manager-applet playerctl python3 parcellite redshift upower xorg-xinit xprintidle xorg wmctrl xdotool tumbler pavucontrol
 
 
 ```
@@ -127,6 +130,18 @@ omf install bira
 
 
 ```
+# service
+```
+sudo systemctl start bluetooth
+
+sudo systemctl enable bluetooth
+
+sudo systemctl enable gdm
+
+sudo systemctl enable NetworkManager
+
+```
+
 
 # 按键配置修改请查看config.h里的注释
 

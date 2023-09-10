@@ -34,7 +34,7 @@ update() {
         if [[ ! -n $DEVICE ]]; then
             DEVICE=$(ls /sys/class/net | grep -v lo | head -1)
         fi
-        wifi_text=$( sar -n DEV 1 1 | grep $DEVICE |grep 平均时间 | awk 'BEGIN{a="";b="";c=" ";d="KB/s"}{print  a""c""$5""d""c""b""c""$6""d }' )
+        wifi_text=$( sar -n DEV 1 1 | grep $DEVICE |grep -E "Average|平均时间" | awk 'BEGIN{a="";b="";c=" ";d="KB/s"}{print  a""c""$5""d""c""b""c""$6""d }' )
     else
         wifi_text=$(nmcli | grep "$wifi_grep_keyword" | awk -F "$wifi_grep_keyword" '{print $2}')
         [ "$wifi_text" = "" ] && wifi_text=$wifi_disconnected

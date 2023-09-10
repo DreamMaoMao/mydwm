@@ -25,7 +25,7 @@ signal=$(echo "^s$this^" | sed 's/_//')
 [ ! "$(command -v pactl)" ] && echo command not found: pactl && exit
 
 update() {
-    is_blue=$( pactl list sinks | grep -E "name:|名称：" | grep blue )
+    is_blue=$( pactl list sinks | grep -E "Name:|名称：" | grep blue )
     sink=$(pactl info | grep 'Default Sink' | awk '{print $3}')
     if [ "$sink" = "" ]; then sink=$(pactl info | grep '默认音频入口' | awk -F'：' '{print $2}');fi
     volunmuted=$(pactl list sinks | grep $sink -A 6 | sed -n '7p' | grep '静音：否')
