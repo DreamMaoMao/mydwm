@@ -449,9 +449,6 @@ static Client *hiddenWinStack[100];
 static void overview_restore(Client *c);
 static void overivew_backup(Client *c);
 
-// static int is_overview_to_normal = 0; 
-// static int is_normanl_to_overview = 0;
-
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
@@ -510,7 +507,6 @@ void applyrules(Client *c) {   //读取config.h的窗口配置规则处理
   for (i = 0; i < LENGTH(rules); i++) {
 
     r = &rules[i];
-
 
     // 当rule中定义了一个或多个属性时，只要有一个属性匹配，就认为匹配成功
     if ((r->title && strstr(c->name, r->title)) ||
