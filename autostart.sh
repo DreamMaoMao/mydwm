@@ -23,7 +23,7 @@ settings() {
 	blueman-applet &
 	nm-applet &
 	fcitx & # 开启输入法
-	/usr/local/libexec/polkit-gnome-authentication-agent-1 &
+	/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1  &
 	numlockx on
 	$_thisdir/statusbar/statusbar.sh cron & # 开启状态栏定时更新
 
