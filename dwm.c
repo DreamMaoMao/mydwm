@@ -449,6 +449,9 @@ static Client *hiddenWinStack[100];
 static void overview_restore(Client *c);
 static void overivew_backup(Client *c);
 
+// static int is_overview_to_normal = 0; 
+// static int is_normanl_to_overview = 0;
+
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
@@ -507,6 +510,7 @@ void applyrules(Client *c) {   //读取config.h的窗口配置规则处理
   for (i = 0; i < LENGTH(rules); i++) {
 
     r = &rules[i];
+
 
     // 当rule中定义了一个或多个属性时，只要有一个属性匹配，就认为匹配成功
     if ((r->title && strstr(c->name, r->title)) ||
@@ -682,7 +686,7 @@ void attach(Client *c) {  //新打开的窗口放入窗口链表中
   for (fc = selmon->clients; fc; fc = fc->next){ //如果有窗口全屏,就把他退出全屏参与平铺
     clear_fullscreen_flag(fc);
   }
-  if (!newclientathead) {  //是否从头部增加新窗口
+  if (!newclientathead) { 
     Client **tc;
     for (tc = &c->mon->clients; *tc; tc = &(*tc)->next)
       ;
@@ -775,10 +779,11 @@ void buttonpress(XEvent *e) { //鼠标按键事件处理函数
   } else if ((c = wintoclient(ev->window))) {
     focus(c);
     restack(selmon);
+    //这句代码好像是多余的,因为不停止捕获,重新发送的事件还是会被再次拦截捕获,不会传到原本的客户端
     XAllowEvents(dpy, ReplayPointer, CurrentTime); 
     click = ClkClientWin;
   }
-  // 增加ClkRootWin也可以触发按键事件,这样tab无窗口才能使用鼠标中键加滚轮切换tab
+  // 增加ClkRootWin也可以触发鼠标按键事件,这样tab无窗口才能使用鼠标中键加滚轮切换tab
   for (i = 0; i < LENGTH(buttons); i++)
     if (click == buttons[i].click && buttons[i].func &&
         buttons[i].button == ev->button &&
@@ -2278,7 +2283,10 @@ void propertynotify(XEvent *e) {
   }
 }
 
-void quit(const Arg *arg) { running = 0; }
+void quit(const Arg *arg)
+{
+  running = 0;
+}
 
 Monitor *recttomon(int x, int y, int w, int h) {
   Monitor *m, *r = selmon;
@@ -2564,7 +2572,7 @@ void setfullscreen(Client *c) {
   if (!c->isfullscreen) {
     XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
                     PropModeReplace, (unsigned char *)&netatom[NetWMFullscreen],
-                    1); 
+                    1); //设置窗口在x11状态,实际xprop并没看到改对了,状态还是normal
     c->isfullscreen = 1;
     c->oldstate = c->isfloating;
     c->oldbw = c->bw;
@@ -3732,9 +3740,9 @@ void grid(Monitor *m, uint gappo, uint gappi) {
   if (n == 1) {
     c = nexttiled(m->clients);
     cw = (m->ww - 2 * gappo) * 0.7;
-    ch = (m->wh - 2 * gappo) * 0.65;
-    resize(c, m->mx + (m->mw - cw) / 2 + gappo,
-           m->my + (m->mh - ch) / 2 + gappo, cw - 2 * c->bw, ch - 2 * c->bw, 0);
+    ch = (m->wh - 2 * gappo) * 0.8;
+    resize(c, m->wx + (m->mw - cw) / 2 ,
+           m->my + (m->wh - ch) / 2 , cw - 2 * c->bw, ch - 2 * c->bw, 0);
     return;
   }
   if (n == 2) {
