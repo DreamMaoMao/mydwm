@@ -55,6 +55,8 @@
 
 - 16.增加tag可以循环切换
   
+- 17.优化bar栏在各个布局下隐藏和显示后窗口的重新适应屏幕
+
 
 ![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/cb62f0dc-088c-4ffd-a1c8-d0d3c82a2142)
 

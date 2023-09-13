@@ -3742,7 +3742,7 @@ void grid(Monitor *m, uint gappo, uint gappi) {
     cw = (m->ww - 2 * gappo) * 0.7;
     ch = (m->wh - 2 * gappo) * 0.8;
     resize(c, m->wx + (m->mw - cw) / 2 ,
-           m->my + (m->wh - ch) / 2 , cw - 2 * c->bw, ch - 2 * c->bw, 0);
+           m->wy + (m->wh - ch) / 2, cw - 2 * c->bw, ch - 2 * c->bw, 0);
     return;
   }
   if (n == 2) {
