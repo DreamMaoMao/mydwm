@@ -57,6 +57,9 @@
   
 - 17.优化bar栏在各个布局下隐藏和显示后窗口的重新适应屏幕
 
+- 18.增加鼠标中键选中taskbar可以切换完整标题和部分标题
+
+- 19.增加当鼠标在bar的tasktitle部分移动的时候,窗口焦点会自动移动到title对应的窗口上
 
 ![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/cb62f0dc-088c-4ffd-a1c8-d0d3c82a2142)
 

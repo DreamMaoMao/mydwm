@@ -1,7 +1,7 @@
 #include <X11/XF86keysym.h>
 
 
-static int tag_circle = 1;           /* 是否启用工作区循环 */
+static int tag_circle = 0;           /* 是否启用工作区循环 */
 static int enable_hotarea = 1;           /* 是否启用热区 */
 static int hotarea_size = 10;           /* 热区大小10x10 */
 
@@ -9,13 +9,16 @@ static int no_stack_show_border = 1;           /* 一个窗口也显示border */
 static int showsystray = 1;           /* 是否显示托盘栏 */
 static int newclientathead = 1; /* 定义新窗口在栈顶还是栈底 */
 static const unsigned int borderpx = 5; /* 窗口边框大小 */
-static const unsigned int systraypinning = 1; /* 托盘跟随的显示器 0代表不指定显示器 */
+static const unsigned int systraypinning =
+    1; /* 托盘跟随的显示器 0代表不指定显示器 */
 static const unsigned int systrayspacing = 1;  /* 托盘间距 */
 static const unsigned int systrayspadding = 5; /* 托盘和状态栏的间隙 */
 static int gappi = 10; /* 窗口与窗口 缝隙大小 */
 static int gappo = 10; /* 窗口与边缘 缝隙大小 */
-static const int _gappo = 10; /* 窗口与窗口 缝隙大小 不可变 用于恢复时的默认值 */
-static const int _gappi = 10; /* 窗口与边缘 缝隙大小 不可变 用于恢复时的默认值 */
+static const int _gappo =
+    10; /* 窗口与窗口 缝隙大小 不可变 用于恢复时的默认值 */
+static const int _gappi =
+    10; /* 窗口与边缘 缝隙大小 不可变 用于恢复时的默认值 */
 static const int vertpad = 5;        /* vertical padding of bar */
 static const int sidepad = 5;        /* horizontal padding of bar */
 static const int overviewgappi = 24; /* overview时 窗口与边缘 缝隙大小 */
@@ -88,7 +91,7 @@ static const char *tags[] = {
 /* monitor 定义符合该规则的窗口显示在哪个显示器上 -1 为当前屏幕 */
 /* floatposition 定义符合该规则的窗口显示的位置 0 中间，1到9分别为9宫格位置，例如1左上，9右下，3右上 */
 /* width 悬浮窗口的宽度 */
-/* width 悬浮窗口的高度 */
+/* high 悬浮窗口的高度 */
 
 
 static const Rule rules[] = {
@@ -101,11 +104,12 @@ static const Rule rules[] = {
     {"obs",                  NULL,                 NULL,             1 << 5,       0,          0,          0,        -1,      0,            0,       0},       // obs        tag6 
     {"chrome",               NULL,                 NULL,             1 << 3,       0,          0,          0,        -1,      0,            0,       0},       // chrome     tag4 
     {"music",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1200,       800},  // music      浮动
+    {"org.gnome.Nautilus",   NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1200,       800},  // nautilus   浮动
     {"kitty",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1500,       800},  // music      浮动
     {NULL,                  "qq",                  NULL,             1 << 2,       0,          0,          0,        -1,      0,            0,       0},       // qq         tag3 
     {"flameshot",            NULL,                 NULL,             0,            1,          0,          0,        -1,      0,            0,       0},       // 火焰截图            浮动
     {"Blueman-manager",      NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // blueman            浮动
-    {"thunder",              NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // 迅雷            浮动
+    {"com.xunlei.download",              NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // 迅雷            浮动
     {"Clash for Windows",    NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // clash            浮动
     {"FGN",                  NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // pavucontrol            浮动
 
@@ -155,7 +159,6 @@ static Key keys[] = {
     { AltMask,    XK_s,         zoom,             {0} },                                      /* alt s              |  将当前聚焦窗口置为主窗口 */
 
     { AltMask,                  XK_backslash,    togglefloating,   {0} },                     /* alt \            |  开启/关闭 聚焦目标的float模式 */
-    { AltMask,                  XK_Caps_Lock,    togglefloating,   {0} },                     /* alt \            |  开启/关闭 聚焦目标的float模式 */
     { AltMask|ShiftMask,        XK_backslash,    toggleallfloating,{0} },                     /* alt shift \      |  开启/关闭 全部目标的float模式 */
     { AltMask,                  XK_a,            fake_fullscreen,       {0} },                /* alt a              |  开启/关闭 假全屏      */
     { AltMask,                  XK_f,            fullscreen,       {0} },                     /* alt f              |  开启/关闭 全屏   */
@@ -217,7 +220,7 @@ static Key keys[] = {
     { ControlMask,              XK_Return, spawn, SHCMD("bash ~/tool/clash.sh") },                                                                                              /* super enter      | 打开终端             */
     { SuperMask,                XK_d,      spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/dwmdrun.rasi -show run") },                                                       /* super d          | rofi: 执行run          */
     { AltMask,                  XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/dwmdrun.rasi -show drun") },                                                      /* alt space        | rofi: 执行drun          */
-    { SuperMask|ControlMask,    XK_Return, spawn, SHCMD("konsole -e  /usr/local/bin/yazi") },                                                                                                          /* ctrl win enter   | rofi: nautilus 文件浏览器          */
+    { SuperMask|ControlMask,    XK_Return, spawn, SHCMD("konsole -e /usr/local/bin/yazi") },                                                                                                          /* ctrl win enter   | rofi: nautilus 文件浏览器          */
     { ControlMask,              XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },              /* ctrl space       | rofi: 执行自定义脚本   */
     { SuperMask,                XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },     /* super space      | rofi: 执行自定义脚本   */
     { SuperMask,                XK_l,      spawn, SHCMD("$DWM/scripts/blurlock.sh") },                                   /* super l     | 锁定屏幕               */
@@ -225,7 +228,7 @@ static Key keys[] = {
     { AltMask,                  XK_comma,  spawn, SHCMD("$DWM/scripts/volume.sh down") },                               /* alt <       | 音量减                 */
     { ControlMask,              XK_period, spawn, SHCMD("$DWM/scripts/brightness.sh up") },                             /* ctrl >      | 亮度加                 */
     { ControlMask,              XK_comma,  spawn, SHCMD("$DWM/scripts/brightness.sh down") },                           /* ctrl <      | 亮度减    */
-    { AltMask|ControlMask,      XK_a,      spawn, SHCMD("flameshot gui -c -p ~/Pictures/screenshots") },             /* ctrl alt a  | 截图                   */
+    { AltMask|ControlMask,      XK_a,      spawn, SHCMD("flameshot gui -c -p ~/down") },             /* ctrl alt a  | 截图                   */
     { AltMask|SuperMask,        XK_q,      spawn, SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") }, /* super alt q | 选中某个窗口并强制kill */
     { SuperMask,                XK_p,      spawn, SHCMD("bash $DWM/scripts/monitor.sh") },                              /* super p     | 关闭内部显示器 */
     { SuperMask|ControlMask,    XK_m,      spawn, SHCMD("$DWM/scripts/rofidwm.sh outopts") },
@@ -264,9 +267,9 @@ static Key keys[] = {
 static Button buttons[] = {
     /* click               event mask       button            function       argument  */
     /* 点击窗口标题栏操作 */
-    { ClkWinTitle,         0,               Button2,          hideotherwins, {0} },                                   // 中键        |  点击标题     |  隐藏其他窗口仅保留该窗口
+    { ClkWinTitle,         0,               Button2,          fullname_taskbar_activeitem, {0} },                     // 中键        |  点击选中的标题     |  切换完整title和部分title
     { ClkWinTitle,         0,               Button1,          togglewin,     {0} },                                   // 左键        |  点击标题     |  切换窗口显示状态
-    { ClkWinTitle,         0,               Button3,          killclient,    {0} },                                   // 右键        |  点击标题     |  退出窗口
+    { ClkWinTitle,         0,               Button3,          killclient,    {0} },                                   // 右键        |  点击选中的标题     |  退出窗口
     /* 点击窗口操作 */
     { ClkClientWin,        SuperMask,       Button1,          movemouse,     {0} },                                   // super+左键  |  拖拽窗口     |  拖拽窗口
     { ClkClientWin,        SuperMask,       Button3,          resizemouse,   {0} },                                   // super+右键  |  拖拽窗口     |  改变窗口大小

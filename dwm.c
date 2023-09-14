@@ -161,7 +161,7 @@ struct Client {
   int bw, oldbw;
   int overview_backup_x, overview_backup_y, overview_backup_w, overview_backup_h;
   int basew, baseh, incw, inch, maxw, maxh, minw, minh;
-  int taskw;
+  int taskw,no_limit_taskw;
   unsigned int tags;
   int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen,
       isglobal, isnoborder, isscratchpad,isfullscreenbak,isfloatingbak;
@@ -449,8 +449,7 @@ static Client *hiddenWinStack[100];
 static void overview_restore(Client *c);
 static void overivew_backup(Client *c);
 
-// static int is_overview_to_normal = 0; 
-// static int is_normanl_to_overview = 0;
+static void fullname_taskbar_activeitem(const Arg *arg);
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -1185,7 +1184,11 @@ void drawbar(Monitor *m) {  //绘制bar
     drw_setscheme(drw, scheme[scm]);
 
     // 绘制TASK
-    w = MIN(TEXTW(c->name), TEXTW("          "));
+    if(c->no_limit_taskw == 1){
+      w = TEXTW(c->name);
+    } else {
+      w = MIN(TEXTW(c->name), TEXTW("          "));
+    }
     empty_w = m->ww - x - status_w - system_w;
     if (w > empty_w) { // 如果当前TASK绘制后长度超过最大宽度
       w = empty_w;
@@ -1450,7 +1453,7 @@ void enternotify(XEvent *e) {
   focus(c);
 }
 
-void expose(XEvent *e) {
+void expose(XEvent *e) { //窗口创建事件
   Monitor *m;
   XExposeEvent *ev = &e->xexpose;
 
@@ -1874,6 +1877,7 @@ void manage(Window w, XWindowAttributes *wa) {
   c->bw = c->oldbw = borderpx;
   c->isfloating = 0;
   c->isfullscreen = 0;
+  c->no_limit_taskw = 0;
   updatetitle(c);
 
   if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
@@ -1971,6 +1975,79 @@ void motionnotify(XEvent *e) {
 
   if (ev->window != root)
     return;
+
+
+  // 判断鼠标的位置自动聚焦到鼠标所在的标题的窗口
+  unsigned int i, x,occ = 0;
+  Client *c = wintoclient(ev->window);
+
+  // click = ClkRootWin;
+  /* focus monitor if necessary */
+  if ((m = wintomon(ev->window)) && m != selmon) {
+    unfocus(selmon->sel, 1);
+    selmon = m;
+    focus(NULL);
+  }
+
+  int status_w = drawstatusbar(selmon, bh, stext);
+  int system_w = getsystraywidth();
+  if (ev->window == selmon->barwin ||
+      (!c && selmon->showbar &&
+       (topbar ? ev->y_root <= selmon->wy
+               : ev->y_root >= selmon->wy + selmon->wh))) { // 点击在bar上
+    i = x = 0;
+    blw = TEXTW(selmon->ltsymbol);
+
+    if (selmon->isoverview) {
+      x += TEXTW(overviewtag);
+      i = ~0;
+      if (ev->x_root > x)
+        i = LENGTH(tags);
+    } else {
+      for (c = m->clients; c; c = c->next)
+        occ |= c->tags == TAGMASK ? 0 : c->tags;
+      do {
+        /* do not reserve space for vacant tags */
+        if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
+          continue;
+        x += TEXTW(tags[i]);
+      } while (ev->x_root >= x && ++i < LENGTH(tags));
+    }
+    if (i < LENGTH(tags)) {  //点击在tab上
+      // click = ClkTagBar;
+      // arg.ui = 1 << i;
+    } else if (ev->x_root < x + blw){  //点击在布局标签上
+      // click = ClkLtSymbol;
+    }
+    else if (ev->x_root > selmon->ww - status_w - 2 * sp - (selmon == systraytomon(selmon)? (system_w ? system_w + systraypinning + 2 : 0): 0)) {
+      // click = ClkStatusText;
+      // arg.i = ev->x_root - (selmon->ww - status_w - 2 * sp -
+      //                  (selmon == systraytomon(selmon)
+      //                       ? (system_w ? system_w + systraypinning + 2 : 0)
+      //                       : 0));
+      // arg.ui = ev->button; // 1 => L，2 => M，3 => R, 5 => U, 6 => D
+    } else {
+      // click = ClkBarEmpty;
+
+      x += blw;
+      c = m->clients;
+
+      if (m->bt != 0)
+        do {
+          if (!ISVISIBLE(c))
+            continue;
+          else
+            x += c->taskw;
+        } while (ev->x_root > x && (c = c->next));
+
+      if (c) {
+        // click = ClkWinTitle; //鼠标在标题栏上
+        // arg.v = c;
+        focus(c);  //焦点切换到该标题对应的窗口
+      }
+    }
+  }
+  
 
   //左下角热区坐标计算,兼容多显示屏
   unsigned hx = selmon->mx + hotarea_size;
@@ -4186,4 +4263,17 @@ void exchange_client(const Arg *arg) {
   if (!c || c->isfloating || c->isfullscreen)
     return;
   exchange_two_client(c, direction_select(arg));
+}
+
+
+
+void fullname_taskbar_activeitem(const Arg *arg) { // 切换task标签完整title/限长title
+  if (!selmon->sel)
+    return;
+  if(selmon->sel->no_limit_taskw == 1){
+    selmon->sel->no_limit_taskw = 0;
+  } else {
+    selmon->sel->no_limit_taskw = 1;
+  }
+  drawbar(selmon);
 }
