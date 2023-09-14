@@ -1,6 +1,6 @@
 #include <X11/XF86keysym.h>
 
-
+static int taskbar_movemouse_focus = 1;           /* 是否启用鼠标在taskbar移动的时候自动切换焦点 */
 static int tag_circle = 0;           /* 是否启用工作区循环 */
 static int enable_hotarea = 1;           /* 是否启用热区 */
 static int hotarea_size = 10;           /* 热区大小10x10 */

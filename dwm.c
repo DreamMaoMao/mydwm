@@ -2040,7 +2040,7 @@ void motionnotify(XEvent *e) {
             x += c->taskw;
         } while (ev->x_root > x && (c = c->next));
 
-      if (c) {
+      if (c && taskbar_movemouse_focus == 1) {
         // click = ClkWinTitle; //鼠标在标题栏上
         // arg.v = c;
         focus(c);  //焦点切换到该标题对应的窗口
