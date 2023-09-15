@@ -46,6 +46,7 @@
 #include "util.h"
 #include <math.h>
 
+
 /* macros */
 #define BUTTONMASK (ButtonPressMask | ButtonReleaseMask)
 #define CLEANMASK(mask)                                                        \
@@ -155,6 +156,7 @@ typedef struct Monitor Monitor;
 typedef struct Client Client;
 struct Client {
   char name[256];
+  char icon[10];
   float mina, maxa;
   int x, y, w, h;
   int oldx, oldy, oldw, oldh;
@@ -223,6 +225,11 @@ typedef struct {
   uint width;
   uint high;
 } Rule;
+
+typedef struct {
+  const char *class;
+  const char *style;
+} Icon;    
 
 typedef struct Systray Systray;
 struct Systray {
@@ -376,6 +383,7 @@ static void updatesystray(void);
 static void updatesystrayicongeom(Client *i, int w, int h);
 static void updatesystrayiconstate(Client *i, XPropertyEvent *ev);
 static void updatetitle(Client *c);
+static void updateicon(Client *c);
 static void updatewindowtype(Client *c);
 static void updatewmhints(Client *c);
 
@@ -453,6 +461,8 @@ static void fullname_taskbar_activeitem(const Arg *arg);
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
+#include "icons.h"
+
 
 struct Pertag {
   unsigned int curtag, prevtag;          /* current and previous tag */
@@ -1115,6 +1125,7 @@ void drawbar(Monitor *m) {  //绘制bar
   unsigned int i, occ = 0, n = 0, urg = 0, scm;
   Client *c;
   int boxw = 2;
+  char *task_content;
 
   if (!m->showbar)
     return;
@@ -1170,6 +1181,7 @@ void drawbar(Monitor *m) {  //绘制bar
   drw_setscheme(drw, scheme[SchemeNorm]);
   x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 
+
   // 绘制TASKS
   for (c = m->clients; c; c = c->next) {
     // 判断是否需要绘制 && 判断颜色设置
@@ -1183,13 +1195,21 @@ void drawbar(Monitor *m) {  //绘制bar
       scm = SchemeNorm;
     drw_setscheme(drw, scheme[scm]);
 
+    //task是否使用图表表示
+    if(taskbar_icon == 1 && c->no_limit_taskw == 0 ) {
+      task_content = c->icon;
+    } else {
+      task_content = c->name;
+    }
+
     // 绘制TASK
     if(c->no_limit_taskw == 1){
-      w = TEXTW(c->name);
+      w = TEXTW(task_content);
     } else {
-      w = MIN(TEXTW(c->name), TEXTW("          "));
+      w = MIN(TEXTW(task_content), TEXTW("           "));
     }
     empty_w = m->ww - x - status_w - system_w;
+
     if (w > empty_w) { // 如果当前TASK绘制后长度超过最大宽度
       w = empty_w;
       x = drw_text(drw, x, 0, w, bh, lrpad / 2, "...", 0);
@@ -1197,7 +1217,7 @@ void drawbar(Monitor *m) {  //绘制bar
       tasks_w += w;
       break;
     } else {
-      x = drw_text(drw, x, 0, w, bh, lrpad / 2, c->name, 0);
+      x = drw_text(drw, x, 0, w, bh, lrpad / 2, task_content, 0);
       c->taskw = w;
       tasks_w += w;
     }
@@ -1861,6 +1881,7 @@ void managefloating(Client *c) {
   }
 }
 
+
 void manage(Window w, XWindowAttributes *wa) {
   Client *c, *t = NULL;
   Window trans = None;
@@ -1879,7 +1900,7 @@ void manage(Window w, XWindowAttributes *wa) {
   c->isfullscreen = 0;
   c->no_limit_taskw = 0;
   updatetitle(c);
-
+  updateicon(c);
   if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
     c->mon = t->mon;
     c->tags = t->tags;
@@ -3486,6 +3507,22 @@ void updatesystray(void) {
   XMapWindow(dpy, systray->win);
   XMapSubwindows(dpy, systray->win);
   XSync(dpy, False);
+}
+
+void updateicon(Client *c) {
+  int i;
+  XClassHint ch = {NULL, NULL};
+  XGetClassHint(dpy, c->win, &ch);
+  if(ch.res_class){
+    for (i = 0; i < LENGTH(icons); i++) {
+      if(strstr(ch.res_class,(&icons[i])->class)){
+        strcpy(c->icon, (&icons[i])->style);
+        return ;
+      }
+    }
+  }
+  strcpy(c->icon, default_icon);
+  return ;
 }
 
 void updatetitle(Client *c) {

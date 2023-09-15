@@ -61,7 +61,9 @@
 
 - 19.增加当鼠标在bar的tasktitle部分移动的时候,窗口焦点会自动移动到title对应的窗口上
 
-![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/cb62f0dc-088c-4ffd-a1c8-d0d3c82a2142)
+- 20.增加taskbar部分标题 由icon代替,icon字样可以在icons.h中设置
+
+![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/357a1c44-0a01-422c-821d-e6ce5e24bbaa)
 
 
 
@@ -98,10 +100,10 @@ yay -S blueman acpi dunst jq alsa-utils polkit-gnome  rofi-blocks-git light numl
 
 
 ```
-# 安装特定版本的picom
+# 安装特定版本的picom(相对于原版在透明窗口全屏时不会闪烁)
 ```
 cd ~/Downloads
-git clone https://github.com/yaocccc/picom.git
+git clone https://github.com/DreamMaoMao/picom.git
 cd picom/
 meson --buildtype=release . build --prefix=/usr -Dwith_docs=true
 sudo ninja -C build install
@@ -131,9 +133,6 @@ git clone https://github.com/oh-my-fish/oh-my-fish
 cd oh-my-fish
 bin/install --offline
 omf install bira
-
-
-
 ```
 # service
 ```

@@ -1,5 +1,7 @@
 #include <X11/XF86keysym.h>
 
+
+static int taskbar_icon = 1;  /* 任务栏使用的是icon而不是title*/
 static int taskbar_movemouse_focus = 1;           /* 是否启用鼠标在taskbar移动的时候自动切换焦点 */
 static int tag_circle = 0;           /* 是否启用工作区循环 */
 static int enable_hotarea = 1;           /* 是否启用热区 */
@@ -31,7 +33,7 @@ static const unsigned int snap = 10;          /* 边缘依附宽度 */
 static const unsigned int baralpha = 0xc0;    /* 状态栏透明度 */
 static const unsigned int borderalpha = 0xdd; /* 边框透明度 */
 static const char *fonts[] = {"JetBrainsMono Nerd Font:style=Bold:size=13",
-                              "JetBrainsMono Nerd Font:style=Bold:size=13"};
+                                };
 static const char *colors[][3] = {
     /* 颜色设置 ColFg, ColBg, ColBorder */
     [SchemeNorm] = {"#ffb871", "#3c2003", "#444444"},
