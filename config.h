@@ -104,16 +104,16 @@ static const Rule rules[] = {
 
     /** 普通优先度 */
     {"obs",                  NULL,                 NULL,             1 << 5,       0,          0,          0,        -1,      0,            0,       0},       // obs        tag6 
-    {"chrome",               NULL,                 NULL,             1 << 3,       0,          0,          0,        -1,      0,            0,       0},       // chrome     tag4 
-    {"music",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1200,       800},  // music      浮动
-    {"org.gnome.Nautilus",   NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1200,       800},  // nautilus   浮动
-    {"kitty",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1500,       800},  // music      浮动
-    {NULL,                  "qq",                  NULL,             1 << 2,       0,          0,          0,        -1,      0,            0,       0},       // qq         tag3 
+    {"Google-chrome",               NULL,                 NULL,             1 << 3,       0,          0,          0,        -1,      0,            0,       0},       // chrome     tag4 
+    {"electron-netease-cloud-music",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1200,       800},  // music      浮动
+    {"baidunetdisk",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},  // 百度云网盘      浮动
+    {"alixby3",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1200,       800},  // 阿里云网盘      浮动
+    {"QQ",                  NULL,                  NULL,             1 << 2,       0,          0,          0,        -1,      0,            0,       0},       // qq         tag3 
     {"flameshot",            NULL,                 NULL,             0,            1,          0,          0,        -1,      0,            0,       0},       // 火焰截图            浮动
     {"Blueman-manager",      NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // blueman            浮动
     {"com.xunlei.download",              NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // 迅雷            浮动
     {"Clash for Windows",    NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // clash            浮动
-    {"FGN",                  NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // pavucontrol            浮动
+    {"Pavucontrol",                  NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // pavucontrol            浮动
 
 
     /** 优先度低 越在上面优先度越低 */

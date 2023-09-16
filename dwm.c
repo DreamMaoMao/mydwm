@@ -2678,7 +2678,7 @@ void setfullscreen(Client *c) {
     c->oldstate = c->isfloating;
     c->oldbw = c->bw;
     c->bw = 0;
-    c->isfloatingbak = c->isfloating;
+    c->oldstate = c->isfloating;
     c->isfloating = 0; //全屏不浮动才能自动退出全屏参与平铺
     resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
     XRaiseWindow(dpy, c->win);
@@ -2686,7 +2686,7 @@ void setfullscreen(Client *c) {
     XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
                     PropModeReplace, (unsigned char *)0, 0);
     c->isfullscreen = 0;
-    c->isfloating = c->isfloatingbak;
+    c->isfloating = c->oldstate;
     c->bw = c->oldbw;
     c->x = c->oldx;
     c->y = c->oldy;
