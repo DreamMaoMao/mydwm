@@ -13,10 +13,6 @@ settings() {
 	picom --experimental-backends --config $DWM/scripts/config/picom.conf >>/dev/null 2>&1 & # 开启picom
 	feh --randomize --bg-fill $DWM/wallpaper/caoyuan.jpg & # 壁纸
 	dunst -config ~/.config/dunst/hypr_dunstrc &     # 开启通知server
-	systemctl --user unmask xdg-desktop-portal-gnome
-	systemctl --user mask xdg-desktop-portal-hyprland
-	/usr/libexec/xdg-desktop-portal &
-	# xmodmap -e "pointer = 1 25 3 4 5 6 7 2"
 	echo "Xft.dpi: 140" | xrdb -merge
 	redshift &
 	parcellite &
