@@ -162,11 +162,12 @@ struct Client {
   int oldx, oldy, oldw, oldh;
   int bw, oldbw;
   int overview_backup_x, overview_backup_y, overview_backup_w, overview_backup_h;
+  int fullscreen_backup_x, fullscreen_backup_y, fullscreen_backup_w, fullscreen_backup_h;
   int basew, baseh, incw, inch, maxw, maxh, minw, minh;
   int taskw,no_limit_taskw;
   unsigned int tags;
   int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen,
-      isglobal, isnoborder, isscratchpad,isfullscreenbak,isfloatingbak;
+      isglobal, isnoborder, isscratchpad,overview_isfullscreenbak,overview_isfloatingbak;
   Client *next;
   Client *snext;
   Monitor *mon;
@@ -505,10 +506,10 @@ void applyrules(Client *c) {   //读取config.h的窗口配置规则处理
 
   /* rule matching */
   c->isfloating = 0;
-  c->isfloatingbak = 0;
+  c->overview_isfloatingbak = 0;
   c->isglobal = 0;
   c->isfullscreen = 0;
-  c->isfullscreenbak = 0;
+  c->overview_isfullscreenbak = 0;
   c->isnoborder = 0;
   c->isscratchpad = 0;
   c->tags = 0;
@@ -1893,10 +1894,10 @@ void manage(Window w, XWindowAttributes *wa) {
   c = ecalloc(1, sizeof(Client));
   c->win = w;
   /* geometry */
-  c->x = c->oldx = c->overview_backup_x = wa->x;
-  c->y = c->oldy = c->overview_backup_y = wa->y;
-  c->w = c->oldw = c->overview_backup_w = wa->width;
-  c->h = c->oldh = c->overview_backup_h = wa->height;
+  c->x = c->oldx = c->overview_backup_x = c->fullscreen_backup_x = wa->x;
+  c->y = c->oldy = c->overview_backup_y = c->fullscreen_backup_y = wa->y;
+  c->w = c->oldw = c->overview_backup_w = c->fullscreen_backup_w = wa->width;
+  c->h = c->oldh = c->overview_backup_h = c->fullscreen_backup_h = wa->height;
   // c->oldbw = wa->border_width;
   c->bw = c->oldbw = borderpx;
   c->isfloating = 0;
@@ -2678,8 +2679,11 @@ void setfullscreen(Client *c) {
     c->oldstate = c->isfloating;
     c->oldbw = c->bw;
     c->bw = 0;
-    c->oldstate = c->isfloating;
     c->isfloating = 0; //全屏不浮动才能自动退出全屏参与平铺
+    c->fullscreen_backup_x = c->x;
+    c->fullscreen_backup_y = c->y;
+    c->fullscreen_backup_w = c->w;
+    c->fullscreen_backup_h = c->h;
     resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
     XRaiseWindow(dpy, c->win);
   } else {
@@ -2688,11 +2692,8 @@ void setfullscreen(Client *c) {
     c->isfullscreen = 0;
     c->isfloating = c->oldstate;
     c->bw = c->oldbw;
-    c->x = c->oldx;
-    c->y = c->oldy;
-    c->w = c->oldw;
-    c->h = c->oldh;
-    resizeclient(c, c->x, c->y, c->w, c->h);
+
+    resizeclient(c, c->fullscreen_backup_x, c->fullscreen_backup_y, c->fullscreen_backup_w, c->fullscreen_backup_h);
     arrange(c->mon);
   }
 }
@@ -2711,6 +2712,10 @@ void set_fake_fullscreen(Client *c) {
     c->isfloating = 0; //全屏不浮动才能自动退出全屏参与平铺
     // 要多减一个gappo,因为mon->wx,wh不包含右边和下边看不见的10px区域
     //鼠标在屏幕左上都不可以超出去的,右下可以超出10px
+    c->fullscreen_backup_x = c->x;
+    c->fullscreen_backup_y = c->y;
+    c->fullscreen_backup_w = c->w;
+    c->fullscreen_backup_h = c->h;
     resizeclient(c, c->mon->wx + gappo, c->mon->wy + gappo, c->mon->ww-(gappo*2)-gappo, c->mon->wh-(gappo*2)-gappo);
     XRaiseWindow(dpy, c->win); //提升窗口到顶层
     border_type = get_border_type(c);  //确认窗口边框的颜色
@@ -2722,11 +2727,7 @@ void set_fake_fullscreen(Client *c) {
     c->isfullscreen = 0;
     c->isfloating = c->oldstate;
     c->bw = c->oldbw;
-    c->x = c->oldx;
-    c->y = c->oldy;
-    c->w = c->oldw;
-    c->h = c->oldh;
-    resizeclient(c, c->x, c->y, c->w, c->h);
+    resizeclient(c, c->fullscreen_backup_x, c->fullscreen_backup_y, c->fullscreen_backup_w, c->fullscreen_backup_h);
     border_type = get_border_type(c);  //确认窗口边框的颜色
     XSetWindowBorder(dpy, c->win,scheme[border_type][ColBorder].pixel);
     arrange(c->mon);
@@ -3724,8 +3725,8 @@ void clear_fullscreen_flag(Client *c) {
 
 //普通视图切换到overview时保存窗口的旧状态
 void overview_backup(Client *c) {
-    c->isfloatingbak = c->isfloating;
-    c->isfullscreenbak = c->isfullscreen;
+    c->overview_isfloatingbak = c->isfloating;
+    c->overview_isfullscreenbak = c->isfullscreen;
     c->isfloating = 0;
     c->isfullscreen = 0;
     c->overview_backup_x = c->x;
@@ -3737,21 +3738,21 @@ void overview_backup(Client *c) {
 
 //overview切回到普通视图还原窗口的状态
 void overview_restore(Client *c) {
-    c->isfloating = c->isfloatingbak;
-    c->isfullscreen = c->isfullscreenbak;
-    c->isfloatingbak  = 0 ;
-    c->isfullscreenbak = 0;
+    c->isfloating = c->overview_isfloatingbak;
+    c->isfullscreen = c->overview_isfullscreenbak;
+    c->overview_isfloatingbak  = 0 ;
+    c->overview_isfullscreenbak = 0;
+    // c->x = c->overview_backup_x ;
+    // c->y = c->overview_backup_y ;
+    // c->w = c->overview_backup_w ;
+    // c->h = c->overview_backup_h ;
     if (c->isfloating) {
-      // c->x = selmon->wx + selmon->ww / 6,
-      // c->y = selmon->wy + selmon->wh / 6, managefloating(c);
+
       XRaiseWindow(dpy, c->win); //提升悬浮窗口到顶层
-      resize(c, c->overview_backup_x, c->overview_backup_y,c->overview_backup_w,
-             c->overview_backup_h, 0);  
-      // focus(c);
+      resize(c, c->overview_backup_x , c->overview_backup_y,c->overview_backup_w,c->overview_backup_h, 0);  
     }
     if (c->isfullscreen) {
-      resizeclient(c, c->overview_backup_x, c->overview_backup_y,c->overview_backup_w,
-             c->overview_backup_h);
+      resizeclient(c, c->overview_backup_x , c->overview_backup_y,c->overview_backup_w,c->overview_backup_h);
       XRaiseWindow(dpy, c->win); //提升窗口到顶层
     }
 }
