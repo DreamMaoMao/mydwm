@@ -522,9 +522,9 @@ void applyrules(Client *c) {   //读取config.h的窗口配置规则处理
 
 
     // 当rule中定义了一个或多个属性时，只要有一个属性匹配，就认为匹配成功
-    if ((r->title && strstr(c->name, r->title)) ||
-        (r->class && strstr(class, r->class)) ||
-        (r->instance && strstr(instance, r->instance))) {
+    if ((r->title && !strcmp(c->name, r->title)) ||
+        (r->class && !strcmp(class, r->class)) ||
+        (r->instance && !strcmp(instance, r->instance))) {
 
       c->isfloating = r->isfloating;
       c->isglobal = r->isglobal;
@@ -1195,7 +1195,7 @@ void drawbar(Monitor *m) {  //绘制bar
       scm = SchemeNorm;
     drw_setscheme(drw, scheme[scm]);
 
-    //task是否使用图表表示
+    //task是否使用图标表示
     if(taskbar_icon == 1 && c->no_limit_taskw == 0 ) {
       task_content = c->icon;
     } else {
@@ -1208,6 +1208,8 @@ void drawbar(Monitor *m) {  //绘制bar
     } else {
       w = MIN(TEXTW(task_content), TEXTW("           "));
     }
+
+    //剩余的空白区域宽度
     empty_w = m->ww - x - status_w - system_w;
 
     if (w > empty_w) { // 如果当前TASK绘制后长度超过最大宽度
@@ -1237,6 +1239,7 @@ void drawbar(Monitor *m) {  //绘制bar
   resizebarwin(m);
 }
 
+//绘制全部显示器的bar
 void drawbars(void) {
   Monitor *m;
 
@@ -2675,6 +2678,7 @@ void setfullscreen(Client *c) {
     c->oldstate = c->isfloating;
     c->oldbw = c->bw;
     c->bw = 0;
+    c->isfloatingbak = c->isfloating;
     c->isfloating = 0; //全屏不浮动才能自动退出全屏参与平铺
     resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
     XRaiseWindow(dpy, c->win);
@@ -2682,7 +2686,7 @@ void setfullscreen(Client *c) {
     XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
                     PropModeReplace, (unsigned char *)0, 0);
     c->isfullscreen = 0;
-    c->isfloating = c->oldstate;
+    c->isfloating = c->isfloatingbak;
     c->bw = c->oldbw;
     c->x = c->oldx;
     c->y = c->oldy;
@@ -3515,7 +3519,7 @@ void updateicon(Client *c) {
   XGetClassHint(dpy, c->win, &ch);
   if(ch.res_class){
     for (i = 0; i < LENGTH(icons); i++) {
-      if(strstr(ch.res_class,(&icons[i])->class)){
+      if(!strcmp(ch.res_class,(&icons[i])->class)){
         strcpy(c->icon, (&icons[i])->style);
         return ;
       }
@@ -4015,28 +4019,6 @@ void zoom(const Arg *arg) {
   pop(c);
 }
 
-int main(int argc, char *argv[]) {
-  if (argc == 2 && !strcmp("-v", argv[1]))
-    die("dwm-6.3");
-  else if (argc != 1)
-    die("usage: dwm [-v]");
-  if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
-    fputs("warning: no locale support\n", stderr);
-  if (!(dpy = XOpenDisplay(NULL)))
-    die("dwm: cannot open display");
-  checkotherwm();
-  setup();
-#ifdef __OpenBSD__
-  if (pledge("stdio rpath proc exec", NULL) == -1)
-    die("pledge");
-#endif /* __OpenBSD__ */
-  scan();
-  runAutostart();
-  run();
-  cleanup();
-  XCloseDisplay(dpy);
-  return EXIT_SUCCESS;
-}
 
 Client *direction_select(const Arg *arg) {
   Client *tempClients[100];
@@ -4303,8 +4285,8 @@ void exchange_client(const Arg *arg) {
 }
 
 
-
-void fullname_taskbar_activeitem(const Arg *arg) { // 切换task标签完整title/限长title
+// 切换task标签完整title(或者icon),限长title
+void fullname_taskbar_activeitem(const Arg *arg) { 
   if (!selmon->sel)
     return;
   if(selmon->sel->no_limit_taskw == 1){
@@ -4314,3 +4296,27 @@ void fullname_taskbar_activeitem(const Arg *arg) { // 切换task标签完整titl
   }
   drawbar(selmon);
 }
+
+int main(int argc, char *argv[]) {
+  if (argc == 2 && !strcmp("-v", argv[1]))
+    die("dwm-6.3");
+  else if (argc != 1)
+    die("usage: dwm [-v]");
+  if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
+    fputs("warning: no locale support\n", stderr);
+  if (!(dpy = XOpenDisplay(NULL)))
+    die("dwm: cannot open display");
+  checkotherwm();
+  setup();
+#ifdef __OpenBSD__
+  if (pledge("stdio rpath proc exec", NULL) == -1)
+    die("pledge");
+#endif /* __OpenBSD__ */
+  scan();
+  runAutostart();
+  run();
+  cleanup();
+  XCloseDisplay(dpy);
+  return EXIT_SUCCESS;
+}
+
