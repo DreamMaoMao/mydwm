@@ -73,15 +73,15 @@ static const char scratchpadname[] = "scratchpad";
 /* 自定义特定实例的显示状态 */
 
 static const char *tags[] = { 
-    "1", // tag:0  key:1  desc:terminal1
-    "2", // tag:1  key:2  desc:terminal2
-    "3", // tag:2  key:3  desc:terminal3
-    "4", // tag:4  key:9  desc:obs
-    "5", // tag:5  key:c  desc:chrome
-    "6", // tag:1  key:2  desc:terminal2
-    "7", // tag:2  key:3  desc:terminal3
-    "8", // tag:4  key:9  desc:obs
-    "9", // tag:5  key:c  desc:chrome
+    "1", // tag:0  key:1  desc:
+    "2", // tag:1  key:2  desc:
+    "3", // tag:2  key:3  desc:qq
+    "4", // tag:4  key:4  desc:chrome
+    "5", // tag:5  key:5  desc:
+    "6", // tag:6  key:6  desc:obs
+    "7", // tag:7  key:7  desc:
+    "8", // tag:8  key:8  desc:
+    "9", // tag:9  key:9  desc:
 };
 
 /* 自定义窗口显示规则 */
@@ -151,7 +151,7 @@ static Key keys[] = {
     { ControlMask|SuperMask,    XK_Left,         tagtoleft,        {0} },                     /* ctrl alt left      |  将本窗口移动到左边tag */
     { ControlMask|SuperMask,    XK_Right,        tagtoright,       {0} },                     /* ctrl alt right     |  将本窗口移动到右边tag */
 
-    { AltMask,                  XK_Tab,            toggleoverview,   {0} },                     /* super tab           |  显示所有tag 或 跳转到聚焦窗口的tag */
+    { AltMask,                  XK_Tab,            toggleoverview,   {0} },                     /* alt tab           |  显示所有tag 或 跳转到聚焦窗口的tag */
     { SuperMask,                XK_comma,        setmfact,         {.f = -0.05} },            /* super ,            |  缩小主工作区 */
     { SuperMask,                XK_period,       setmfact,         {.f = +0.05} },            /* super .            |  放大主工作区 */
 
@@ -163,7 +163,7 @@ static Key keys[] = {
     { AltMask,                  XK_backslash,    togglefloating,   {0} },                     /* alt \            |  开启/关闭 聚焦目标的float模式 */
     { AltMask|ShiftMask,        XK_backslash,    toggleallfloating,{0} },                     /* alt shift \      |  开启/关闭 全部目标的float模式 */
     { AltMask,                  XK_a,            fake_fullscreen,       {0} },                /* alt a              |  开启/关闭 假全屏      */
-    { AltMask,                  XK_f,            fullscreen,       {0} },                     /* alt f              |  开启/关闭 全屏   */
+    { AltMask,                  XK_f,            fullscreen,       {0} },                     /* alt f              |  开启/关闭 真全屏   */
     { SuperMask,                XK_h,            togglebar,        {0} },                     /* super h            |  开启/关闭 状态栏 */
     { SuperMask,                XK_g,            toggleglobal,     {0} },                     /* super g            |  开启/关闭 全局 */
     { SuperMask,                XK_u,            toggleborder,     {0} },                     /* super u            |  开启/关闭 边框 */
@@ -173,9 +173,9 @@ static Key keys[] = {
     { SuperMask|ShiftMask,      XK_b,            tagmon,           {.i = +1} },               /* super shift b      |  将聚焦窗口移动到另一个显示器 */
 
     { ControlMask,              XK_0,            view,             {.ui= ~0} },               /* ctrl 0             |  显示所有workspace */
-    { ControlMask,              XK_KP_0,         view,             {.ui= ~0} },               /* ctrl 0             |  显示所有workspace */
+    { ControlMask,              XK_KP_0,         view,             {.ui= ~0} },               /* ctrl 0(右边数字键)   |  显示所有workspace */
     { AltMask,                  XK_0,            tag,              {.ui= ~0} },               /* alt 0              |  窗口在所有workspace都显示 */
-    { AltMask,                  XK_KP_0,         tag,              {.ui= ~0} },               /* alt 0              |  窗口在所有workspace都显示 */
+    { AltMask,                  XK_KP_0,         tag,              {.ui= ~0} },               /* alt 0(右边数字键)    |  窗口在所有workspace都显示 */
 
     { AltMask,                  XK_q,            killclient,       {0} },                     /* alt q              |  关闭窗口 */
     { AltMask|ControlMask,      XK_q,            forcekillclient,  {0} },                     /* alt ctrl q         |  强制关闭窗口(处理某些情况下无法销毁的窗口) */
@@ -189,10 +189,10 @@ static Key keys[] = {
     { SuperMask|ControlMask,    XK_minus,        setgap,           {.i = +6} },               /* super ctrl -       |  窗口减小 */
     { SuperMask|ControlMask,    XK_space,        setgap,           {.i = 0} },                /* super ctrl space   |  窗口重置 */
 
-    { AltMask|ControlMask,      XK_Up,           movewin,          {.ui = UP} },              /* super ctrl up      |  移动窗口 */
-    { AltMask|ControlMask,      XK_Down,         movewin,          {.ui = DOWN} },            /* super ctrl down    |  移动窗口 */
-    { AltMask|ControlMask,      XK_Left,         movewin,          {.ui = LEFT} },            /* super ctrl left    |  移动窗口 */
-    { AltMask|ControlMask,      XK_Right,        movewin,          {.ui = RIGHT} },           /* super ctrl right   |  移动窗口 */
+    { AltMask|ControlMask,      XK_Up,           movewin,          {.ui = UP} },              /* alt ctrl up      |  移动窗口 */
+    { AltMask|ControlMask,      XK_Down,         movewin,          {.ui = DOWN} },            /* alt ctrl down    |  移动窗口 */
+    { AltMask|ControlMask,      XK_Left,         movewin,          {.ui = LEFT} },            /* alt ctrl left    |  移动窗口 */
+    { AltMask|ControlMask,      XK_Right,        movewin,          {.ui = RIGHT} },           /* alt ctrl right   |  移动窗口 */
 
     { SuperMask|AltMask,        XK_Up,           resizewin,        {.ui = V_REDUCE} },        /* super alt up       |  调整窗口大小 */
     { SuperMask|AltMask,        XK_Down,         resizewin,        {.ui = V_EXPAND} },        /* super alt down     |  调整窗口大小 */
@@ -219,7 +219,7 @@ static Key keys[] = {
     /* spawn + SHCMD 执行对应命令(已下部分建议完全自己重新定义) */
     { AltMask,                  XK_Return, spawn, SHCMD("konsole") },  
     { SuperMask,                XK_Return, spawn, SHCMD("google-chrome") },
-    { ControlMask,              XK_Return, spawn, SHCMD("bash ~/tool/clash.sh") },                                                                                              /* super enter      | 打开终端             */
+    { ControlMask,              XK_Return, spawn, SHCMD("bash ~/tool/clash.sh") },                                                                                              /* alt enter      | 打开终端             */
     { SuperMask,                XK_d,      spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/dwmdrun.rasi -show run") },                                                       /* super d          | rofi: 执行run          */
     { AltMask,                  XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/dwmdrun.rasi -show drun") },                                                      /* alt space        | rofi: 执行drun          */
     { SuperMask|ControlMask,    XK_Return, spawn, SHCMD("konsole -e /usr/local/bin/yazi") },                                                                                                          /* ctrl win enter   | rofi: nautilus 文件浏览器          */
@@ -237,8 +237,8 @@ static Key keys[] = {
     { AltMask|ControlMask,      XK_Return, spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/dwmwin.rasi -show window") },
 
 
-    /* super key : 跳转到对应tag (可附加一条命令 若目标目录无窗口，则执行该命令) */
-    /* super shift key : 将聚焦窗口移动到对应tag */
+    /* alt key : 跳转到对应tag (可附加一条命令 若目标目录无窗口，则执行该命令) */
+    /* ctrl key : 将聚焦窗口移动到对应tag */
     /* key tag cmd */
     TAGKEYS(XK_1, 0, 0)
     TAGKEYS(XK_2, 1, 0)
@@ -269,26 +269,26 @@ static Key keys[] = {
 static Button buttons[] = {
     /* click               event mask       button            function       argument  */
     /* 点击窗口标题栏操作 */
-    { ClkWinTitle,         0,               Button2,          fullname_taskbar_activeitem, {0} },                     // 中键        |  点击选中的标题     |  切换完整title和部分title
+    { ClkWinTitle,         0,               Button2,          fullname_taskbar_activeitem, {0} },                     // 中键        |  点击标题     |  切换完整title和部分title
     { ClkWinTitle,         0,               Button1,          togglewin,     {0} },                                   // 左键        |  点击标题     |  切换窗口显示状态
-    { ClkWinTitle,         0,               Button3,          killclient,    {0} },                                   // 右键        |  点击选中的标题     |  退出窗口
+    { ClkWinTitle,         0,               Button3,          killclient,    {0} },                                   // 右键        |  点击标题     |  退出窗口
     /* 点击窗口操作 */
     { ClkClientWin,        SuperMask,       Button1,          movemouse,     {0} },                                   // super+左键  |  拖拽窗口     |  拖拽窗口
     { ClkClientWin,        SuperMask,       Button3,          resizemouse,   {0} },                                   // super+右键  |  拖拽窗口     |  改变窗口大小
-    { ClkClientWin,        0,               Button2,          fake_fullscreen,    {0} },                                   // super+中键  |  点击窗口     |  窗口假全屏
-    { ClkClientWin,        SuperMask,       Button4,          viewtoleft,{0} },                                       // super+鼠标滚轮上  |  鼠标滚轮上         
-    { ClkClientWin,        SuperMask,       Button5,          viewtoright,{0} },                                      // super+鼠标滚轮下  |  鼠标滚轮 下
+    { ClkClientWin,        0,               Button2,          fake_fullscreen,    {0} },                                   // 中键  |  点击窗口     |  窗口假全屏
+    { ClkClientWin,        SuperMask,       Button4,          viewtoleft,{0} },                                       // super+鼠标滚轮上  |  鼠标滚轮上   | 切换到上一个tag      
+    { ClkClientWin,        SuperMask,       Button5,          viewtoright,{0} },                                      // super+鼠标滚轮下  |  鼠标滚轮 下  | 切换到下一个tag
     { ClkClientWin,        0,               Button1,          inner_overvew_toggleoverview,     {0} },                    //左键  |  overview视图点击窗口 |退出overview跳转到窗口所在tag 
     { ClkClientWin,        0,               Button3,          inner_overvew_killclient,       {0} },                    //右键  |  overview视图点击窗口 |关闭该窗口
 
-    { ClkRootWin,          SuperMask,       Button4,          viewtoleft,{0} },                                       // super+鼠标滚轮上  |  鼠标滚轮上         
-    { ClkRootWin,          SuperMask,       Button5,          viewtoright,{0} }, 
+    { ClkRootWin,          SuperMask,       Button4,          viewtoleft,{0} },                                       // super+鼠标滚轮上  |  鼠标滚轮上     | 切换到上一个tag    
+    { ClkRootWin,          SuperMask,       Button5,          viewtoright,{0} },                                        // super+鼠标滚轮下  |  鼠标滚轮 下  | 切换到下一个tag
     /* 点击tag操作 */
     { ClkTagBar,           0,               Button1,          view,          {0} },                                   // 左键        |  点击tag      |  切换tag
 	{ ClkTagBar,           0,               Button3,          toggleview,    {0} },                                   // 右键        |  点击tag      |  切换是否显示tag
     { ClkTagBar,           SuperMask,       Button1,          tag,           {0} },                                   // super+左键  |  点击tag      |  将窗口移动到对应tag
-    { ClkTagBar,           0,               Button4,          viewtoleft,    {0} },                                   // 鼠标滚轮上  |  tag          |  向前切换tag
-	{ ClkTagBar,           0,               Button5,          viewtoright,   {0} },                                   // 鼠标滚轮下  |  tag          |  向后切换tag
+    { ClkTagBar,           0,               Button4,          viewtoleft,    {0} },                                   // 鼠标放tag图表滚轮上  |  tag          |  向前切换tag
+	{ ClkTagBar,           0,               Button5,          viewtoright,   {0} },                                   // 鼠标放tag图表滚轮下  |  tag          |  向后切换tag
     /* 点击状态栏操作 */
     { ClkStatusText,       0,               Button1,          clickstatusbar,{0} },                                   // 左键        |  点击状态栏   |  根据状态栏的信号执行 $DWM/scripts/dwmstatusbar.sh $signal L
     { ClkStatusText,       0,               Button2,          clickstatusbar,{0} },                                   // 中键        |  点击状态栏   |  根据状态栏的信号执行 $DWM/scripts/dwmstatusbar.sh $signal M
@@ -296,8 +296,8 @@ static Button buttons[] = {
     { ClkStatusText,       0,               Button4,          clickstatusbar,{0} },                                   // 鼠标滚轮上  |  状态栏       |  根据状态栏的信号执行 $DWM/scripts/dwmstatusbar.sh $signal U
     { ClkStatusText,       0,               Button5,          clickstatusbar,{0} },                                   // 鼠标滚轮下  |  状态栏       |  根据状态栏的信号执行 $DWM/scripts/dwmstatusbar.sh $signal D
     /*点击布局图标*/
-    { ClkLtSymbol,           0,             Button1,          selectlayout,{.v = &layouts[1]} },                                                        // 左键        |  点击tag      |  切换tag                                                                                                      //
-    { ClkLtSymbol,           0,             Button3,          selectlayout,{.v = &layouts[2]} },                                                        // 右键        |  点击tag      |  切换tag                                                                                                      //
+    { ClkLtSymbol,           0,             Button1,          selectlayout,{.v = &layouts[1]} },                                                        // 左键        |  点击布局图表      |  切换网格和栈布局                                                                                                   //
+    { ClkLtSymbol,           0,             Button3,          selectlayout,{.v = &layouts[2]} },                                                        // 右键        |  点击布局图表      |  切换从头部入栈还是尾部                                                                                                      //
     /* 点击bar空白处 */
     { ClkBarEmpty,         0,               Button1,          spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/dwmwin.rasi -show window") },         // 左键        |  bar空白处    |  rofi 执行 window
     { ClkBarEmpty,         0,               Button3,          spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/all.rasi -show drun") },               // 右键        |  bar空白处    |  rofi 执行 drun
