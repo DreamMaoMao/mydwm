@@ -65,9 +65,13 @@
 
 ![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/357a1c44-0a01-422c-821d-e6ce5e24bbaa)
 
+![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/5be684bb-9ed6-454e-b715-1297f43d98e8)
+
+![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/6c434c0f-09ff-4a45-94c0-592d60ee91b4)
 
 
-https://github.com/DreamMaoMao/superdwm/assets/30348075/b6b0291a-1e5a-4be0-906e-9094839a68b3
+
+https://github.com/DreamMaoMao/superdwm/assets/30348075/b89478fd-f1d4-42c4-9fff-675b41af3efc
 
 
 
@@ -96,7 +100,7 @@ sudo pacman -S inetutils
 sudo pacman -S  networkmanager 
 sudo pacman -S  gdm
 
-yay -S blueman acpi dunst jq alsa-utils polkit-gnome  rofi-blocks-git light numlockx nemo flameshot feh lm_sensors   mantablockscreen network-manager-applet playerctl python3 parcellite redshift upower xorg-xinit xprintidle xorg wmctrl xdotool tumbler pavucontrol ttf-jetbrains-mono-nerd
+yay -S blueman acpi dunst jq alsa-utils polkit-gnome  rofi-blocks-git light numlockx nemo flameshot feh lm_sensors   mantablockscreen network-manager-applet playerctl python3 parcellite redshift upower xorg-xinit xprintidle xorg wmctrl xdotool tumbler pavucontrol ttf-jetbrains-mono-nerd eww-x11
 
 
 ```
@@ -119,6 +123,7 @@ cp rofi -r ~/.config/
 cp dunst -r ~/.config/
 cp fish -r ~/.config/
 cp konsole -r ~/.local/share/
+cp eww -r ~/.config/
 sed -i s#/home/user#$HOME# dwm.desktop
 sudo cp dwm.desktop /usr/share/xsession/
 
