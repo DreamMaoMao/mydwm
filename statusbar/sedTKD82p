@@ -1,7 +1,0 @@
-
-export _bat='^sbat^^c#0a4b55^^b#96d5dd0xff^  97% '
-export _date='^sdate^^c#ffffff^^b#cf206c0xff^  09/04 22:26 '
-export _mem='^smem^^c#3B001B^^b#cba6f70xff^ 󰍛 35% '
-export _wifi='^swifi^^c#000080^^b#a6e3a10xff^   tpwrq5g '
-export _vol='^svol^^c#442266^^b#fab3870xff^  46% '
-export _light='^slight^^c#442266^^b#dedbd40xff^  20% '

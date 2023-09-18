@@ -21,9 +21,9 @@ click() {
 
 # 更新状态栏
 refresh() {
-    _music='';_wifi='';_cpu='';_mem='';_date='';_vol='';_light='';_bat=''# 重置所有模块的状态为空
+    _wifi='';_cpu='';_mem='';_date='';_vol='';_light='';_bat=''# 重置所有模块的状态为空
     source $tempfile
-    xsetroot -name "$_music$_wifi$_cpu$_mem$_date$_vol$_light$_bat"      
+    xsetroot -name "$_wifi$_cpu$_mem$_date$_vol$_light$_bat"      
 
 }
 
@@ -57,6 +57,6 @@ cron() {
 case $1 in
     cron) cron ;;
     update) shift 1; update $* ;;
-    updateall|check) update  music wifi cpu mem date vol light bat ;;
+    updateall|check) update wifi cpu mem date vol light bat ;;
     *) click $1 $2 ;; # 接收clickstatusbar传递过来的信号 $1: 模块名  $2: 按键(L|M|R|U|D)
 esac
