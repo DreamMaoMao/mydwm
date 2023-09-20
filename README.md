@@ -124,6 +124,7 @@ cp dunst -r ~/.config/
 cp fish -r ~/.config/
 cp konsole -r ~/.local/share/
 cp eww -r ~/.config/
+cp parcellite -r ~/.config/
 sed -i s#/home/user#$HOME# dwm.desktop
 sudo cp dwm.desktop /usr/share/xsession/
 
