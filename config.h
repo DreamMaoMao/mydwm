@@ -57,8 +57,8 @@ static const unsigned int alphas[][3] = {
     [SchemeSelFakeFullGLObal] = {OPAQUE, baralpha, borderalpha},
     [SchemeNormTag] = {OPAQUE, baralpha, borderalpha},
     [SchemeSelTag] = {OPAQUE, baralpha, borderalpha},
-    [SchemeBarEmpty] = {NULL, 0x11, NULL},
-    [SchemeStatusText] = {OPAQUE, 0x88, NULL},
+    [SchemeBarEmpty] = {0, 0x11, 0},
+    [SchemeStatusText] = {OPAQUE, 0x88, 0},
 };
 
 

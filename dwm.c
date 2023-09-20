@@ -239,8 +239,8 @@ struct Systray {
 };
 
 /* function declarations */
-static void logtofile(const char *fmt, ...);
-static void lognumtofile(unsigned int num);
+// static void logtofile(const char *fmt, ...);
+// static void lognumtofile(unsigned int num);
 
 
 static void tile(Monitor *m);
@@ -362,7 +362,7 @@ static void togglebar(const Arg *arg);
 static void togglesystray();
 static void togglefloating(const Arg *arg);
 static void toggleallfloating(const Arg *arg);
-static void togglescratch(const Arg *arg);
+// static void togglescratch(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void toggleoverview(const Arg *arg);
 static void togglewin(const Arg *arg);
@@ -456,7 +456,7 @@ static int hiddenWinStackTop = -1;
 static Client *hiddenWinStack[100];
 
 static void overview_restore(Client *c);
-static void overivew_backup(Client *c);
+static void overview_backup(Client *c);
 
 static void fullname_taskbar_activeitem(const Arg *arg);
 
@@ -476,25 +476,25 @@ struct Pertag {
 };
 
 /* function implementations */ 
-void logtofile(const char *fmt, ...) {
-  char buf[256];
-  char cmd[256];
-  va_list ap;
-  va_start(ap, fmt);
-  vsprintf((char *)buf, fmt, ap);
-  va_end(ap);
-  uint i = strlen((const char *)buf);
+// void logtofile(const char *fmt, ...) {
+//   char buf[256];
+//   char cmd[256];
+//   va_list ap;
+//   va_start(ap, fmt);
+//   vsprintf((char *)buf, fmt, ap);
+//   va_end(ap);
+//   uint i = strlen((const char *)buf);
 
-  sprintf(cmd, "echo '%.*s' >> ~/log", i, buf);
-  system(cmd);
-}
+//   sprintf(cmd, "echo '%.*s' >> ~/log", i, buf);
+//   system(cmd);
+// }
 
 /* function implementations */
-void lognumtofile(unsigned int num) {
-  char cmd[256];
-  sprintf(cmd, "echo '%x' >> ~/log",num);
-  system(cmd);
-}
+// void lognumtofile(unsigned int num) {
+//   char cmd[256];
+//   sprintf(cmd, "echo '%x' >> ~/log",num);
+//   system(cmd);
+// }
 
 
 void applyrules(Client *c) {   //读取config.h的窗口配置规则处理
@@ -683,10 +683,10 @@ void arrange(Monitor *m) {  //布局管理
 
 void arrangemon(Monitor *m) {  //确认选用的布局
   if (m->isoverview) {
-    strncpy(m->ltsymbol, overviewlayout.symbol, sizeof m->ltsymbol);
+    strncpy(m->ltsymbol, overviewlayout.symbol, sizeof overviewlayout.symbol);
     overviewlayout.arrange(m);
   } else {
-    strncpy(m->ltsymbol, m->lt[m->sellt]->symbol, sizeof m->ltsymbol);
+    strncpy(m->ltsymbol, m->lt[m->sellt]->symbol, sizeof m->lt[m->sellt]->symbol);
     m->lt[m->sellt]->arrange(m);
   }
 }
@@ -3049,31 +3049,31 @@ void toggleallfloating(const Arg *arg) {
   pointerfocuswin(selmon->sel);
 }
 
-void togglescratch(const Arg *arg) {
-  Client *c;
-  Monitor *m;
-  unsigned int found = 0;
+// void togglescratch(const Arg *arg) {
+//   Client *c;
+//   Monitor *m;
+//   unsigned int found = 0;
 
-  for (m = mons; m && !found; m = m->next)
-    for (c = m->clients; c && !(found = c->isscratchpad); c = c->next)
-      ;
-  if (found) {
-    if (c->mon == selmon) // 在同屏幕则toggle win状态
-      togglewin(&(Arg){.v = c});
-    else { // 不在同屏幕则将win移到当前屏幕 并显示
-      sendmon(c, selmon);
-      show(c);
-      focus(c);
-      if (c->isfloating) {
-        resize(c, selmon->mx + (selmon->mw - selmon->sel->w) / 2,
-               selmon->my + (selmon->mh - selmon->sel->h) / 2, selmon->sel->w,
-               selmon->sel->h, 0);
-      }
-      pointerfocuswin(c);
-    }
-  } else
-    spawn(arg);
-}
+//   for (m = mons; m && !found; m = m->next)
+//     for (c = m->clients; c && !(found = c->isscratchpad); c = c->next)
+//       ;
+//   if (found) {
+//     if (c->mon == selmon) // 在同屏幕则toggle win状态
+//       togglewin(&(Arg){.v = c});
+//     else { // 不在同屏幕则将win移到当前屏幕 并显示
+//       sendmon(c, selmon);
+//       show(c);
+//       focus(c);
+//       if (c->isfloating) {
+//         resize(c, selmon->mx + (selmon->mw - selmon->sel->w) / 2,
+//                selmon->my + (selmon->mh - selmon->sel->h) / 2, selmon->sel->w,
+//                selmon->sel->h, 0);
+//       }
+//       pointerfocuswin(c);
+//     }
+//   } else
+//     spawn(arg);
+// }
 
 void restorewin(const Arg *arg) {
   int i = hiddenWinStackTop;
@@ -3623,14 +3623,14 @@ void view(const Arg *arg) {
 /* overview 模式左键跳转窗口 */
 void inner_overvew_toggleoverview(const Arg *arg) {
   if(selmon->isoverview) {
-    toggleoverview(&arg);
+    toggleoverview(arg);
   }
 }
 
 /* overview 模式右键关闭窗口 */
 void inner_overvew_killclient(const Arg *arg) {
   if(selmon->isoverview) {
-    killclient(&arg);
+    killclient(arg);
   }
 }
 
@@ -4024,8 +4024,8 @@ void zoom(const Arg *arg) {
 Client *direction_select(const Arg *arg) {
   Client *tempClients[100];
   Client *c = NULL, *tc = selmon->sel;
-  int last = -1, cur = 0, issingle = issinglewin(NULL);
-
+  int last = -1, issingle = issinglewin(NULL);
+  // int cur = 0;
   if (tc &&
       tc->isfullscreen) /* no support for focusstack with fullscreen windows */
     return NULL;
@@ -4038,8 +4038,8 @@ Client *direction_select(const Arg *arg) {
     if (ISVISIBLE(c) && (issingle || !HIDDEN(c))) {
       last++;
       tempClients[last] = c;
-      if (c == tc)
-        cur = last;
+      // if (c == tc)
+        // cur = last;
     }
   }
 
@@ -4048,7 +4048,7 @@ Client *direction_select(const Arg *arg) {
   int sel_x = tc->x;
   int sel_y = tc->y;
   long long int distance = LLONG_MAX;
-  int temp_focus = 0;
+  // int temp_focus = 0;
   Client *tempFocusClients = NULL;
 
   switch (arg->i) {
