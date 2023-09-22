@@ -694,7 +694,11 @@ void arrangemon(Monitor *m) {  //确认选用的布局
 void attach(Client *c) {  //新打开的窗口放入窗口链表中
   Client *fc;
   for (fc = selmon->clients; fc; fc = fc->next){ //如果有窗口全屏,就把他退出全屏参与平铺
-    clear_fullscreen_flag(fc);
+    //将1左移当前的tag号-1位置,得到当前tag号在tags二进制中的位置,然后和当前窗口标记的可显示tag与,如果有位置重叠就成立
+    if((1 << (selmon->pertag->curtag-1)) & fc->tags){
+      clear_fullscreen_flag(fc);
+    }
+    
   }
   if (!newclientathead) { 
     Client **tc;
