@@ -104,11 +104,11 @@ yay -S blueman acpi dunst jq alsa-utils polkit-gnome  rofi-blocks-git light numl
 
 
 ```
-# 安装特定版本的picom(相对于原版在透明窗口全屏时不会闪烁)
+# 安装特定版本的picom
 ```
 cd ~/Downloads
-git clone https://github.com/DreamMaoMao/picom_dwm.git
-cd picom_dwm/
+git clone https://github.com/DreamMaoMao/picom.git
+cd picom/
 meson --buildtype=release . build --prefix=/usr -Dwith_docs=true
 sudo ninja -C build install
 ```

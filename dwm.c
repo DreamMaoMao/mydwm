@@ -3720,6 +3720,7 @@ void clear_fullscreen_flag(Client *c) {
   if (c->isfullscreen){
     c->isfullscreen=0;
     c->bw = c->oldbw ;
+    XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,PropModeReplace, (unsigned char *)0, 0); //清除窗口在x11服务中标记的全屏属性
   } 
 }
 
