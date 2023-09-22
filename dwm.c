@@ -2726,8 +2726,8 @@ void set_fake_fullscreen(Client *c) {
     XSetWindowBorder(dpy, c->win,scheme[border_type][ColBorder].pixel);
 
   } else {
-    // XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
-    //                 PropModeReplace, (unsigned char *)0, 0);
+    XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
+                    PropModeReplace, (unsigned char *)0, 0);
     c->isfullscreen = 0;
     c->isfloating = c->oldstate;
     c->bw = c->oldbw;
