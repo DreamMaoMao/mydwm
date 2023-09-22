@@ -235,6 +235,7 @@ static Key keys[] = {
     { SuperMask,                XK_p,      spawn, SHCMD("bash $DWM/scripts/monitor.sh") },                              /* super p     | 关闭内部显示器 */
     { SuperMask|ControlMask,    XK_m,      spawn, SHCMD("$DWM/scripts/rofidwm.sh outopts") },
     { AltMask|ControlMask,      XK_Return, spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/dwmwin.rasi -show window") },
+    { SuperMask,                XK_b,      spawn, SHCMD("systemctl suspend") },      /* super b     | 系统挂起 */ 
 
 
     /* alt key : 跳转到对应tag (可附加一条命令 若目标目录无窗口，则执行该命令) */
