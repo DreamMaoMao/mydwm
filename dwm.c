@@ -3577,7 +3577,7 @@ void setgap(const Arg *arg) {
 void view(const Arg *arg) {
   int i;
   unsigned int tmptag;
-  Client *c;
+  Client *c,*fc;
   int n = 0;
 
   selmon->seltags ^= 1; /* toggle sel tagset */
@@ -3621,6 +3621,14 @@ void view(const Arg *arg) {
       spawn(&(Arg){.v = (const char *[]){"/bin/sh", "-c", arg->v, NULL}});
     }
   }
+
+  //如果目标tag有窗口全屏,就把他置于最高层
+  for (fc = selmon->clients; fc; fc = fc->next){ 
+    if((1 << (selmon->pertag->curtag-1)) & fc->tags && fc->isfullscreen && fc->bw == 0){
+      XRaiseWindow(dpy,fc->win);   
+    }
+  }
+
 }
 
 
