@@ -161,7 +161,7 @@ struct Client {
   int x, y, w, h;
   int oldx, oldy, oldw, oldh;
   int bw, oldbw;
-  int overview_backup_x, overview_backup_y, overview_backup_w, overview_backup_h;
+  int overview_backup_x, overview_backup_y, overview_backup_w, overview_backup_h,overview_backup_bw;
   int fullscreen_backup_x, fullscreen_backup_y, fullscreen_backup_w, fullscreen_backup_h;
   int basew, baseh, incw, inch, maxw, maxh, minw, minh;
   int taskw,no_limit_taskw;
@@ -456,7 +456,7 @@ static Window root, wmcheckwin;
 static int hiddenWinStackTop = -1;
 static Client *hiddenWinStack[100];
 
-static void overview_restore(Client *c);
+static void overview_restore(Client *c,const Arg *arg);
 static void overview_backup(Client *c);
 
 static void fullname_taskbar_activeitem(const Arg *arg);
@@ -702,7 +702,6 @@ void attach(Client *c) {  //新打开的窗口放入窗口链表中
     clear_fullscreen_flag(fc);
   }
 
-  
   if (!newclientathead) { 
     Client **tc;
     for (tc = &c->mon->clients; *tc; tc = &(*tc)->next)
@@ -1906,7 +1905,7 @@ void manage(Window w, XWindowAttributes *wa) {
   c->w = c->oldw = c->overview_backup_w = c->fullscreen_backup_w = wa->width;
   c->h = c->oldh = c->overview_backup_h = c->fullscreen_backup_h = wa->height;
   // c->oldbw = wa->border_width;
-  c->bw = c->oldbw = borderpx;
+  c->bw = c->oldbw = c->overview_backup_bw = borderpx;
   c->isfloating = 0;
   c->isfullscreen = 0;
   c->no_limit_taskw = 0;
@@ -3192,6 +3191,8 @@ void unfocus(Client *c, int setfocus) {
 void unmanage(Client *c, int destroyed) {
   Monitor *m = c->mon;
   XWindowChanges wc;
+  unsigned int tags,i;
+  unsigned mask = 1;
 
   detach(c);
   detachstack(c);
@@ -3205,6 +3206,15 @@ void unmanage(Client *c, int destroyed) {
     XSync(dpy, False);
     XSetErrorHandler(xerror);
     XUngrabServer(dpy);
+  }
+
+  //如果全屏窗口还没退出全屏就被删除了,就清空他所在tag的全屏指针
+  if(c->isfullscreen){
+    for(tags=c->tags,i=0;tags > 0;i++,tags= tags >> 1 ){
+      if(tags & mask){
+        c->mon->pertag->fullscreen_client[i+1] = NULL;
+      }
+    }
   }
   free(c);
   focus(NULL);
@@ -3639,8 +3649,9 @@ void view(const Arg *arg) {
 
   //如果目标tag有窗口全屏,就把他置于最高层
   fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
-  if(fc && fc->bw == 0){
+  if(fc){
     XRaiseWindow(dpy,fc->win);   
+    focus(fc);
   }
 
 }
@@ -3667,15 +3678,15 @@ void toggleoverview(const Arg *arg) {
                                                             : selmon->seltags;
   selmon->isoverview ^= 1;
   Client *c;
-  // 正常视图到overview,退出所有窗口的浮动状态参与平铺,
-  //overview到正常视图,还原之前退出的浮动窗口状态 
+  // 正常视图到overview,退出所有窗口的浮动和全屏状态参与平铺,
+  //overview到正常视图,还原之前退出的浮动和全屏窗口状态 
   if(selmon->isoverview) {
     for (c = selmon->clients; c; c = c->next){
       overview_backup(c);
     }
   } else {
     for (c = selmon->clients; c; c = c->next){
-      overview_restore(c);
+      overview_restore(c,&(Arg){.ui = target});
     }
   }
 
@@ -3753,36 +3764,54 @@ void clear_fullscreen_flag(Client *c) {
 
 //普通视图切换到overview时保存窗口的旧状态
 void overview_backup(Client *c) {
-    c->overview_isfloatingbak = c->isfloating;
-    c->overview_isfullscreenbak = c->isfullscreen;
-    c->isfloating = 0;
-    c->isfullscreen = 0;
-    c->overview_backup_x = c->x;
-    c->overview_backup_y = c->y;
-    c->overview_backup_w = c->w;
-    c->overview_backup_h = c->h;
-    c->bw = c->oldbw ;
+  c->overview_isfloatingbak = c->isfloating;
+  c->overview_isfullscreenbak = c->isfullscreen;
+  c->isfloating = 0;
+  c->overview_backup_x = c->x;
+  c->overview_backup_y = c->y;
+  c->overview_backup_w = c->w;
+  c->overview_backup_h = c->h;
+  c->overview_backup_bw = c->bw;
+  if (c->isfullscreen){
+    if(c->bw == 0){ //真全屏窗口清除x11全屏属性
+      XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
+                      PropModeReplace, (unsigned char *)0, 0);
+    }
+    c->isfullscreen = 0; //清楚窗口全屏标志
+  }
+  c->bw = c->oldbw ; //恢复非全屏的border
 }
 
 //overview切回到普通视图还原窗口的状态
-void overview_restore(Client *c) {
-    c->isfloating = c->overview_isfloatingbak;
-    c->isfullscreen = c->overview_isfullscreenbak;
-    c->overview_isfloatingbak  = 0 ;
-    c->overview_isfullscreenbak = 0;
-    // c->x = c->overview_backup_x ;
-    // c->y = c->overview_backup_y ;
-    // c->w = c->overview_backup_w ;
-    // c->h = c->overview_backup_h ;
-    if (c->isfloating) {
+void overview_restore(Client *c,const Arg *arg) {
+  unsigned int tag,i;
+  c->isfloating = c->overview_isfloatingbak;
+  c->isfullscreen = c->overview_isfullscreenbak;
+  c->overview_isfloatingbak  = 0 ;
+  c->overview_isfullscreenbak = 0;
+  c->bw = c->overview_backup_bw;
+  if (c->isfloating) {
+    XRaiseWindow(dpy, c->win); //提升悬浮窗口到顶层
+    resize(c, c->overview_backup_x , c->overview_backup_y,c->overview_backup_w,c->overview_backup_h, 0);  
+  }
+  if (c->isfullscreen) {
+    if(c->overview_backup_bw == 0){ //真全屏窗口设置x11全屏属性
+      XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
+                PropModeReplace, (unsigned char *)&netatom[NetWMFullscreen],
+                1); //设置窗口在x11状态
+    }
+    resizeclient(c, c->overview_backup_x , c->overview_backup_y,c->overview_backup_w,c->overview_backup_h);
 
-      XRaiseWindow(dpy, c->win); //提升悬浮窗口到顶层
-      resize(c, c->overview_backup_x , c->overview_backup_y,c->overview_backup_w,c->overview_backup_h, 0);  
+    //记录tag中全屏窗口的指针
+    if (arg->ui == ~0)
+      tag = 0;
+    else {
+      for (i = 0; !(arg->ui & 1 << i); i++)
+        ;
+      tag = i + 1;
     }
-    if (c->isfullscreen) {
-      resizeclient(c, c->overview_backup_x , c->overview_backup_y,c->overview_backup_w,c->overview_backup_h);
-      XRaiseWindow(dpy, c->win); //提升窗口到顶层
-    }
+    c->mon->pertag->fullscreen_client[tag] = c;
+  }
 }
 
 //栈底部入栈布局位置大小计算
