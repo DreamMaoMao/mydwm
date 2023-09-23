@@ -3194,8 +3194,10 @@ void unmanage(Client *c, int destroyed) {
   unsigned int tags,i;
   unsigned mask = 1;
 
+  //从窗口栈中移除
   detach(c);
   detachstack(c);
+  
   if (!destroyed) {
     wc.border_width = c->oldbw;
     XGrabServer(dpy); /* avoid race conditions */
@@ -3216,6 +3218,10 @@ void unmanage(Client *c, int destroyed) {
       }
     }
   }
+
+  //取消窗口的相关事件监听
+  XSelectInput(dpy, c->win,NoEventMask);
+  //释放窗口资源
   free(c);
   focus(NULL);
   updateclientlist();
