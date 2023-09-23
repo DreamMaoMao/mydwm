@@ -729,6 +729,19 @@ void buttonpress(XEvent *e) { //鼠标按键事件处理函数
   XButtonPressedEvent *ev = &e->xbutton;
   Client *c = wintoclient(ev->window);
 
+  //滚轮加按键事件直接操作,不进行下面鼠标位置判断
+  for (i = 0; i < LENGTH(buttons); i++){
+    if (buttons[i].func && 
+        buttons[i].button == ev->button && 
+        (ev->button == Button4 || ev->button == Button5) &&
+        CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state) &&
+        CLEANMASK(buttons[i].mask) != 0) {
+
+      buttons[i].func(&buttons[i].arg);
+      return;
+    }
+  }
+
   // 判断鼠标点击的位置
   click = ClkRootWin;
   /* focus monitor if necessary */
