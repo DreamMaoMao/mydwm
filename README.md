@@ -63,16 +63,14 @@
 
 - 20.增加taskbar部分标题 由icon代替,icon字样可以在icons.h中设置
 
-![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/357a1c44-0a01-422c-821d-e6ce5e24bbaa)
+![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/8d1bf508-acfb-4551-bdc2-8258ca3d66f0)
 
-![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/5be684bb-9ed6-454e-b715-1297f43d98e8)
-
-![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/6c434c0f-09ff-4a45-94c0-592d60ee91b4)
+![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/e5796a37-5e35-4bf7-a90f-a75747d254a4)
 
 
 
-https://github.com/DreamMaoMao/superdwm/assets/30348075/b89478fd-f1d4-42c4-9fff-675b41af3efc
 
+https://github.com/DreamMaoMao/superdwm/assets/30348075/c48d4bf0-abc6-4faf-a37d-786ba56a3afd
 
 
 
