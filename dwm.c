@@ -461,6 +461,9 @@ static void overview_backup(Client *c);
 
 static void fullname_taskbar_activeitem(const Arg *arg);
 
+void set_tag_fullscreen_flag(Client *c);
+void clear_tag_fullscreen_flag(Client *c);
+
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 #include "icons.h"
@@ -2694,7 +2697,7 @@ void setfullscreen(Client *c) {
     XRaiseWindow(dpy, c->win);
 
     //记录tag中全屏窗口的指针
-    c->mon->pertag->fullscreen_client[selmon->pertag->curtag] = c;
+    set_tag_fullscreen_flag(c);
   } else {
     XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
                     PropModeReplace, (unsigned char *)0, 0);
@@ -2706,7 +2709,7 @@ void setfullscreen(Client *c) {
     arrange(c->mon);
 
     //清除tag中全屏窗口的指针
-    c->mon->pertag->fullscreen_client[selmon->pertag->curtag] = NULL;
+    clear_tag_fullscreen_flag(c);
   }
 }
 
@@ -2734,7 +2737,7 @@ void set_fake_fullscreen(Client *c) {
     XSetWindowBorder(dpy, c->win,scheme[border_type][ColBorder].pixel);
 
     //记录tag中全屏窗口的指针
-    c->mon->pertag->fullscreen_client[selmon->pertag->curtag] = c;
+    set_tag_fullscreen_flag(c);
 
   } else {
     XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
@@ -2748,7 +2751,7 @@ void set_fake_fullscreen(Client *c) {
     arrange(c->mon);
 
     //清除tag中全屏窗口的指针
-    c->mon->pertag->fullscreen_client[selmon->pertag->curtag] = NULL;
+    clear_tag_fullscreen_flag(c);
   }
 }
 
@@ -3188,11 +3191,30 @@ void unfocus(Client *c, int setfocus) {
   }
 }
 
+void set_tag_fullscreen_flag(Client *c){
+  unsigned int tags,i;
+  unsigned mask = 1;
+  for(tags=c->tags,i=0;tags > 0;i++,tags= tags >> 1 ){
+    if(tags & mask){
+      c->mon->pertag->fullscreen_client[i+1] = c;
+    }
+  }
+}
+
+void clear_tag_fullscreen_flag(Client *c){
+  unsigned int tags,i;
+  unsigned mask = 1;
+  for(tags=c->tags,i=0;tags > 0;i++,tags= tags >> 1 ){
+    if(tags & mask){
+      c->mon->pertag->fullscreen_client[i+1] = NULL;
+    }
+  }
+}
+
 void unmanage(Client *c, int destroyed) {
   Monitor *m = c->mon;
   XWindowChanges wc;
-  unsigned int tags,i;
-  unsigned mask = 1;
+
 
   //从窗口栈中移除
   detach(c);
@@ -3212,11 +3234,7 @@ void unmanage(Client *c, int destroyed) {
 
   //如果全屏窗口还没退出全屏就被删除了,就清空他所在tag的全屏指针
   if(c->isfullscreen){
-    for(tags=c->tags,i=0;tags > 0;i++,tags= tags >> 1 ){
-      if(tags & mask){
-        c->mon->pertag->fullscreen_client[i+1] = NULL;
-      }
-    }
+    clear_tag_fullscreen_flag(c);
   }
 
   //取消窗口的相关事件监听
@@ -3764,7 +3782,7 @@ void clear_fullscreen_flag(Client *c) {
     c->isfullscreen=0;
     c->bw = c->oldbw ;
     XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,PropModeReplace, (unsigned char *)0, 0); //清除窗口在x11服务中标记的全屏属性
-    selmon->pertag->fullscreen_client[selmon->pertag->curtag] = NULL;  //清除tag中记录的全屏窗口
+    clear_tag_fullscreen_flag(c);
   } 
 }
 
@@ -3790,7 +3808,6 @@ void overview_backup(Client *c) {
 
 //overview切回到普通视图还原窗口的状态
 void overview_restore(Client *c,const Arg *arg) {
-  unsigned int tag,i;
   c->isfloating = c->overview_isfloatingbak;
   c->isfullscreen = c->overview_isfullscreenbak;
   c->overview_isfloatingbak  = 0 ;
@@ -3809,14 +3826,7 @@ void overview_restore(Client *c,const Arg *arg) {
     resizeclient(c, c->overview_backup_x , c->overview_backup_y,c->overview_backup_w,c->overview_backup_h);
 
     //记录tag中全屏窗口的指针
-    if (arg->ui == ~0)
-      tag = 0;
-    else {
-      for (i = 0; !(arg->ui & 1 << i); i++)
-        ;
-      tag = i + 1;
-    }
-    c->mon->pertag->fullscreen_client[tag] = c;
+    set_tag_fullscreen_flag(c);
   }
 }
 
