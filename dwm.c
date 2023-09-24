@@ -522,10 +522,11 @@ static void xi_handler(XEvent xevent){
                        &win_x_return, &win_y_return,
                        &mask_return);
 
+    toggle_hotarea(root_x_return,root_y_return); //判断窗口真全屏状态左下角触发热区
+
     if (child_return != None) {
         pointer_in_client = wintoclient(child_return);  //window对象转换为client对象
         focus(pointer_in_client); //聚焦到鼠标所在的窗口
-        toggle_hotarea(win_x_return,win_y_return); //判断窗口真全屏状态左下角触发热区
     }  
   }
   XFreeEventData(dpy, &xevent.xcookie);  //释放函数开头get到内存的数据防止内存泄露
@@ -2138,8 +2139,7 @@ void motionnotify(XEvent *e) {
   }
 
   // 监测热区触发overview  
-  toggle_hotarea(ev->x_root,ev->y_root);
-
+  // toggle_hotarea(ev->x_root,ev->y_root);
 
   if ((m = recttomon(ev->x_root, ev->y_root, 1, 1)) != mon && mon) {
     unfocus(selmon->sel, 1);
