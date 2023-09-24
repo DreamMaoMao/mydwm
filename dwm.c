@@ -3277,6 +3277,7 @@ void unfocus(Client *c, int setfocus) {
 void set_tag_fullscreen_flag(Client *c){
   unsigned int tags,i;
   unsigned mask = 1;
+
   for(tags=c->tags,i=0;tags > 0;i++,tags= tags >> 1 ){
     if(tags & mask){
       c->mon->pertag->fullscreen_client[i+1] = c;
@@ -3287,6 +3288,7 @@ void set_tag_fullscreen_flag(Client *c){
 void clear_tag_fullscreen_flag(Client *c){
   unsigned int tags,i;
   unsigned mask = 1;
+
   for(tags=c->tags,i=0;tags > 0;i++,tags= tags >> 1 ){
     if(tags & mask){
       c->mon->pertag->fullscreen_client[i+1] = NULL;
@@ -3316,9 +3318,8 @@ void unmanage(Client *c, int destroyed) {
   }
 
   //如果全屏窗口还没退出全屏就被删除了,就清空他所在tag的全屏指针
-  if(c->overview_isfullscreenbak){
-    clear_tag_fullscreen_flag(c);
-  }
+  clear_tag_fullscreen_flag(c);
+
 
   //取消窗口的相关事件监听
   XSelectInput(dpy, c->win,NoEventMask);
