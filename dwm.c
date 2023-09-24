@@ -45,6 +45,7 @@
 #include "drw.h"
 #include "util.h"
 #include <math.h>
+#include <X11/extensions/XInput2.h>
 
 
 /* macros */
@@ -411,6 +412,8 @@ static void inner_overvew_toggleoverview(const Arg *arg);
 static void inner_overvew_killclient(const Arg *arg);
 static void clear_fullscreen_flag(Client *c);
 static uint get_border_type(Client *c);
+static void toggle_hotarea(int x_root,int y_root);
+static int xi_hander(XEvent xevent);
 
 /* variables */
 static Systray *systray = NULL;
@@ -440,11 +443,13 @@ static void (*handler[LASTEvent])(XEvent *) = { //给捕获的事件定义处理
     [PropertyNotify] = propertynotify,
     [ResizeRequest] = resizerequest,
     [UnmapNotify] = unmapnotify};
+
 static Atom wmatom[WMLast], netatom[NetLast], xatom[XLast];
 static int running = 1;
 static Cur *cursor[CurLast];
 static Clr **scheme;
 static Display *dpy;
+static int xi_opcode;
 static Drw *drw;
 static int useargb = 0;
 static Visual *visual;
@@ -461,8 +466,9 @@ static void overview_backup(Client *c);
 
 static void fullname_taskbar_activeitem(const Arg *arg);
 
-void set_tag_fullscreen_flag(Client *c);
-void clear_tag_fullscreen_flag(Client *c);
+static void set_tag_fullscreen_flag(Client *c);
+static void clear_tag_fullscreen_flag(Client *c);
+
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -501,6 +507,35 @@ struct Pertag {
 //   system(cmd);
 // }
 
+//扩展输入事件处理函数
+static int xi_hander(XEvent xevent){
+  XGetEventData (dpy, &xevent.xcookie);
+  if (xevent.xcookie.evtype == XI_RawMotion) { //鼠标移动事件
+    Window root_return, child_return;
+    int root_x_return, root_y_return;
+    int win_x_return, win_y_return;
+    unsigned int mask_return;
+
+    XQueryPointer(dpy, root, &root_return, &child_return, //获取鼠标位置和鼠标所在的窗口
+                       &root_x_return, &root_y_return,
+                       &win_x_return, &win_y_return,
+                       &mask_return);
+
+    if (child_return != None) {
+        Client *c;
+        c= wintoclient(child_return);  //window对象转换为client对象
+        focus(c); //聚焦到该窗口
+        toggle_hotarea(win_x_return,win_y_return); //判断窗口真全屏状态左下角触发热区
+    }
+
+    return 0;
+
+  } else {
+
+    return -1;
+  
+  }
+}
 
 void applyrules(Client *c) {   //读取config.h的窗口配置规则处理
   const char *class, *instance;
@@ -2014,11 +2049,24 @@ void maprequest(XEvent *e) {
     manage(ev->window, &wa);
 }
 
+void toggle_hotarea(int x_root,int y_root){
+  //左下角热区坐标计算,兼容多显示屏
+  Arg arg = {0};
+  unsigned hx = selmon->mx + hotarea_size;
+  unsigned hy = selmon->my + selmon->mh - hotarea_size;
+
+  if(enable_hotarea == 1 &&  selmon->is_in_hotarea == 0 && y_root > hy && x_root < hx && x_root >= selmon->mx && y_root <= (selmon->my +selmon->mh) ){
+      toggleoverview(&arg);
+      selmon->is_in_hotarea = 1;   
+  } else if(enable_hotarea == 1 && selmon->is_in_hotarea == 1 && (y_root <= hy || x_root >= hx || x_root < selmon->mx || y_root > (selmon->my +selmon->mh) ) ) {
+      selmon->is_in_hotarea = 0;
+  }
+}
+
 void motionnotify(XEvent *e) {
   static Monitor *mon = NULL;
   Monitor *m;
   XMotionEvent *ev = &e->xmotion;
-  Arg arg = {0};
 
   if (ev->window != root)
     return;
@@ -2094,18 +2142,10 @@ void motionnotify(XEvent *e) {
       }
     }
   }
-  
 
-  //左下角热区坐标计算,兼容多显示屏
-  unsigned hx = selmon->mx + hotarea_size;
-  unsigned hy = selmon->my + selmon->mh - hotarea_size;
+  // 监测热区触发overview  
+  toggle_hotarea(ev->x_root,ev->y_root);
 
-  if(enable_hotarea == 1 &&  selmon->is_in_hotarea == 0 && ev->y_root > hy && ev->x_root < hx && ev->x_root >= selmon->mx && ev->y_root <= (selmon->my +selmon->mh) ){
-      toggleoverview(&arg);
-      selmon->is_in_hotarea = 1;   
-  } else if(enable_hotarea == 1 && selmon->is_in_hotarea == 1 && (ev->y_root <= hy || ev->x_root >= hx || ev->x_root < selmon->mx || ev->y_root > (selmon->my +selmon->mh) ) ) {
-      selmon->is_in_hotarea = 0;
-  }
 
   if ((m = recttomon(ev->x_root, ev->y_root, 1, 1)) != mon && mon) {
     unfocus(selmon->sel, 1);
@@ -2573,12 +2613,25 @@ void restack(Monitor *m) {
 }
 
 void run(void) {
-  XEvent ev;
+  XEvent xevent;
+  unsigned int match_event;
   /* main event loop */
   XSync(dpy, False);
-  while (running && !XNextEvent(dpy, &ev))
-    if (handler[ev.type])
-      handler[ev.type](&ev); /* call handler */
+  while (running && !XNextEvent(dpy, &xevent)){
+    if (xevent.xcookie.type != GenericEvent || xevent.xcookie.extension != xi_opcode) {
+        /* 不是一个xinput2扩展事件,而是xlib的事件 */
+        if (handler[xevent.type])
+          handler[xevent.type](&xevent); /* call handler */
+        continue;
+    } else{ //xinput2扩展输入事件
+      match_event = xi_hander(xevent); //处理事件
+      if (match_event == 0){
+        XFreeEventData(dpy, &xevent.xcookie);    
+      } else {
+        continue;
+      }
+    }
+  }
 }
 
 void runAutostart(void) {
@@ -2889,7 +2942,37 @@ void setup(void) {
                   ButtonPressMask | PointerMotionMask | EnterWindowMask |
                   LeaveWindowMask | StructureNotifyMask | PropertyChangeMask;
   XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
+
+  //引入xinput2扩展的原始输入事件监测
+  /* 检查XInput2扩展的可用性 */
+  int event, error;
+  if (!XQueryExtension (dpy, "XInputExtension", &xi_opcode, &event, &error)) {
+      printf ("XInput扩展不可用。\n");
+      return;
+  }
+
+  /* 检查XInput2扩展的版本 */
+  int major = 2, minor = 0;
+  if (XIQueryVersion (dpy, &major, &minor) == BadRequest) {
+      printf ("不支持XInput2扩展的版本%d.%d。\n", major, minor);
+      return;
+  }
+
+  //xlib非扩展的窗口事件
   XSelectInput(dpy, root, wa.event_mask);
+
+  /* 设置掩码以接收所有主设备的事件 */
+  unsigned char mask_bytes [XIMaskLen (XI_LASTEVENT)];
+  memset (mask_bytes, 0, sizeof (mask_bytes));
+  XISetMask (mask_bytes, XI_RawMotion);  //鼠标移动事件
+
+  XIEventMask evmasks [1];
+  evmasks [0].deviceid = XIAllMasterDevices;
+  evmasks [0].mask_len = sizeof (mask_bytes);
+  evmasks [0].mask = mask_bytes;
+
+  XISelectEvents (dpy, root, evmasks, 1);
+  
   grabkeys();
   focus(NULL);
 }
