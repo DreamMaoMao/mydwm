@@ -413,7 +413,7 @@ static void inner_overvew_killclient(const Arg *arg);
 static void clear_fullscreen_flag(Client *c);
 static uint get_border_type(Client *c);
 static void toggle_hotarea(int x_root,int y_root);
-static void xi_hander(XEvent xevent);
+static void xi_handler(XEvent xevent);
 
 /* variables */
 static Systray *systray = NULL;
@@ -508,7 +508,7 @@ struct Pertag {
 // }
 
 //扩展输入事件处理函数
-static void xi_hander(XEvent xevent){
+static void xi_handler(XEvent xevent){
   XGetEventData (dpy, &xevent.xcookie); //获取扩展事件cookie对应的事件数据
   if (xevent.xcookie.evtype == XI_RawMotion) { //鼠标移动事件
     Window root_return, child_return;
@@ -2615,9 +2615,8 @@ void run(void) {
         /* 不是一个xinput2扩展事件,而是xlib的事件 */
         if (handler[xevent.type])
           handler[xevent.type](&xevent); /* call handler */
-        continue;
     } else{ //xinput2扩展输入事件
-      xi_hander(xevent); //处理事件
+      xi_handler(xevent); //处理扩展输入事件
     }
   }
 }
