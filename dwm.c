@@ -3316,7 +3316,7 @@ void unmanage(Client *c, int destroyed) {
   }
 
   //如果全屏窗口还没退出全屏就被删除了,就清空他所在tag的全屏指针
-  if(c->isfullscreen){
+  if(c->overview_isfullscreenbak){
     clear_tag_fullscreen_flag(c);
   }
 
@@ -3873,18 +3873,20 @@ void clear_fullscreen_flag(Client *c) {
 void overview_backup(Client *c) {
   c->overview_isfloatingbak = c->isfloating;
   c->overview_isfullscreenbak = c->isfullscreen;
-  c->isfloating = 0;
   c->overview_backup_x = c->x;
   c->overview_backup_y = c->y;
   c->overview_backup_w = c->w;
   c->overview_backup_h = c->h;
   c->overview_backup_bw = c->bw;
+  if(c->isfloating){
+    c->isfloating = 0;
+  }
   if (c->isfullscreen){
     if(c->bw == 0){ //真全屏窗口清除x11全屏属性
       XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
                       PropModeReplace, (unsigned char *)0, 0);
     }
-    c->isfullscreen = 0; //清楚窗口全屏标志
+    c->isfullscreen = 0; //清除窗口全屏标志
   }
   c->bw = c->oldbw ; //恢复非全屏的border
 }
