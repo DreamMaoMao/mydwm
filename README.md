@@ -63,6 +63,12 @@
 
 - 20.增加taskbar部分标题 由icon代替,icon字样可以在icons.h中设置
 
+- 21.新增加xinput2 扩展输入事件支持,解决非根窗口鼠标移动事件无法捕获的问题
+
+- 22.支持鼠标在非聚焦窗口内,不需要移出窗口再移动回来聚焦,只需要稍微动一下鼠标就能聚焦
+
+- 23.支持真全屏窗口左下角依旧可以触发热区
+  
 ![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/8d1bf508-acfb-4551-bdc2-8258ca3d66f0)
 
 ![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/e5796a37-5e35-4bf7-a90f-a75747d254a4)
