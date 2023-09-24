@@ -413,7 +413,7 @@ static void inner_overvew_killclient(const Arg *arg);
 static void clear_fullscreen_flag(Client *c);
 static uint get_border_type(Client *c);
 static void toggle_hotarea(int x_root,int y_root);
-static int xi_hander(XEvent xevent);
+static void xi_hander(XEvent xevent);
 
 /* variables */
 static Systray *systray = NULL;
@@ -508,8 +508,8 @@ struct Pertag {
 // }
 
 //扩展输入事件处理函数
-static int xi_hander(XEvent xevent){
-  XGetEventData (dpy, &xevent.xcookie);
+static void xi_hander(XEvent xevent){
+  XGetEventData (dpy, &xevent.xcookie); //获取扩展事件cookie对应的事件数据
   if (xevent.xcookie.evtype == XI_RawMotion) { //鼠标移动事件
     Window root_return, child_return;
     int root_x_return, root_y_return;
@@ -526,15 +526,9 @@ static int xi_hander(XEvent xevent){
         c= wintoclient(child_return);  //window对象转换为client对象
         focus(c); //聚焦到该窗口
         toggle_hotarea(win_x_return,win_y_return); //判断窗口真全屏状态左下角触发热区
-    }
-
-    return 0;
-
-  } else {
-
-    return -1;
-  
+    }  
   }
+  XFreeEventData(dpy, &xevent.xcookie);  //释放函数开头get到内存的数据防止内存泄露
 }
 
 void applyrules(Client *c) {   //读取config.h的窗口配置规则处理
@@ -2614,7 +2608,6 @@ void restack(Monitor *m) {
 
 void run(void) {
   XEvent xevent;
-  unsigned int match_event;
   /* main event loop */
   XSync(dpy, False);
   while (running && !XNextEvent(dpy, &xevent)){
@@ -2624,12 +2617,7 @@ void run(void) {
           handler[xevent.type](&xevent); /* call handler */
         continue;
     } else{ //xinput2扩展输入事件
-      match_event = xi_hander(xevent); //处理事件
-      if (match_event == 0){
-        XFreeEventData(dpy, &xevent.xcookie);    
-      } else {
-        continue;
-      }
+      xi_hander(xevent); //处理事件
     }
   }
 }
