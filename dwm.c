@@ -524,7 +524,7 @@ static void xi_handler(XEvent xevent){
 
     toggle_hotarea(root_x_return,root_y_return); //判断窗口真全屏状态左下角触发热区
 
-    if (child_return != None) {
+    if (child_return != None && mouse_move_toggle_focus == 1) {
         pointer_in_client = wintoclient(child_return);  //window对象转换为client对象
         focus(pointer_in_client); //聚焦到鼠标所在的窗口
     }  

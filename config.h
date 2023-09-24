@@ -1,13 +1,14 @@
 #include <X11/XF86keysym.h>
 
 
-static int taskbar_icon = 1;  /* 任务栏使用的是icon而不是title*/
-static int taskbar_movemouse_focus = 1;           /* 是否启用鼠标在taskbar移动的时候自动切换焦点 */
-static int tag_circle = 0;           /* 是否启用工作区循环 */
-static int enable_hotarea = 1;           /* 是否启用热区 */
-static int hotarea_size = 10;           /* 热区大小10x10 */
+static int const mouse_move_toggle_focus = 1; /* 在非聚焦窗口移动鼠标是否触发聚焦,不启用的话只有从另一个窗口移动到当前窗口才聚焦*/
+static int const taskbar_icon = 1;  /* 任务栏使用的是icon而不是title*/
+static int const taskbar_movemouse_focus = 1;           /* 是否启用鼠标在taskbar移动的时候自动切换焦点 */
+static int const tag_circle = 0;           /* 是否启用工作区循环 */
+static int const enable_hotarea = 1;           /* 是否启用热区 */
+static int const hotarea_size = 10;           /* 热区大小10x10 */
 
-static int no_stack_show_border = 1;           /* 一个窗口也显示border */
+static int const no_stack_show_border = 1;           /* 一个窗口也显示border */
 static int showsystray = 1;           /* 是否显示托盘栏 */
 static int newclientathead = 1; /* 定义新窗口在栈顶还是栈底 */
 static const unsigned int borderpx = 5; /* 窗口边框大小 */
