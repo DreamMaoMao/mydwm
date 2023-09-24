@@ -509,6 +509,7 @@ struct Pertag {
 
 //扩展输入事件处理函数
 static void xi_handler(XEvent xevent){
+  Client *pointer_in_client; //鼠标所在的窗口
   XGetEventData (dpy, &xevent.xcookie); //获取扩展事件cookie对应的事件数据
   if (xevent.xcookie.evtype == XI_RawMotion) { //鼠标移动事件
     Window root_return, child_return;
@@ -522,9 +523,8 @@ static void xi_handler(XEvent xevent){
                        &mask_return);
 
     if (child_return != None) {
-        Client *c;
-        c= wintoclient(child_return);  //window对象转换为client对象
-        focus(c); //聚焦到该窗口
+        pointer_in_client = wintoclient(child_return);  //window对象转换为client对象
+        focus(pointer_in_client); //聚焦到鼠标所在的窗口
         toggle_hotarea(win_x_return,win_y_return); //判断窗口真全屏状态左下角触发热区
     }  
   }
