@@ -213,6 +213,7 @@ struct Monitor {
   Pertag *pertag;
   uint isoverview;
   uint is_in_hotarea;
+  int status_w;
 
 };
 
@@ -781,7 +782,7 @@ void buttonpress(XEvent *e) { //鼠标按键事件处理函数
     selmon = m;
     focus(NULL);
   }
-  int status_w = drawstatusbar(selmon, bh, stext);
+  int status_w = selmon->status_w;
   int system_w = getsystraywidth();
   if (ev->window == selmon->barwin ||
       (!c && selmon->showbar &&
@@ -1190,6 +1191,8 @@ void drawbar(Monitor *m) {  //绘制bar
 
   // 绘制STATUSBAR
   status_w = drawstatusbar(m, bh, stext);
+
+  m->status_w = status_w;
 
   // 判断tag显示数量
   for (c = m->clients; c; c = c->next) {
@@ -2091,7 +2094,7 @@ void motionnotify(XEvent *e) {
     focus(NULL);
   }
 
-  int status_w = drawstatusbar(selmon, bh, stext);
+  int status_w = selmon->status_w;
   int system_w = getsystraywidth();
   if (ev->window == selmon->barwin ||
       (!c && selmon->showbar &&
