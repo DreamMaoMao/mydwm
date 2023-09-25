@@ -1108,6 +1108,7 @@ Monitor *createmon(void) { //初始化新的显示器数据结构
   m->pertag->curtag = m->pertag->prevtag = 1;
   m->isoverview = 0;
   m->is_in_hotarea = 0;
+  m->status_w = 0;
 
   for (i = 0; i <= LENGTH(tags); i++) {
     m->pertag->nmasters[i] = m->nmaster;
