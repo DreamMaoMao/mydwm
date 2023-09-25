@@ -164,6 +164,7 @@ struct Client {
   int bw, oldbw;
   int overview_backup_x, overview_backup_y, overview_backup_w, overview_backup_h,overview_backup_bw;
   int fullscreen_backup_x, fullscreen_backup_y, fullscreen_backup_w, fullscreen_backup_h;
+  int isactive;
   int basew, baseh, incw, inch, maxw, maxh, minw, minh;
   int taskw,no_limit_taskw;
   unsigned int tags;
@@ -241,8 +242,8 @@ struct Systray {
 };
 
 /* function declarations */
-// static void logtofile(const char *fmt, ...);
-// static void lognumtofile(unsigned int num);
+static void logtofile(const char *fmt, ...);
+static void lognumtofile(unsigned int num);
 
 
 static void tile(Monitor *m);
@@ -487,25 +488,25 @@ struct Pertag {
 
 
 /* function implementations */ 
-// void logtofile(const char *fmt, ...) {
-//   char buf[256];
-//   char cmd[256];
-//   va_list ap;
-//   va_start(ap, fmt);
-//   vsprintf((char *)buf, fmt, ap);
-//   va_end(ap);
-//   uint i = strlen((const char *)buf);
+void logtofile(const char *fmt, ...) {
+  char buf[256];
+  char cmd[256];
+  va_list ap;
+  va_start(ap, fmt);
+  vsprintf((char *)buf, fmt, ap);
+  va_end(ap);
+  uint i = strlen((const char *)buf);
 
-//   sprintf(cmd, "echo '%.*s' >> ~/log", i, buf);
-//   system(cmd);
-// }
+  sprintf(cmd, "echo '%.*s' >> ~/log", i, buf);
+  system(cmd);
+}
 
 /* function implementations */
-// void lognumtofile(unsigned int num) {
-//   char cmd[256];
-//   sprintf(cmd, "echo '%x' >> ~/log",num);
-//   system(cmd);
-// }
+void lognumtofile(unsigned int num) {
+  char cmd[256];
+  sprintf(cmd, "echo '%x' >> ~/log",num);
+  system(cmd);
+}
 
 //扩展输入事件处理函数
 static void xi_handler(XEvent xevent){
@@ -1555,11 +1556,17 @@ uint get_border_type(Client *c){
 //聚焦函数
 void focus(Client *c) {
   uint border_type = SchemeSel;
+
+  if (c && c->isactive) {  //已经设置过了什么也不做,针对设置了全局鼠标聚焦监测mouse_move_toggle_focus
+    return;                //避免反复设置损耗性能
+  }
+
   if (!c || !ISVISIBLE(c) || HIDDEN(c))
     for (c = selmon->stack; c && (!ISVISIBLE(c) || HIDDEN(c)); c = c->snext)
       ;
   if (selmon->sel && selmon->sel != c)
     unfocus(selmon->sel, 0);
+
   if (c) {
     if (c->mon != selmon)
       selmon = c->mon;
@@ -1568,10 +1575,14 @@ void focus(Client *c) {
     detachstack(c);
     attachstack(c);
     grabbuttons(c, 1);
+    c->isactive = 1; //标记已经设置过了
     //设置窗口的border
     border_type = get_border_type(c);
     XSetWindowBorder(dpy, c->win,scheme[border_type][ColBorder].pixel);
     setfocus(c);
+    if(c->isfloating){
+      XRaiseWindow(dpy,c->win);  //浮动窗口聚焦后把视图提到最高层,不被其他窗口覆盖
+    }
   } else {
     XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
     XDeleteProperty(dpy, root, netatom[NetActiveWindow]);
@@ -1955,6 +1966,7 @@ void manage(Window w, XWindowAttributes *wa) {
   c->isfloating = 0;
   c->isfullscreen = 0;
   c->no_limit_taskw = 0;
+  c->isactive = 0;
   updatetitle(c);
   updateicon(c);
   if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
@@ -3266,6 +3278,7 @@ void toggleborder(const Arg *arg) {
 void unfocus(Client *c, int setfocus) {
   if (!c)
     return;
+  c->isactive = 0; //取消已经在窗口设置过聚焦的标志
   grabbuttons(c, 0);
   XSetWindowBorder(dpy, c->win, scheme[SchemeNorm][ColBorder].pixel);
   if (setfocus) {
