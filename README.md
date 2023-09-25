@@ -158,6 +158,18 @@ sudo systemctl enable NetworkManager
 
 
 # 按键配置修改请查看config.h里的注释
+`建议不要用带有cpp格式化的编辑器编辑,不然格式化后可能会自动换行导致配置代码结构非常混乱`
+![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/c71bb970-bbd5-4421-b9bc-c4bd887ade92)
+
+
+# 应用对应的nerd icon 可以在icons.h中设置
+`左边是xprop 命令执行后点击所需要查询的窗口得到的wm_class,右边是nerd font icon`
+
+![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/e8a2a005-9f6d-413a-a887-8e5de8410100)
+
+nerd icon 可以在这里查询: [nerd font icon](https://www.nerdfonts.com/cheat-sheet)
+
+![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/8c315ca4-a3fe-43bc-8bf4-029eb20be8a1)
 
 # reference
 https://github.com/yaocccc/dwm
