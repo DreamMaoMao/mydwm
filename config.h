@@ -145,10 +145,14 @@ static Key keys[] = {
 
     { SuperMask,                XK_Tab,          focusstack,       {.i = +1} },               /* super tab          |  本tag内切换聚焦窗口 */
     { SuperMask|ShiftMask,      XK_Tab,          focusstack,       {.i = -1} },               /* super shift tab    |  本tag内切换聚焦窗口 */
-    { ControlMask,              XK_Left,         viewtoleft,       {0} },                     /* ctrl left          |  聚焦到左边的tag */
-    { ControlMask,              XK_Right,        viewtoright,      {0} },                     /* ctrl right         |  聚焦到右边的tag */
-    { ControlMask,              XK_Up,           viewtoleft,       {0} },                     /* ctrl up            |  聚焦到左边的tag */
-    { ControlMask,              XK_Down,         viewtoright,      {0} },                     /* ctrl down          |  聚焦到右边的tag */
+    { ControlMask,              XK_Left,         viewtoleft,       {0} },                     /* ctrl left          |  聚焦到左边有窗口的tag */
+    { ControlMask,              XK_Right,        viewtoright,      {0} },                     /* ctrl right         |  聚焦到右边有窗口的tag */
+    { ControlMask,              XK_Up,           viewtoleft,       {0} },                     /* ctrl up            |  聚焦到左边有窗口的tag */
+    { ControlMask,              XK_Down,         viewtoright,      {0} },                     /* ctrl down          |  聚焦到右边有窗口的tag */
+    { SuperMask,                XK_Left,         addtoleft,        {0} },                     /* super left         |  聚焦到左边的tag */
+    { SuperMask,                XK_Right,        addtoright,       {0} },                     /* super right        |  聚焦到右边的tag */
+    { SuperMask,                XK_Up,           addtoleft,        {0} },                     /* super up           |  聚焦到左边的tag */
+    { SuperMask,                XK_Down,         addtoright,       {0} },                     /* super down         |  聚焦到右边的tag */
     { ControlMask|SuperMask,    XK_Left,         tagtoleft,        {0} },                     /* ctrl alt left      |  将本窗口移动到左边tag */
     { ControlMask|SuperMask,    XK_Right,        tagtoright,       {0} },                     /* ctrl alt right     |  将本窗口移动到右边tag */
 
