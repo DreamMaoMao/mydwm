@@ -2,8 +2,8 @@ configuration {
 	font: "mono 20";
   run-list-command: "";
   drun-match-fields: "keywords,name";
-  modi: "drun,movie:/home/wrq/tool/movie.py";
-  cache-dir: "/home/wrq/.cache";
+  modi: "drun";
+  cache-dir: "~/.cache";
   drun-use-desktop-cache: true;
   drun-reload-desktop-cache:true;
   input-method: "fcitx";
