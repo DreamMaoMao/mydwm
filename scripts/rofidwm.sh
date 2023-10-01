@@ -39,7 +39,7 @@ outopts)
 		$DWM/scripts/blurlock.sh
 		;;
 	"󰒲")
-		sudo systemctl hibernate
+		systemctl hibernate
 		;;
 	esac
 	;;
