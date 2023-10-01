@@ -24,16 +24,16 @@ outopts)
 		/usr/bin/rofi -config $roficonf/logoutdwm.rasi -dmenu -p "Select logout" -font "JetBrainsMono Nerd Font 18")
 	case $option in
 	"")
-		sudo reboot
+		reboot
 		;;
 	"")
-		sudo pkill dwm
+		pkill dwm
 		;;
 	"")
-		sudo systemclt suspend
+		systemclt suspend
 		;;
 	"⏻")
-		sudo shutdown -h now
+		shutdown -h now
 		;;
 	"󰌾")
 		$DWM/scripts/blurlock.sh
