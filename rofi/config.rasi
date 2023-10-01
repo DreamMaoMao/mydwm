@@ -3,7 +3,7 @@ configuration {
   run-list-command: "";
   drun-match-fields: "keywords,name";
   modi: "drun";
-  cache-dir: "~/.cache";
+  // cache-dir: "~/.cache";
   drun-use-desktop-cache: true;
   drun-reload-desktop-cache:true;
   input-method: "fcitx";
