@@ -734,7 +734,7 @@ void attach(Client *c) { // 新打开的窗口放入窗口链表中
 
   // 如果当前的tag中有新创建的窗口,就让当前tag中的全屏窗口退出全屏参与平铺
   fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
-  if (fc) {
+  if (fc && !c->isfloating) {
     clear_fullscreen_flag(fc);
   }
 
