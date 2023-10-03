@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/bash
 # VOL 音量脚本
 # 本脚本需要你自行修改音量获取命令
 # 例如我使用的是 pipewire
@@ -65,9 +65,9 @@ click() {
     case "$1" in
         L) blueman                                           ;; # 仅通知
         M) pactl set-sink-mute @DEFAULT_SINK@ toggle        ;; # 切换静音
-        R) killall pavucontrol || pavucontrol --class=FGN & ;; # 打开pavucontrol
-        U) amixer set Master 5%+;  ;; # 音量加
-        D) amixer set Master 5%-; ;; # 音量减
+        R) killall pavucontrol || pavucontrol & ;; # 打开pavucontrol
+        U) amixer set Master 1%+;  ;; # 音量加
+        D) amixer set Master 1%-; ;; # 音量减
     esac
 }
 

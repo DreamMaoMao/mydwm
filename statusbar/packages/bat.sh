@@ -58,7 +58,7 @@ notify() {
 click() {
     case "$1" in
         L) $DWM/scripts/rofidwm.sh outopts;;
-        R) ;;
+        R) eww  open-many --toggle background-closer system-menu;;
     esac
 }
 
