@@ -3338,14 +3338,15 @@ void set_tag_fullscreen_flag(Client *c) {
 }
 
 void clear_tag_fullscreen_flag(Client *c) {
-  unsigned int tags, i;
-  unsigned mask = 1;
 
-  for (tags = c->tags, i = 0; tags > 0; i++, tags = tags >> 1) {
-    if (tags & mask) {
-      c->mon->pertag->fullscreen_client[i + 1] = NULL;
+  unsigned int tag_len = LENGTH(tags),i;
+
+  for(i=0;i<=tag_len;i++){
+    if(c->mon->pertag->fullscreen_client[i] && c->mon->pertag->fullscreen_client[i] == c ){
+      c->mon->pertag->fullscreen_client[i] = NULL;
     }
   }
+
 }
 
 void unmanage(Client *c, int destroyed) {
@@ -3886,7 +3887,7 @@ void viewtoleft(const Arg *arg) {
 
 void addtoleft(const Arg *arg) {
   unsigned int target = selmon->tagset[selmon->seltags];
-  unsigned int tag_len = __builtin_popcount(TAGMASK);
+  unsigned int tag_len = LENGTH(tags);
   target >>= 1;
   if (target == 0 && tag_circle){ //如果开启了循环到最左边的下一个是右边最后一个tag
     target = (1 << (tag_len - 1));
