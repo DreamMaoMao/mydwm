@@ -3369,7 +3369,8 @@ void unmanage(Client *c, int destroyed) {
   }
 
   // 如果全屏窗口还没退出全屏就被删除了,就清空他所在tag的全屏指针
-  clear_tag_fullscreen_flag(c);
+  if(c->isfullscreen  || c->overview_isfullscreenbak )
+    clear_tag_fullscreen_flag(c);
 
   // 取消窗口的相关事件监听
   XSelectInput(dpy, c->win, NoEventMask);
