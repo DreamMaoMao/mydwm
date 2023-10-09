@@ -2791,6 +2791,7 @@ void setfocus(Client *c) {
 }
 
 void setfullscreen(Client *c) {
+  unsigned int border_type;
   if (!c->isfullscreen) {
     XChangeProperty(
         dpy, c->win, netatom[NetWMState], XA_ATOM, 32, PropModeReplace,
@@ -2810,14 +2811,18 @@ void setfullscreen(Client *c) {
     // 记录tag中全屏窗口的指针
     set_tag_fullscreen_flag(c);
   } else {
+
     XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
                     PropModeReplace, (unsigned char *)0, 0);
+
     c->isfullscreen = 0;
     c->isfloating = c->oldstate;
-    c->bw = c->oldbw;
-
+    c->bw = borderpx;
     resizeclient(c, c->fullscreen_backup_x, c->fullscreen_backup_y,
                  c->fullscreen_backup_w, c->fullscreen_backup_h);
+    border_type = get_border_type(c); // 确认窗口边框的颜色
+    XSetWindowBorder(dpy, c->win, scheme[border_type][ColBorder].pixel);
+
     arrange(c->mon);
 
     // 清除tag中全屏窗口的指针
@@ -2858,7 +2863,7 @@ void set_fake_fullscreen(Client *c) {
                     PropModeReplace, (unsigned char *)0, 0);
     c->isfullscreen = 0;
     c->isfloating = c->oldstate;
-    c->bw = c->oldbw;
+    c->bw = borderpx;
     resizeclient(c, c->fullscreen_backup_x, c->fullscreen_backup_y,
                  c->fullscreen_backup_w, c->fullscreen_backup_h);
     border_type = get_border_type(c); // 确认窗口边框的颜色
