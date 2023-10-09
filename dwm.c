@@ -3380,6 +3380,12 @@ void unmanage(Client *c, int destroyed) {
   focus(NULL);
   updateclientlist();
   arrange(m);
+  if(selmon->clients == NULL){
+		if(selmon->isoverview){
+			Arg arg = {0};
+			toggleoverview(&arg);
+		}	    
+  }
 }
 
 void unmapnotify(XEvent *e) {
@@ -3810,6 +3816,7 @@ void view(const Arg *arg) {
   // 如果目标tag有窗口全屏,就把他置于最高层
   fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
   if (fc) {
+    logtofile(fc->name);
     XRaiseWindow(dpy, fc->win);
     focus(fc);
   }
