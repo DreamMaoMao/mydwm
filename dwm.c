@@ -2798,7 +2798,6 @@ void setfullscreen(Client *c) {
     c->fullscreen_backup_h = c->h;
     resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
     XRaiseWindow(dpy, c->win);
-
     // 记录tag中全屏窗口的指针
     set_tag_fullscreen_flag(c);
   } else {
@@ -3848,6 +3847,7 @@ void toggleoverview(const Arg *arg) {
                                                             : selmon->seltags;
   selmon->isoverview ^= 1;
   Client *c;
+  Client *target_client =selmon->sel ;
   // 正常视图到overview,退出所有窗口的浮动和全屏状态参与平铺,
   // overview到正常视图,还原之前退出的浮动和全屏窗口状态
   if (selmon->isoverview) {
@@ -3861,7 +3861,11 @@ void toggleoverview(const Arg *arg) {
   }
 
   view(&(Arg){.ui = target});
-  // pointerfocuswin(selmon->sel); //我不需要自动鼠标跳转窗口
+
+  if(target_client){
+    XRaiseWindow(dpy,target_client);
+    focus(target_client);
+  }
 }
 
 void viewtoleft(const Arg *arg) {
