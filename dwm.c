@@ -3997,7 +3997,7 @@ void overview_backup(Client *c) {
     }
     c->isfullscreen = 0; // 清除窗口全屏标志
   }
-  c->bw = c->oldbw; // 恢复非全屏的border
+  c->bw = borderpx; // 恢复非全屏的border
 }
 
 // overview切回到普通视图还原窗口的状态
