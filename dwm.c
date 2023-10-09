@@ -1173,6 +1173,7 @@ Monitor *dirtomon(int dir) {
 }
 
 void drawbar(Monitor *m) { // 绘制bar
+
   int x, empty_w;
   int w = 0;
   int system_w = 0, tasks_w = 0, status_w;
@@ -1183,6 +1184,10 @@ void drawbar(Monitor *m) { // 绘制bar
 
   if (!m->showbar)
     return;
+
+  XLowerWindow(dpy,m->barwin);
+  XLowerWindow(dpy,systray->win);
+
 
   // 获取系统托盘的宽度
   if (showsystray && m == systraytomon(m))
@@ -3391,7 +3396,8 @@ void unmanage(Client *c, int destroyed) {
 void unmapnotify(XEvent *e) {
   Client *c;
   XUnmapEvent *ev = &e->xunmap;
-
+  XLowerWindow(dpy,systray->win);
+  XLowerWindow(dpy,selmon->barwin);
   if ((c = wintoclient(ev->window))) {
     if (ev->send_event)
       setclientstate(c, WithdrawnState);
