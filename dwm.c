@@ -3863,7 +3863,7 @@ void toggleoverview(const Arg *arg) {
   view(&(Arg){.ui = target});
 
   if(target_client){
-    XRaiseWindow(dpy,target_client);
+    XRaiseWindow(dpy,target_client->win);
     focus(target_client);
   }
 }
