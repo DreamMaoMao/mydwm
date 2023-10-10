@@ -424,8 +424,6 @@ static void xi_handler(XEvent xevent);
 static void overview_restore(Client *c, const Arg *arg);
 static void overview_backup(Client *c);
 static void fullname_taskbar_activeitem(const Arg *arg);
-static void set_tag_fullscreen_flag(Client *c);
-static void clear_tag_fullscreen_flag(Client *c);
 
 /* variables */
 static Systray *systray = NULL;
@@ -485,7 +483,6 @@ struct Pertag {
   const Layout
       *ltidxs[LENGTH(tags) + 1][2]; /* matrix of tags and layouts indexes  */
   int showbars[LENGTH(tags) + 1];   /* display bar for the current tag */
-  Client *fullscreen_client[LENGTH(tags) + 1]; /*记录每个tag中的全屏窗口*/
 };
 
 /* function implementations */
@@ -732,18 +729,16 @@ void arrangemon(Monitor *m) { // 确认选用的布局
 }
 
 void attach(Client *c) { // 新打开的窗口放入窗口链表中
-  Client *fc;
 
-  // 如果当前的tag中有新创建的窗口,就让当前tag中的全屏窗口退出全屏参与平铺
-  fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
-  if (fc && !c->isfloating) {
-    clear_fullscreen_flag(fc);
+  Client **tc;
+  for (tc = &c->mon->clients; *tc; tc = &(*tc)->next){
+    // 如果当前的tag中有新创建的窗口,就让当前tag中的全屏窗口退出全屏参与平铺
+    if((*tc) && !c->isfloating && (*tc)->tags & c->tags){
+      clear_fullscreen_flag(*tc);
+    }
   }
 
   if (!newclientathead) {
-    Client **tc;
-    for (tc = &c->mon->clients; *tc; tc = &(*tc)->next)
-      ;
     *tc = c;
     c->next = NULL;
   } else {
@@ -2808,8 +2803,7 @@ void setfullscreen(Client *c) {
     c->fullscreen_backup_h = c->h;
     resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
     XRaiseWindow(dpy, c->win);
-    // 记录tag中全屏窗口的指针
-    set_tag_fullscreen_flag(c);
+
   } else {
 
     XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
@@ -2825,8 +2819,6 @@ void setfullscreen(Client *c) {
 
     arrange(c->mon);
 
-    // 清除tag中全屏窗口的指针
-    clear_tag_fullscreen_flag(c);
   }
 }
 
@@ -2855,9 +2847,6 @@ void set_fake_fullscreen(Client *c) {
     border_type = get_border_type(c); // 确认窗口边框的颜色
     XSetWindowBorder(dpy, c->win, scheme[border_type][ColBorder].pixel);
 
-    // 记录tag中全屏窗口的指针
-    set_tag_fullscreen_flag(c);
-
   } else {
     XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
                     PropModeReplace, (unsigned char *)0, 0);
@@ -2870,8 +2859,6 @@ void set_fake_fullscreen(Client *c) {
     XSetWindowBorder(dpy, c->win, scheme[border_type][ColBorder].pixel);
     arrange(c->mon);
 
-    // 清除tag中全屏窗口的指针
-    clear_tag_fullscreen_flag(c);
   }
 }
 
@@ -3344,29 +3331,6 @@ void unfocus(Client *c, int setfocus) {
   }
 }
 
-void set_tag_fullscreen_flag(Client *c) {
-  unsigned int tags, i;
-  unsigned mask = 1;
-
-  for (tags = c->tags, i = 0; tags > 0; i++, tags = tags >> 1) {
-    if (tags & mask) {
-      c->mon->pertag->fullscreen_client[i + 1] = c;
-    }
-  }
-}
-
-void clear_tag_fullscreen_flag(Client *c) {
-
-  unsigned int tag_len = LENGTH(tags),i;
-
-  for(i=0;i<=tag_len;i++){
-    if(c->mon->pertag->fullscreen_client[i] && c->mon->pertag->fullscreen_client[i] == c ){
-      c->mon->pertag->fullscreen_client[i] = NULL;
-    }
-  }
-
-}
-
 void unmanage(Client *c, int destroyed) {
   Monitor *m = c->mon;
   XWindowChanges wc;
@@ -3386,10 +3350,6 @@ void unmanage(Client *c, int destroyed) {
     XSetErrorHandler(xerror);
     XUngrabServer(dpy);
   }
-
-  // 如果全屏窗口还没退出全屏就被删除了,就清空他所在tag的全屏指针
-  if(c->isfullscreen  || c->overview_isfullscreenbak )
-    clear_tag_fullscreen_flag(c);
 
   // 取消窗口的相关事件监听
   XSelectInput(dpy, c->win, NoEventMask);
@@ -3787,7 +3747,7 @@ void setgap(const Arg *arg) {
 void view(const Arg *arg) {
   int i;
   unsigned int tmptag;
-  Client *c, *fc;
+  Client *c;
   int n = 0;
 
   selmon->seltags ^= 1; /* toggle sel tagset */
@@ -3832,12 +3792,15 @@ void view(const Arg *arg) {
     }
   }
 
-  // 如果目标tag有窗口全屏,就把他置于最高层
-  fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
-  if (fc) {
-    XRaiseWindow(dpy, fc->win);
-    focus(fc);
+  Client **tc;
+  for (tc = &selmon->clients; *tc; tc = &(*tc)->next){
+    // 目标窗口有全屏窗口的话把它提升到最高层
+    if((*tc) && (*tc)->isfullscreen){
+      XRaiseWindow(dpy, (*tc)->win);
+      focus(*tc);;
+    }
   }
+
 }
 
 /* overview 模式左键跳转窗口 */
@@ -3974,7 +3937,6 @@ void clear_fullscreen_flag(Client *c) {
     XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
                     PropModeReplace, (unsigned char *)0,
                     0); // 清除窗口在x11服务中标记的全屏属性
-    clear_tag_fullscreen_flag(c);
   }
 }
 
@@ -4021,9 +3983,6 @@ void overview_restore(Client *c, const Arg *arg) {
     }
     resizeclient(c, c->overview_backup_x, c->overview_backup_y,
                  c->overview_backup_w, c->overview_backup_h);
-
-    // 记录tag中全屏窗口的指针
-    set_tag_fullscreen_flag(c);
   }
 }
 
