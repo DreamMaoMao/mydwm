@@ -3101,7 +3101,7 @@ void tag(const Arg *arg) {
     Client **tc;
     for (tc = &target_client; *tc; tc = &(*tc)->next){
       // 让目标tag中的全屏窗口退出全屏参与平铺
-      if((*tc) && !target_client->isfloating && (*tc)->tags & target_client->tags){
+      if((*tc) && (*tc) != target_client && !target_client->isfloating && (*tc)->tags & target_client->tags){
         clear_fullscreen_flag(*tc);
       }
     }
@@ -3114,7 +3114,9 @@ void tag(const Arg *arg) {
   //如果是浮动的移动过去就让他置于顶层
   if(target_client->isfloating){
     XRaiseWindow(dpy, target_client);
-    focus(target_client);;
+    focus(target_client);
+  }else {
+    focus(target_client);
   }
 }
 
