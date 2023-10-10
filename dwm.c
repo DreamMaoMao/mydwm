@@ -3113,7 +3113,7 @@ void tag(const Arg *arg) {
   }
   //如果是浮动的移动过去就让他置于顶层
   if(target_client->isfloating){
-    XRaiseWindow(dpy, target_client);
+    XRaiseWindow(dpy, target_client->win);
     focus(target_client);
   }else {
     focus(target_client);
@@ -3951,7 +3951,7 @@ void addtoright(const Arg *arg) {
 void clear_fullscreen_flag(Client *c) {
   if (c->isfullscreen) {
     c->isfullscreen = 0;
-    c->bw = c->oldbw;
+    c->bw = borderpx; // 恢复非全屏的border
     XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
                     PropModeReplace, (unsigned char *)0,
                     0); // 清除窗口在x11服务中标记的全屏属性
