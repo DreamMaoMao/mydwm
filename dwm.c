@@ -728,6 +728,7 @@ void arrangemon(Monitor *m) { // 确认选用的布局
   }
 }
 
+
 void attach(Client *c) { // 新打开的窗口放入窗口链表中
 
   Client **tc;
@@ -3093,13 +3094,28 @@ void spawn(const Arg *arg) {
 }
 
 void tag(const Arg *arg) {
-  if (selmon->sel && !selmon->sel->isglobal && arg->ui & TAGMASK) {
-    selmon->sel->tags = arg->ui & TAGMASK;
+  Client *target_client = selmon->sel;
+  if (target_client && !target_client->isglobal && arg->ui & TAGMASK) {
+    target_client->tags = arg->ui & TAGMASK;
+
+    Client **tc;
+    for (tc = &target_client; *tc; tc = &(*tc)->next){
+      // 让目标tag中的全屏窗口退出全屏参与平铺
+      if((*tc) && !target_client->isfloating && (*tc)->tags & target_client->tags){
+        clear_fullscreen_flag(*tc);
+      }
+    }
     focus(NULL);
     arrange(selmon);
     view(&(Arg){.ui = arg->ui});
-  } else
+  } else{
     view(arg);
+  }
+  //如果是浮动的移动过去就让他置于顶层
+  if(target_client->isfloating){
+    XRaiseWindow(dpy, target_client);
+    focus(target_client);;
+  }
 }
 
 void tagmon(const Arg *arg) {
