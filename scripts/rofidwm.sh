@@ -30,7 +30,7 @@ outopts)
 		pkill dwm
 		;;
 	"")
-		systemclt suspend
+		systemctl suspend
 		;;
 	"⏻")
 		shutdown -h now
@@ -39,7 +39,7 @@ outopts)
 		$DWM/scripts/blurlock.sh
 		;;
 	"󰒲")
-		systemctl hibernate
+		sudo systemctl hibernate
 		;;
 	esac
 	;;
