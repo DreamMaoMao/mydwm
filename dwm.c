@@ -1592,10 +1592,10 @@ void focus(Client *c) {
     border_type = get_border_type(c);
     XSetWindowBorder(dpy, c->win, scheme[border_type][ColBorder].pixel);
     setfocus(c);
-    if (c->isfloating) {
-      XRaiseWindow(dpy,
-                   c->win); // 浮动窗口聚焦后把视图提到最高层,不被其他窗口覆盖
-    }
+    // if (c->isfloating) {
+    //   XRaiseWindow(dpy,
+    //                c->win); // 浮动窗口聚焦后把视图提到最高层,不被其他窗口覆盖
+    // }
   } else {
     XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
     XDeleteProperty(dpy, root, netatom[NetActiveWindow]);
