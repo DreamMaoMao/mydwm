@@ -3101,7 +3101,7 @@ void tag(const Arg *arg) {
     Client **tc;
     for (tc = &target_client; *tc; tc = &(*tc)->next){
       // 让目标tag中的全屏窗口退出全屏参与平铺
-      if((*tc) && (*tc) != target_client && !target_client->isfloating && (*tc)->tags & target_client->tags){
+      if(!target_client->isfloating && (*tc) != target_client && (*tc) && (*tc)->isfullscreen  && (*tc)->tags & target_client->tags){
         clear_fullscreen_flag(*tc);
       }
     }
