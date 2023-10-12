@@ -13,7 +13,7 @@
     (box :class "main-buttons-box" :orientation "h" :space-evenly "false"
       (button :tooltip "Shutdown" :class "shutdown" :onclick "shutdown now" "󰐥")
       (button :tooltip "Reboot" :class "reboot" :onclick "reboot" "󰜉")
-      (button :tooltip "Exit" :class "exit" :onclick "hyprctl dispatch exit" "󰍃")
+      (button :tooltip "Exit" :class "exit" :onclick "~/.config/eww/Misc/scripts/logout" "󰍃")
       (button :tooltip "Suspend" :class "suspend" :onclick "systemctl suspend" "")
       (button :tooltip "Hibernate" :class "hibernate" :onclick "sudo systemctl hibernate" "󰒲")
       (button :tooltip "Lock" :class "lock" :onclick "swaylock -f -c 000000" "󰌾"))))

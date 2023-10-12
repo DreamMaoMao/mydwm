@@ -122,6 +122,6 @@
   :windowtype "normal"
   :wm-ignore true
   :monitor 0
-  :geometry (geometry  :width "30%" :height 300 :y 47 :x "60%")
+  :geometry (geometry  :width 500 :height 300 :y 50 :x 1155)
   (system))
 
