@@ -2,7 +2,7 @@
 
 icon() {
     # Lets round the float result
-    bri=$(brightnessctl i -m | tr , " " | awk '{print $4}' | cut -c 1-2)
+    bri=$(brightnessctl get)
     
     if [[ "$bri" -gt "90" ]]; then
         echo "󰃠"
