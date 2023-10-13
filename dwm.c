@@ -264,6 +264,7 @@ static void attach(Client *c);
 static void attachstack(Client *c);
 static void buttonpress(XEvent *e);
 static void checkotherwm(void);
+static unsigned int judge_win_contain_state(Window w, Atom prop);
 static void cleanup(void);
 static void cleanupmon(Monitor *mon);
 static void clientmessage(XEvent *e);
@@ -534,19 +535,27 @@ static void xi_handler(XEvent xevent) {
     int root_x_return, root_y_return;
     int win_x_return, win_y_return;
     unsigned int mask_return;
+
+
     XQueryPointer(dpy, root, &root_return,
                   &child_return, // 获取鼠标位置和鼠标所在的窗口
                   &root_x_return, &root_y_return, &win_x_return, &win_y_return,
                   &mask_return);
-      if(!child_return || child_return == selmon->barwin || child_return == systray->win){
-        goto FreeEventData;
-      }
-      pointer_in_client =
-          wintoclient(child_return); // window对象转换为client对象
-      focus(pointer_in_client);      // 聚焦到鼠标所在的窗口
-      if(pointer_in_client->isfloating){
-        XRaiseWindow(dpy,pointer_in_client->win);   //提升浮动窗口到顶层
-      }
+
+    Atom net_wm_state_skip_pager =                        //_NET_WM_STATE_SKIP_PAGER一些窗口小部件有这个属性比如eww面板
+    XInternAtom(dpy, "_NET_WM_STATE_SKIP_PAGER", False); //最后一个参数表示是否系统本来就存在该原子的时候才返回,这里表示可以自定义不管系统有没有
+
+    unsigned int isinbacklist = judge_win_contain_state(child_return, net_wm_state_skip_pager);
+
+    if(!child_return || child_return == selmon->barwin || child_return == systray->win || isinbacklist == 1 ){
+      goto FreeEventData;
+    }
+    pointer_in_client =
+        wintoclient(child_return); // window对象转换为client对象
+    focus(pointer_in_client);      // 聚焦到鼠标所在的窗口
+    if(pointer_in_client->isfloating){
+      XRaiseWindow(dpy,pointer_in_client->win);   //提升浮动窗口到顶层
+    }
   } 
 
 FreeEventData:
@@ -1719,6 +1728,41 @@ Atom getatomprop(Client *c, Atom prop) {
   }
   return atom;
 }
+
+
+unsigned int 
+judge_win_contain_state(Window w, Atom want_net_wm_state) 
+{
+
+    Atom net_wm_state = XInternAtom(dpy, "_NET_WM_STATE", False);
+    // Atom net_wm_state_skip_pager = XInternAtom(dpy, "_NET_WM_STATE_SKIP_PAGER", False);
+
+    Atom actual_type;
+    int actual_format;
+    unsigned long nitems;
+    unsigned long bytes_after;
+    unsigned char *prop;
+
+    int status = XGetWindowProperty(dpy, w, net_wm_state, 0, (~0L), False, AnyPropertyType,
+                                    &actual_type, &actual_format, &nitems, &bytes_after, &prop);
+
+    if (status == Success && actual_type == XA_ATOM && nitems > 0)
+    {
+        Atom *atoms = (Atom *)prop;
+        int i;
+        for (i = 0; i < nitems; i++)
+        {
+            if (atoms[i] == want_net_wm_state)
+            {
+                XFree(prop);
+                return 1;
+            }
+        }
+        XFree(prop);
+    }
+    return 0;
+}
+
 
 int getrootptr(int *x, int *y) {
   int di;
@@ -3759,6 +3803,9 @@ void updatewindowtype(Client *c) {
   if (wtype == netatom[NetWMWindowTypeDialog])
     c->isfloating = 1;
 }
+
+
+
 
 void updatewmhints(Client *c) {
   XWMHints *wmh;
