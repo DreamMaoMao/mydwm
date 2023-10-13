@@ -529,7 +529,22 @@ static void xi_handler(XEvent xevent) {
           wintoclient(child_return); // window对象转换为client对象
       focus(pointer_in_client);      // 聚焦到鼠标所在的窗口
     }
-  }
+  } else if (xevent.xcookie.evtype == XI_RawButtonPress){ //鼠标按键事件
+    Window root_return, child_return;
+    int root_x_return, root_y_return;
+    int win_x_return, win_y_return;
+    unsigned int mask_return;
+    XQueryPointer(dpy, root, &root_return,
+                  &child_return, // 获取鼠标位置和鼠标所在的窗口
+                  &root_x_return, &root_y_return, &win_x_return, &win_y_return,
+                  &mask_return);
+      pointer_in_client =
+          wintoclient(child_return); // window对象转换为client对象
+      focus(pointer_in_client);      // 聚焦到鼠标所在的窗口
+      if(pointer_in_client->isfloating){
+        XRaiseWindow(dpy,pointer_in_client->win);   //提升浮动窗口到顶层
+      }
+  } 
   XFreeEventData(dpy,
                  &xevent.xcookie); // 释放函数开头get到内存的数据防止内存泄露
 }
@@ -840,6 +855,9 @@ void buttonpress(XEvent *e) { // 鼠标按键事件处理函数
     }
   } else if ((c = wintoclient(ev->window))) {
     focus(c);
+    if(c->isfloating){
+      XRaiseWindow(dpy,c->win);
+    }
     restack(selmon);
     // 这句代码好像是多余的,因为不停止捕获,重新发送的事件还是会被再次拦截捕获,不会传到原本的客户端
     XAllowEvents(dpy, ReplayPointer, CurrentTime);
@@ -3005,7 +3023,8 @@ void setup(void) {
   /* 设置掩码以接收所有主设备的事件 */
   unsigned char mask_bytes[XIMaskLen(XI_LASTEVENT)];
   memset(mask_bytes, 0, sizeof(mask_bytes));
-  XISetMask(mask_bytes, XI_RawMotion); // 鼠标移动事件
+  XISetMask(mask_bytes, XI_RawMotion); // 鼠标移动事件捕获
+  XISetMask(mask_bytes, XI_RawButtonPress); // 鼠标按键事件捕获
 
   XIEventMask evmasks[1];
   evmasks[0].deviceid = XIAllMasterDevices;
