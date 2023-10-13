@@ -270,6 +270,7 @@ static void cleanupmon(Monitor *mon);
 static void clientmessage(XEvent *e);
 static void configure(Client *c);
 static void configurenotify(XEvent *e);
+static Atom getatompropfromwin(Window w, Atom prop);
 static void configurerequest(XEvent *e);
 static void clickstatusbar(const Arg *arg);
 static Monitor *createmon(void);
@@ -545,9 +546,15 @@ static void xi_handler(XEvent xevent) {
     Atom net_wm_state_skip_pager =                        //_NET_WM_STATE_SKIP_PAGER一些窗口小部件有这个属性比如eww面板
     XInternAtom(dpy, "_NET_WM_STATE_SKIP_PAGER", False); //最后一个参数表示是否系统本来就存在该原子的时候才返回,这里表示可以自定义不管系统有没有
 
+    Atom normal_win =                        //_NET_WM_STATE_SKIP_PAGER一些窗口小部件有这个属性比如eww面板
+    XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_NORMAL", False); //最后一个参数表示是否系统本来就存在该原子的时候才返回,这里表示可以自定义不管系统有没有
+
+
     unsigned int isinbacklist = judge_win_contain_state(child_return, net_wm_state_skip_pager);
 
-    if(!child_return || child_return == selmon->barwin || child_return == systray->win || isinbacklist == 1 ){
+    Atom wtype = getatompropfromwin(child_return, netatom[NetWMWindowType]);
+
+    if(!child_return || child_return == selmon->barwin || child_return == systray->win || isinbacklist == 1 || wtype != normal_win){
       goto FreeEventData;
     }
     pointer_in_client =
@@ -1719,6 +1726,29 @@ Atom getatomprop(Client *c, Atom prop) {
     req = xatom[XembedInfo];
 
   if (XGetWindowProperty(dpy, c->win, prop, 0L, sizeof atom, False, req, &da,
+                         &di, &dl, &dl, &p) == Success &&
+      p) {
+    atom = *(Atom *)p;
+    if (da == xatom[XembedInfo] && dl == 2)
+      atom = ((Atom *)p)[1];
+    XFree(p);
+  }
+  return atom;
+}
+
+
+Atom getatompropfromwin(Window w, Atom prop) {
+  int di;
+  unsigned long dl;
+  unsigned char *p = NULL;
+  Atom da, atom = None;
+  /* FIXME getatomprop should return the number of items and a pointer to
+   * the stored data instead of this workaround */
+  Atom req = XA_ATOM;
+  if (prop == xatom[XembedInfo])
+    req = xatom[XembedInfo];
+
+  if (XGetWindowProperty(dpy, w, prop, 0L, sizeof atom, False, req, &da,
                          &di, &dl, &dl, &p) == Success &&
       p) {
     atom = *(Atom *)p;
