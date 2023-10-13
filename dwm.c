@@ -538,6 +538,9 @@ static void xi_handler(XEvent xevent) {
                   &child_return, // 获取鼠标位置和鼠标所在的窗口
                   &root_x_return, &root_y_return, &win_x_return, &win_y_return,
                   &mask_return);
+      if(!child_return || child_return == selmon->barwin || child_return == systray->win){
+        goto FreeEventData;
+      }
       pointer_in_client =
           wintoclient(child_return); // window对象转换为client对象
       focus(pointer_in_client);      // 聚焦到鼠标所在的窗口
@@ -545,6 +548,8 @@ static void xi_handler(XEvent xevent) {
         XRaiseWindow(dpy,pointer_in_client->win);   //提升浮动窗口到顶层
       }
   } 
+
+FreeEventData:
   XFreeEventData(dpy,
                  &xevent.xcookie); // 释放函数开头get到内存的数据防止内存泄露
 }
@@ -855,9 +860,6 @@ void buttonpress(XEvent *e) { // 鼠标按键事件处理函数
     }
   } else if ((c = wintoclient(ev->window))) {
     focus(c);
-    if(c->isfloating){
-      XRaiseWindow(dpy,c->win);
-    }
     restack(selmon);
     // 这句代码好像是多余的,因为不停止捕获,重新发送的事件还是会被再次拦截捕获,不会传到原本的客户端
     XAllowEvents(dpy, ReplayPointer, CurrentTime);
