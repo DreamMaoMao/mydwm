@@ -137,7 +137,7 @@ enum {
 enum { UP, DOWN, LEFT, RIGHT };                  /* movewin */
 enum { V_EXPAND, V_REDUCE, H_EXPAND, H_REDUCE }; /* resizewins */
 
-enum {NetWMState_Remove,NetWMState_Add};
+enum {_NET_WM_STATE_REMOVE,_NET_WM_STATE_ADD};
 
 typedef struct {
   int i;
@@ -1005,10 +1005,10 @@ void clientmessage(XEvent *e) {
   if (cme->message_type == netatom[NetWMState]) {
     if (cme->data.l[1] == netatom[NetWMFullscreen] ||
         cme->data.l[2] == netatom[NetWMFullscreen]){
-          if(cme->data.l[0] == NetWMState_Add){
+          if(cme->data.l[0] == _NET_WM_STATE_ADD){
             c->isfullscreen = 0;
             setfullscreen(c);
-          } else if(cme->data.l[0] == NetWMState_Remove){
+          } else if(cme->data.l[0] == _NET_WM_STATE_REMOVE){
             c->isfullscreen = 1;
             setfullscreen(c);
           }
