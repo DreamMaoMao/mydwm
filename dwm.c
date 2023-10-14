@@ -2699,9 +2699,6 @@ void quit(const Arg *arg)
   for (m = mons; m; m = m->next){
     for (c = m->clients; c; c = c->next)
       clear_client(c);
-    while (m->stack){
-      unmanage(m->stack, 0);
-    }
   }
   running = 0; 
 }
