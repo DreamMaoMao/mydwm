@@ -100,7 +100,9 @@ enum {
   SchemeSelTag,            // 选中的标签
   SchemeUnderline,         // 下划线
   SchemeBarEmpty,          // 状态栏空白部分
-  SchemeStatusText         // 状态栏文本
+  SchemeStatusText,         // 状态栏文本
+  SchemeSelStop,             //窗口进程暂停
+  SchemeSelFakeFullStop      //窗口暂停假全屏
 };                         /* color schemes */
 enum {
   NetSupported,
@@ -558,6 +560,7 @@ static void continue_win(const Arg *arg)
 
 static void toggle_stop_cont_win(const Arg *arg)
 {
+  uint border_type;
   if(!selmon->sel){
     return;
   } 
@@ -566,6 +569,9 @@ static void toggle_stop_cont_win(const Arg *arg)
   }else{
     stop_win(arg);
   }
+  // 设置窗口的border
+  border_type = get_border_type(selmon->sel);
+  XSetWindowBorder(dpy, selmon->sel->win, scheme[border_type][ColBorder].pixel);
 }
 
 // 扩展输入事件处理函数
@@ -1649,7 +1655,11 @@ void expose(XEvent *e) { // 窗口暴露事件,由不可见变成可见的时候
 }
 
 uint get_border_type(Client *c) {  //判断border颜色
-  if (c->isglobal && !c->isfullscreen) {
+  if(c->isstop && c->isfullscreen){
+    return SchemeSelFakeFullStop;
+  } else if(c->isstop && ! c->isfullscreen){
+    return SchemeSelStop;
+  } else if (c->isglobal && !c->isfullscreen) {
     return SchemeSelGlobal;
   } else if (c->isfullscreen && !c->isglobal) {
     return SchemeSelFakeFull;
