@@ -46,6 +46,8 @@
 #include "util.h"
 #include <X11/extensions/XInput2.h>
 #include <math.h>
+#include <signal.h>
+
 
 /* macros */
 #define BUTTONMASK (ButtonPressMask | ButtonReleaseMask)
@@ -137,7 +139,7 @@ enum {
 enum { UP, DOWN, LEFT, RIGHT };                  /* movewin */
 enum { V_EXPAND, V_REDUCE, H_EXPAND, H_REDUCE }; /* resizewins */
 
-enum {_NET_WM_STATE_REMOVE,_NET_WM_STATE_ADD};
+enum {_NET_WM_STATE_REMOVE,_NET_WM_STATE_ADD,_NET_WM_STATE_TOGGLE};  //区分clientmessage是添加请求还是清除请求,第三个是切换请求
 
 typedef struct {
   int i;
@@ -178,6 +180,7 @@ struct Client {
   Client *snext;
   Monitor *mon;
   Window win;
+  unsigned int isstop;
 };
 
 typedef struct {
@@ -270,6 +273,10 @@ static void cleanupmon(Monitor *mon);
 static void clientmessage(XEvent *e);
 static void configure(Client *c);
 static void configurenotify(XEvent *e);
+static unsigned long get_win_pid(Window win);
+static void stop_win(const Arg *arg);
+static void continue_win(const Arg *arg);
+static void toggle_stop_cont_win(const Arg *arg);
 static Atom getatompropfromwin(Window w, Atom prop);
 static void configurerequest(XEvent *e);
 static void clickstatusbar(const Arg *arg);
@@ -442,20 +449,20 @@ static unsigned int numlockmask = 0;
 static void (*handler[LASTEvent])(
     XEvent *) = { // 给捕获的事件定义处理函数,左边是类型,右边是自定义函数
     [ButtonPress] = buttonpress, // 按键事件
-    [ClientMessage] = clientmessage,
-    [ConfigureRequest] = configurerequest,
-    [ConfigureNotify] = configurenotify,
-    [DestroyNotify] = destroynotify,
+    [ClientMessage] = clientmessage, //窗口给x11服务发送的请求比如全屏请求等
+    [ConfigureRequest] = configurerequest, //客户端窗口请求大小和位置变化和边框改变,窗口请求不是用户触发
+    [ConfigureNotify] = configurenotify, //窗口大小和位置变化和边框改变的时候触发
+    [DestroyNotify] = destroynotify, //销毁事件
     [EnterNotify] = enternotify, // 鼠标移动进入窗口事件,比如聚焦的处理
-    [Expose] = expose,
-    [FocusIn] = focusin,
-    [KeyPress] = keypress,
-    [MappingNotify] = mappingnotify,
-    [MapRequest] = maprequest,
+    [Expose] = expose,  // 窗口暴露事件,由不可见变成可见的时候触发
+    [FocusIn] = focusin,   //聚焦事件
+    [KeyPress] = keypress, //键盘事件
+    [MappingNotify] = mappingnotify, //键盘映射发生变化时触发
+    [MapRequest] = maprequest,    //窗口映射触发,只有设置了映射窗口才能被看到
     [MotionNotify] = motionnotify, // 监视器事件,比如鼠标移动到某个位置的处理
-    [PropertyNotify] = propertynotify,
-    [ResizeRequest] = resizerequest,
-    [UnmapNotify] = unmapnotify};
+    [PropertyNotify] = propertynotify, //窗口属性改变的时候触发
+    [ResizeRequest] = resizerequest,  //客户端请求重置大小,不是用户触发的
+    [UnmapNotify] = unmapnotify};   //窗口取消映射的时候触发,比如隐藏和杀死都会触发
 
 static Atom wmatom[WMLast], netatom[NetLast], xatom[XLast];
 static int running = 1;
@@ -506,6 +513,59 @@ void lognumtofile(unsigned int num) {
   char cmd[256];
   sprintf(cmd, "echo '%x' >> ~/log", num);
   system(cmd);
+}
+
+//获取窗口的进程pid
+unsigned long get_win_pid(Window win) {
+  Atom prop_name = XInternAtom(dpy, "_NET_WM_PID", False);
+  Atom type;
+  int format;
+  unsigned long nitems;
+  unsigned long bytes_after;
+  unsigned char *prop = NULL;
+  unsigned long pid = 0;
+
+  if (XGetWindowProperty(dpy, win, prop_name, 0, 1, False, XA_CARDINAL,
+                         &type, &format, &nitems, &bytes_after, &prop) == Success) {
+    if (prop) {
+      pid = *((unsigned long *) prop);
+      XFree(prop);
+    }
+  }
+  return pid;
+}
+
+static void stop_win(const Arg *arg)
+{
+  if(!selmon->sel){
+    return;
+  }
+  unsigned long pid = get_win_pid(selmon->sel->win);
+  kill(pid, SIGSTOP);
+  selmon->sel->isstop=1;
+}
+
+
+static void continue_win(const Arg *arg)
+{
+  if(!selmon->sel){
+    return;
+  }
+  unsigned long pid = get_win_pid(selmon->sel->win);
+  kill(pid, SIGCONT);
+  selmon->sel->isstop=0;
+}
+
+static void toggle_stop_cont_win(const Arg *arg)
+{
+  if(!selmon->sel){
+    return;
+  } 
+  if(selmon->sel->isstop){
+    continue_win(arg);
+  }else{
+    stop_win(arg);
+  }
 }
 
 // 扩展输入事件处理函数
@@ -1577,7 +1637,7 @@ void enternotify(XEvent *e) {
   focus(c);
 }
 
-void expose(XEvent *e) { // 窗口创建事件
+void expose(XEvent *e) { // 窗口暴露事件,由不可见变成可见的时候触发
   Monitor *m;
   XExposeEvent *ev = &e->xexpose;
 
@@ -1588,7 +1648,7 @@ void expose(XEvent *e) { // 窗口创建事件
   }
 }
 
-uint get_border_type(Client *c) {
+uint get_border_type(Client *c) {  //判断border颜色
   if (c->isglobal && !c->isfullscreen) {
     return SchemeSelGlobal;
   } else if (c->isfullscreen && !c->isglobal) {
@@ -2098,6 +2158,7 @@ void manage(Window w, XWindowAttributes *wa) {
   c->isfullscreen = 0;
   c->no_limit_taskw = 0;
   c->isactive = 0;
+  c->isstop = 0;
   updatetitle(c);
   updateicon(c);
   if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
