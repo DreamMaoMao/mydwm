@@ -350,6 +350,7 @@ static void resizeclient(Client *c, int x, int y, int w, int h);
 static void resizemouse(const Arg *arg);
 static void resizerequest(XEvent *e);
 static void restack(Monitor *m);
+static void clear_client(Client *fc);
 
 static void run(void);
 static void runAutostart(void);
@@ -976,12 +977,14 @@ void cleanup(void) {
   Layout foo = {"", NULL};
   Monitor *m;
   size_t i;
-
   view(&a);
   selmon->lt[selmon->sellt] = &foo;
-  for (m = mons; m; m = m->next)
-    while (m->stack)
+  for (m = mons; m; m = m->next){
+    while (m->stack){
       unmanage(m->stack, 0);
+    }
+  }
+      
   XUngrabKey(dpy, AnyKey, AnyModifier, root);
   while (mons)
     cleanupmon(mons);
@@ -2118,6 +2121,30 @@ void killclient(const Arg *arg) {
     focusstack(NULL);
 }
 
+void clear_client(Client *fc) {
+  Client *c;
+  int n = 0;
+
+  if (!fc)
+    return;
+  if (!sendevent(fc->win, wmatom[WMDelete], NoEventMask,
+                 wmatom[WMDelete], CurrentTime, 0, 0, 0)) {
+    XGrabServer(dpy);
+    XSetErrorHandler(xerrordummy);
+    XSetCloseDownMode(dpy, DestroyAll);
+    XKillClient(dpy, fc->win);
+    XSync(dpy, False);
+    XSetErrorHandler(xerror);
+    XUngrabServer(dpy);
+  }
+  for (c = selmon->clients; c; c = c->next)
+    if (ISVISIBLE(c) && !HIDDEN(c))
+      n++;
+  if (n <= 1)
+    focusstack(NULL);
+}
+
+
 void forcekillclient(const Arg *arg) {
   if (!selmon->sel)
     return;
@@ -2665,7 +2692,19 @@ void propertynotify(XEvent *e) {
   }
 }
 
-void quit(const Arg *arg) { running = 0; }
+void quit(const Arg *arg) 
+{ 
+  Client *c;
+  Monitor *m;
+  for (m = mons; m; m = m->next){
+    for (c = m->clients; c; c = c->next)
+      clear_client(c);
+    while (m->stack){
+      unmanage(m->stack, 0);
+    }
+  }
+  running = 0; 
+}
 
 Monitor *recttomon(int x, int y, int w, int h) {
   Monitor *m, *r = selmon;
