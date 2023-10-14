@@ -48,6 +48,8 @@ static const char *colors[][3] = {
     [SchemeNormTag] = {"#a8309e", "#e3e0dc", NULL},
     [SchemeSelTag] = {"#ffffff", "#a8309e", NULL},
     [SchemeBarEmpty] = {NULL, "#111111", NULL},
+    [SchemeSelStop] = {"#ffffff", "#37474F", "#128992"},
+    [SchemeSelFakeFullStop] = {"#ffffff", "#37474F", "#7a48ca"},
 };
 static const unsigned int alphas[][3] = {
     /* 透明度设置 ColFg, ColBg, ColBorder */
@@ -60,6 +62,8 @@ static const unsigned int alphas[][3] = {
     [SchemeSelTag] = {OPAQUE, baralpha, borderalpha},
     [SchemeBarEmpty] = {0, 0x11, 0},
     [SchemeStatusText] = {OPAQUE, 0x88, 0},
+    [SchemeSelStop] = {OPAQUE, baralpha, borderalpha},
+    [SchemeSelFakeFullStop] = {OPAQUE, baralpha, borderalpha},
 };
 
 
@@ -160,6 +164,7 @@ static Key keys[] = {
     { SuperMask,                XK_comma,        setmfact,         {.f = -0.05} },            /* super ,            |  缩小主工作区 */
     { SuperMask,                XK_period,       setmfact,         {.f = +0.05} },            /* super .            |  放大主工作区 */
 
+    { SuperMask|AltMask,        XK_f,            toggle_stop_cont_win,          {0} },         /* super alt f            |  暂停,启动 窗口 */
     { SuperMask,                XK_i,            hidewin,          {0} },                     /* super i            |  隐藏 窗口 */
     { SuperMask|ShiftMask,      XK_i,            restorewin,       {0} },                     /* super shift i      |  取消隐藏 窗口 */
 
