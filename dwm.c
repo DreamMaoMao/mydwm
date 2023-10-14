@@ -558,6 +558,7 @@ static void continue_win(const Arg *arg)
   selmon->sel->isstop=0;
 }
 
+
 static void toggle_stop_cont_win(const Arg *arg)
 {
   uint border_type;
@@ -1084,7 +1085,9 @@ void clientmessage(XEvent *e) {
           } else if(cme->data.l[0] == _NET_WM_STATE_REMOVE){
             c->isfullscreen = 1;
             setfullscreen(c);
-          }
+          } else if(cme->data.l[0] == _NET_WM_STATE_TOGGLE){
+            setfullscreen(c);
+          } 
     }
   } else if (cme->message_type == netatom[NetActiveWindow]) {
     if (c != selmon->sel && !c->isurgent)
