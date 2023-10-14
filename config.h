@@ -240,7 +240,7 @@ static Key keys[] = {
     { AltMask,                  XK_comma,  spawn, SHCMD("$DWM/scripts/volume.sh down") },                               /* alt <       | 音量减                 */
     { ControlMask,              XK_period, spawn, SHCMD("$DWM/scripts/brightness.sh up") },                             /* ctrl >      | 亮度加                 */
     { ControlMask,              XK_comma,  spawn, SHCMD("$DWM/scripts/brightness.sh down") },                           /* ctrl <      | 亮度减    */
-    { AltMask|ControlMask,      XK_a,      spawn, SHCMD("flameshot gui -c -p ~/down") },             /* ctrl alt a  | 截图                   */
+    { AltMask|ControlMask,      XK_a,      spawn, SHCMD("flameshot gui") },             /* ctrl alt a  | 截图                   */
     { AltMask|SuperMask,        XK_q,      spawn, SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") }, /* super alt q | 选中某个窗口并强制kill */
     { SuperMask,                XK_p,      spawn, SHCMD("bash $DWM/scripts/monitor.sh") },                              /* super p     | 关闭内部显示器 */
     { SuperMask|ControlMask,    XK_m,      spawn, SHCMD("$DWM/scripts/rofidwm.sh outopts") },
