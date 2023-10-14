@@ -627,7 +627,7 @@ static void xi_handler(XEvent xevent) {
     pointer_in_client =
         wintoclient(child_return); // window对象转换为client对象
     focus(pointer_in_client);      // 聚焦到鼠标所在的窗口
-    if(pointer_in_client->isfloating){
+    if(pointer_in_client && pointer_in_client->isfloating){
       XRaiseWindow(dpy,pointer_in_client->win);   //提升浮动窗口到顶层
     }
   } 
