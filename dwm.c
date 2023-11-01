@@ -4505,20 +4505,33 @@ Client *direction_select(const Arg *arg) {
   switch (arg->i) {
   case UP:
     for (int _i = 0; _i <= last; _i++) {
-      if (tempClients[_i]->y < sel_y) {
+      if (tempClients[_i]->y < sel_y && tempClients[_i]->x == sel_x) {
         int dis_x = tempClients[_i]->x - sel_x;
         int dis_y = tempClients[_i]->y - sel_y;
         long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
         if (tmp_distance < distance) {
           distance = tmp_distance;
           tempFocusClients = tempClients[_i];
+        }
+      }
+    }
+    if(!tempFocusClients){
+      for (int _i = 0; _i <= last; _i++) {
+        if (tempClients[_i]->y < sel_y) {
+          int dis_x = tempClients[_i]->x - sel_x;
+          int dis_y = tempClients[_i]->y - sel_y;
+          long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
+          if (tmp_distance < distance) {
+            distance = tmp_distance;
+            tempFocusClients = tempClients[_i];
+          }
         }
       }
     }
     break;
   case DOWN:
     for (int _i = 0; _i <= last; _i++) {
-      if (tempClients[_i]->y > sel_y ) {
+      if (tempClients[_i]->y > sel_y && tempClients[_i]->x == sel_x) {
         int dis_x = tempClients[_i]->x - sel_x;
         int dis_y = tempClients[_i]->y - sel_y;
         long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
@@ -4527,11 +4540,24 @@ Client *direction_select(const Arg *arg) {
           tempFocusClients = tempClients[_i];
         }
       }
+    }
+    if(!tempFocusClients){
+      for (int _i = 0; _i <= last; _i++) {
+        if (tempClients[_i]->y > sel_y ) {
+          int dis_x = tempClients[_i]->x - sel_x;
+          int dis_y = tempClients[_i]->y - sel_y;
+          long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
+          if (tmp_distance < distance) {
+            distance = tmp_distance;
+            tempFocusClients = tempClients[_i];
+          }
+        }
+      }      
     }
     break;
   case LEFT:
     for (int _i = 0; _i <= last; _i++) {
-      if (tempClients[_i]->x < sel_x) {
+      if (tempClients[_i]->x < sel_x && tempClients[_i]->y == sel_y) {
         int dis_x = tempClients[_i]->x - sel_x;
         int dis_y = tempClients[_i]->y - sel_y;
         long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
@@ -4540,11 +4566,24 @@ Client *direction_select(const Arg *arg) {
           tempFocusClients = tempClients[_i];
         }
       }
+    }
+    if(!tempFocusClients){
+      for (int _i = 0; _i <= last; _i++) {
+        if (tempClients[_i]->x < sel_x) {
+          int dis_x = tempClients[_i]->x - sel_x;
+          int dis_y = tempClients[_i]->y - sel_y;
+          long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
+          if (tmp_distance < distance) {
+            distance = tmp_distance;
+            tempFocusClients = tempClients[_i];
+          }
+        }
+      }      
     }
     break;
   case RIGHT:
     for (int _i = 0; _i <= last; _i++) {
-      if (tempClients[_i]->x > sel_x) {
+      if (tempClients[_i]->x > sel_x && tempClients[_i]->y == sel_y) {
         int dis_x = tempClients[_i]->x - sel_x;
         int dis_y = tempClients[_i]->y - sel_y;
         long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
@@ -4554,7 +4593,21 @@ Client *direction_select(const Arg *arg) {
         }
       }
     }
+    if(!tempFocusClients){
+      for (int _i = 0; _i <= last; _i++) {
+        if (tempClients[_i]->x > sel_x) {
+          int dis_x = tempClients[_i]->x - sel_x;
+          int dis_y = tempClients[_i]->y - sel_y;
+          long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
+          if (tmp_distance < distance) {
+            distance = tmp_distance;
+            tempFocusClients = tempClients[_i];
+          }
+        }
+      }      
+    }
   }
+
   return tempFocusClients;
 }
 
