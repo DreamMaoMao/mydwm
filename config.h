@@ -117,7 +117,7 @@ static const Rule rules[] = {
     {"flameshot",            NULL,                 NULL,             0,            1,          0,          0,        -1,      0,            0,       0},       // 火焰截图            浮动
     {"Blueman-manager",      NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // blueman            浮动
     {"com.xunlei.download",              NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // 迅雷            浮动
-    {"Clash for Windows",    NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // clash            浮动
+    {"Clash-verge",    NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // clash            浮动
     {"Pavucontrol",                  NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // pavucontrol            浮动
 
 

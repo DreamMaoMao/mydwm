@@ -21,7 +21,7 @@ static const Icon icons[] = {
     {"Fsearch","  "},
     {"Gedit"," 󱞁 "},
     {"Gnome-terminal","  "},
-    {"Clash for Windows"," 󰄛 "},
+    {"Clash-verge"," 󰄛 "},
     {"obs"," 󰻃 "},
     {"flameshot","  "},
     {"Pavucontrol","  "},
