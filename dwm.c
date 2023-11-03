@@ -3317,7 +3317,7 @@ void tag(const Arg *arg) {
     view(arg);
   }
   //如果是浮动的移动过去就让他置于顶层
-  if(target_client->isfloating){
+  if(target_client && target_client->isfloating){
     XRaiseWindow(dpy, target_client->win);
     focus(target_client);
   }else {
