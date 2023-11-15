@@ -113,9 +113,9 @@ yay -S blueman acpi dunst jq alsa-utils polkit-gnome  rofi-blocks-git light numl
 # 安装特定版本的picom
 ```
 cd ~/Downloads
-git clone https://github.com/DreamMaoMao/picom.git
-cd picom/
-meson --buildtype=release . build --prefix=/usr -Dwith_docs=true
+git clone https://github.com/DreamMaoMao/mypicom.git
+cd mypicom/
+meson --buildtype=release . build --prefix=/usr 
 sudo ninja -C build install
 ```
 
@@ -123,8 +123,8 @@ sudo ninja -C build install
 # 安装dwm
 ```
 cd ~/.config
-git clone https://github.com/DreamMaoMao/superdwm.git
-cd superdwm
+git clone https://github.com/DreamMaoMao/mydwm.git
+cd mydwm
 cp rofi -r ~/.config/
 cp dunst -r ~/.config/
 cp fish -r ~/.config/
