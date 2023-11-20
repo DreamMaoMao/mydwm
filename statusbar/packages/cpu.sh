@@ -25,6 +25,8 @@ update() {
 	cpu_text=$(top -n 1 -b | sed -n '1p' | awk '{print $10}')
 	if [[ "$cpu_text" == "average:" ]];then
 		cpu_text=$(top -n 1 -b | sed -n '1p' | awk '{print $11}')
+	elif [[ "$cpu_text" == "load" ]];then
+		cpu_text=$(top -n 1 -b | sed -n '1p' | awk '{print $13}')
 	fi
 	cpu_text=${cpu_text::-1}
 	icon=" $cpu_icon"

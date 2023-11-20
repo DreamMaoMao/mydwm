@@ -40,10 +40,10 @@ cron() {
             wifi_update=5
         fi 
         to=()                                                            # 存放本次需要更新的模块
-        [ $((i % 3)) -eq 0 ]  && to=(${to[@]} vol light)        # 每 20秒  更新 vol light 
-        [ $((i % 30)) -eq 0 ] && to=(${to[@]} bat)                      # 每 300秒 更新 bat
-        [ $((i % 2)) -eq 0 ] && to=(${to[@]} cpu)                      # 每 300秒 更新 bat
-        [ $((i % 5)) -eq 0 ]   && to=(${to[@]} date mem )               # 每 5秒   更新 date cpu mem
+        [ $((i % 1)) -eq 0 ]  && to=(${to[@]} vol light)                # 每 3秒  更新 vol light 
+        [ $((i % 30)) -eq 0 ] && to=(${to[@]} bat)                      # 每 30秒 更新 bat
+        [ $((i % 2)) -eq 0 ] && to=(${to[@]} cpu)                      # 每 2秒 更新 bat
+        [ $((i % 5)) -eq 0 ]   && to=(${to[@]} date mem )               # 每 5或者1秒   更新 date cpu mem
         [ $((i % wifi_update )) -eq 0 ]   && to=(${to[@]} wifi )  
         update ${to[@]}                                                  # 将需要更新的模块传递给 update
         sleep 1; let i+=1
@@ -57,6 +57,6 @@ cron() {
 case $1 in
     cron) cron ;;
     update) shift 1; update $* ;;
-    updateall|check) update wifi cpu mem date vol light bat ;;
+    updateall|check) update  wifi cpu mem date vol light bat ;;
     *) click $1 $2 ;; # 接收clickstatusbar传递过来的信号 $1: 模块名  $2: 按键(L|M|R|U|D)
 esac

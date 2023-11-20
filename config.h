@@ -43,7 +43,7 @@ static const char *colors[][3] = {
     [SchemeSelFakeFull] = {"#ffffff", "#37474F", "#158833"},
     [SchemeSelFakeFullGLObal] = {"#ffffff", "#37474F", "#881519"},
     [SchemeHid] = {"#462503", NULL, NULL},
-    [SchemeSystray] = {NULL, "#3c580e", NULL},
+    [SchemeSystray] = {NULL, "#dabb77", NULL},
     [SchemeUnderline] = {"#6f0d62", NULL, NULL},
     [SchemeNormTag] = {"#a8309e", "#e3e0dc", NULL},
     [SchemeSelTag] = {"#ffffff", "#a8309e", NULL},
@@ -106,6 +106,8 @@ static const Rule rules[] = {
     /** 优先级高 越在上面优先度越高 */
     { NULL,                  NULL,                "图片查看器",        0,            1,          0,          0,        -1,      0,           0,       0},       // qq图片查看器        浮动
     { NULL,                  NULL,                "图片查看",          0,            1,          0,          0,        -1,      0,           0,       0},       // 微信图片查看器      浮动
+    { NULL,                  NULL,                "未命名的播放列表",          0,            1,          0,          0,        -1,      5,           0,       0},       // 微信图片查看器      浮动
+
 
     /** 普通优先度 */
     {"obs",                  NULL,                 NULL,             1 << 5,       0,          0,          0,        -1,      0,            0,       0},       // obs        tag6 
@@ -117,7 +119,7 @@ static const Rule rules[] = {
     {"flameshot",            NULL,                 NULL,             0,            1,          0,          0,        -1,      0,            0,       0},       // 火焰截图            浮动
     {"Blueman-manager",      NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // blueman            浮动
     {"com.xunlei.download",              NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // 迅雷            浮动
-    {"Clash-verge",    NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // clash            浮动
+    {"Clash-verge",    NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1590,       892},       // clash            浮动
     {"Pavucontrol",                  NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // pavucontrol            浮动
 
 
@@ -227,7 +229,7 @@ static Key keys[] = {
     { AltMask|ShiftMask,        XK_Right,        exchange_client,  {.i = RIGHT } },           /* alt shift right    | 二维交换窗口 (仅平铺) */
 
     /* spawn + SHCMD 执行对应命令(已下部分建议完全自己重新定义) */
-    { AltMask,                  XK_Return, spawn, SHCMD("konsole") },  
+    { AltMask,                  XK_Return, spawn, SHCMD("xfce4-terminal") },  
     { SuperMask,                XK_Return, spawn, SHCMD("google-chrome") },
     { ControlMask,              XK_Return, spawn, SHCMD("bash ~/tool/clash.sh") },                                                                                              /* alt enter      | 打开终端             */
     { SuperMask,                XK_d,      spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/dwmdrun.rasi -show run") },                                                       /* super d          | rofi: 执行run          */
