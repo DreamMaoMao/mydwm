@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/bash
 # VOL 音量脚本
 # 本脚本需要你自行修改音量获取命令
 # 例如我使用的是 pipewire
@@ -28,8 +28,8 @@ update() {
     is_blue=$( pactl list sinks | grep -E "Name:|名称：" | grep blue )
     sink=$(pactl info | grep 'Default Sink' | awk '{print $3}')
     if [ "$sink" = "" ]; then sink=$(pactl info | grep '默认音频入口' | awk -F'：' '{print $2}');fi
-    volunmuted=$(pactl list sinks | grep $sink -A 6 | sed -n '7p' | grep '静音：否')
-    vol_text=$(pactl list sinks | grep $sink -A 7 | sed -n '8p' | awk '{printf int($4)}')
+    volunmuted=$(pactl list sinks | grep $sink -A 6 | sed -n '7p' | grep -E 'Mute: no|静音：否')
+    vol_text=$(pactl list sinks | grep $sink -A 7 | sed -n '8p' | awk '{printf int($5)}')
     if [ "$LANG" != "zh_CN.UTF-8" ]; then
         volunmuted=$(pactl list sinks | grep $sink -A 6 | sed -n '7p' | grep 'Mute: no')
         vol_text=$(pactl list sinks | grep $sink -A 7 | sed -n '8p' | awk '{printf int($5)}')
@@ -65,9 +65,9 @@ click() {
     case "$1" in
         L) blueman                                           ;; # 仅通知
         M) pactl set-sink-mute @DEFAULT_SINK@ toggle        ;; # 切换静音
-        R) killall pavucontrol || pavucontrol --class=FGN & ;; # 打开pavucontrol
-        U) amixer set Master 5%+;  ;; # 音量加
-        D) amixer set Master 5%-; ;; # 音量减
+        R) killall pavucontrol || pavucontrol & ;; # 打开pavucontrol
+        U) amixer set Master 1%+;  ;; # 音量加
+        D) amixer set Master 1%-; ;; # 音量减
     esac
 }
 

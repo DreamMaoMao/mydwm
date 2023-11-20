@@ -12,7 +12,7 @@ signal=$(echo "^s$this^" | sed 's/_//')
 [ ! "$(command -v brightnessctl)" ] && echo command not found: brightnessctl && exit
 
 update() {
-    light=$( light -G )
+    light=$( brightnessctl get )
     light_text=$( echo "${light##* }" | sed 's/[^0-9][^.]*//g' )
     if (( $light_text < 50 ));then 
         light_icon="";
@@ -38,9 +38,9 @@ blueman() {
 
 click() {
     case "$1" in
-        L)  ;; # 仅通知
-        M)  ;; # 切换静音
-        R)  ;; # 打开pavucontrol
+        L)  ;; # 打开设置面板
+        M)  ;; # 
+        R)  ;; #
         U) brightnessctl set +1%; ;; # 亮度加
         D) brightnessctl set 1%-; ;; # 亮度减
     esac

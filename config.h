@@ -43,11 +43,13 @@ static const char *colors[][3] = {
     [SchemeSelFakeFull] = {"#ffffff", "#37474F", "#158833"},
     [SchemeSelFakeFullGLObal] = {"#ffffff", "#37474F", "#881519"},
     [SchemeHid] = {"#462503", NULL, NULL},
-    [SchemeSystray] = {NULL, "#3c580e", NULL},
+    [SchemeSystray] = {NULL, "#dabb77", NULL},
     [SchemeUnderline] = {"#6f0d62", NULL, NULL},
     [SchemeNormTag] = {"#a8309e", "#e3e0dc", NULL},
     [SchemeSelTag] = {"#ffffff", "#a8309e", NULL},
     [SchemeBarEmpty] = {NULL, "#111111", NULL},
+    [SchemeSelStop] = {"#ffffff", "#37474F", "#128992"},
+    [SchemeSelFakeFullStop] = {"#ffffff", "#37474F", "#7a48ca"},
 };
 static const unsigned int alphas[][3] = {
     /* 透明度设置 ColFg, ColBg, ColBorder */
@@ -60,6 +62,8 @@ static const unsigned int alphas[][3] = {
     [SchemeSelTag] = {OPAQUE, baralpha, borderalpha},
     [SchemeBarEmpty] = {0, 0x11, 0},
     [SchemeStatusText] = {OPAQUE, 0x88, 0},
+    [SchemeSelStop] = {OPAQUE, baralpha, borderalpha},
+    [SchemeSelFakeFullStop] = {OPAQUE, baralpha, borderalpha},
 };
 
 
@@ -102,6 +106,8 @@ static const Rule rules[] = {
     /** 优先级高 越在上面优先度越高 */
     { NULL,                  NULL,                "图片查看器",        0,            1,          0,          0,        -1,      0,           0,       0},       // qq图片查看器        浮动
     { NULL,                  NULL,                "图片查看",          0,            1,          0,          0,        -1,      0,           0,       0},       // 微信图片查看器      浮动
+    { NULL,                  NULL,                "未命名的播放列表",          0,            1,          0,          0,        -1,      5,           0,       0},       // 微信图片查看器      浮动
+
 
     /** 普通优先度 */
     {"obs",                  NULL,                 NULL,             1 << 5,       0,          0,          0,        -1,      0,            0,       0},       // obs        tag6 
@@ -113,7 +119,7 @@ static const Rule rules[] = {
     {"flameshot",            NULL,                 NULL,             0,            1,          0,          0,        -1,      0,            0,       0},       // 火焰截图            浮动
     {"Blueman-manager",      NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // blueman            浮动
     {"com.xunlei.download",              NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // 迅雷            浮动
-    {"Clash for Windows",    NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // clash            浮动
+    {"Clash-verge",    NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1590,       892},       // clash            浮动
     {"Pavucontrol",                  NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // pavucontrol            浮动
 
 
@@ -145,10 +151,14 @@ static Key keys[] = {
 
     { SuperMask,                XK_Tab,          focusstack,       {.i = +1} },               /* super tab          |  本tag内切换聚焦窗口 */
     { SuperMask|ShiftMask,      XK_Tab,          focusstack,       {.i = -1} },               /* super shift tab    |  本tag内切换聚焦窗口 */
-    { ControlMask,              XK_Left,         viewtoleft,       {0} },                     /* ctrl left          |  聚焦到左边的tag */
-    { ControlMask,              XK_Right,        viewtoright,      {0} },                     /* ctrl right         |  聚焦到右边的tag */
-    { ControlMask,              XK_Up,           viewtoleft,       {0} },                     /* ctrl up            |  聚焦到左边的tag */
-    { ControlMask,              XK_Down,         viewtoright,      {0} },                     /* ctrl down          |  聚焦到右边的tag */
+    { ControlMask,              XK_Left,         viewtoleft,       {0} },                     /* ctrl left          |  聚焦到左边有窗口的tag */
+    { ControlMask,              XK_Right,        viewtoright,      {0} },                     /* ctrl right         |  聚焦到右边有窗口的tag */
+    { ControlMask,              XK_Up,           viewtoleft,       {0} },                     /* ctrl up            |  聚焦到左边有窗口的tag */
+    { ControlMask,              XK_Down,         viewtoright,      {0} },                     /* ctrl down          |  聚焦到右边有窗口的tag */
+    { SuperMask,                XK_Left,         addtoleft,        {0} },                     /* super left         |  聚焦到左边的tag */
+    { SuperMask,                XK_Right,        addtoright,       {0} },                     /* super right        |  聚焦到右边的tag */
+    { SuperMask,                XK_Up,           addtoleft,        {0} },                     /* super up           |  聚焦到左边的tag */
+    { SuperMask,                XK_Down,         addtoright,       {0} },                     /* super down         |  聚焦到右边的tag */
     { ControlMask|SuperMask,    XK_Left,         tagtoleft,        {0} },                     /* ctrl alt left      |  将本窗口移动到左边tag */
     { ControlMask|SuperMask,    XK_Right,        tagtoright,       {0} },                     /* ctrl alt right     |  将本窗口移动到右边tag */
 
@@ -156,6 +166,7 @@ static Key keys[] = {
     { SuperMask,                XK_comma,        setmfact,         {.f = -0.05} },            /* super ,            |  缩小主工作区 */
     { SuperMask,                XK_period,       setmfact,         {.f = +0.05} },            /* super .            |  放大主工作区 */
 
+    { SuperMask|AltMask,        XK_f,            toggle_stop_cont_win,          {0} },         /* super alt f            |  暂停,启动 窗口 */
     { SuperMask,                XK_i,            hidewin,          {0} },                     /* super i            |  隐藏 窗口 */
     { SuperMask|ShiftMask,      XK_i,            restorewin,       {0} },                     /* super shift i      |  取消隐藏 窗口 */
 
@@ -218,7 +229,7 @@ static Key keys[] = {
     { AltMask|ShiftMask,        XK_Right,        exchange_client,  {.i = RIGHT } },           /* alt shift right    | 二维交换窗口 (仅平铺) */
 
     /* spawn + SHCMD 执行对应命令(已下部分建议完全自己重新定义) */
-    { AltMask,                  XK_Return, spawn, SHCMD("konsole") },  
+    { AltMask,                  XK_Return, spawn, SHCMD("xfce4-terminal") },  
     { SuperMask,                XK_Return, spawn, SHCMD("google-chrome") },
     { ControlMask,              XK_Return, spawn, SHCMD("bash ~/tool/clash.sh") },                                                                                              /* alt enter      | 打开终端             */
     { SuperMask,                XK_d,      spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/dwmdrun.rasi -show run") },                                                       /* super d          | rofi: 执行run          */
@@ -231,7 +242,7 @@ static Key keys[] = {
     { AltMask,                  XK_comma,  spawn, SHCMD("$DWM/scripts/volume.sh down") },                               /* alt <       | 音量减                 */
     { ControlMask,              XK_period, spawn, SHCMD("$DWM/scripts/brightness.sh up") },                             /* ctrl >      | 亮度加                 */
     { ControlMask,              XK_comma,  spawn, SHCMD("$DWM/scripts/brightness.sh down") },                           /* ctrl <      | 亮度减    */
-    { AltMask|ControlMask,      XK_a,      spawn, SHCMD("flameshot gui -c -p ~/down") },             /* ctrl alt a  | 截图                   */
+    { AltMask|ControlMask,      XK_a,      spawn, SHCMD("flameshot gui") },             /* ctrl alt a  | 截图                   */
     { AltMask|SuperMask,        XK_q,      spawn, SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") }, /* super alt q | 选中某个窗口并强制kill */
     { SuperMask,                XK_p,      spawn, SHCMD("bash $DWM/scripts/monitor.sh") },                              /* super p     | 关闭内部显示器 */
     { SuperMask|ControlMask,    XK_m,      spawn, SHCMD("$DWM/scripts/rofidwm.sh outopts") },

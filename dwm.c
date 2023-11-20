@@ -44,8 +44,9 @@
 
 #include "drw.h"
 #include "util.h"
-#include <math.h>
 #include <X11/extensions/XInput2.h>
+#include <math.h>
+#include <signal.h>
 
 
 /* macros */
@@ -88,19 +89,21 @@
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
 enum {
-  SchemeNorm,      // 普通
-  SchemeSel,       // 选中的
-  SchemeSelGlobal, // 全局并选中的
-  SchemeSelFakeFull, // 伪全屏并选中的
-  SchemeSelFakeFullGLObal, //伪全屏并全局并选中
-  SchemeHid,       // 隐藏的
-  SchemeSystray,   // 托盘
-  SchemeNormTag,   // 普通标签
-  SchemeSelTag,    // 选中的标签
-  SchemeUnderline, // 下划线
-  SchemeBarEmpty,  // 状态栏空白部分
-  SchemeStatusText // 状态栏文本
-};                 /* color schemes */
+  SchemeNorm,              // 普通
+  SchemeSel,               // 选中的
+  SchemeSelGlobal,         // 全局并选中的
+  SchemeSelFakeFull,       // 伪全屏并选中的
+  SchemeSelFakeFullGLObal, // 伪全屏并全局并选中
+  SchemeHid,               // 隐藏的
+  SchemeSystray,           // 托盘
+  SchemeNormTag,           // 普通标签
+  SchemeSelTag,            // 选中的标签
+  SchemeUnderline,         // 下划线
+  SchemeBarEmpty,          // 状态栏空白部分
+  SchemeStatusText,         // 状态栏文本
+  SchemeSelStop,             //窗口进程暂停
+  SchemeSelFakeFullStop      //窗口暂停假全屏
+};                         /* color schemes */
 enum {
   NetSupported,
   NetWMName,
@@ -138,6 +141,8 @@ enum {
 enum { UP, DOWN, LEFT, RIGHT };                  /* movewin */
 enum { V_EXPAND, V_REDUCE, H_EXPAND, H_REDUCE }; /* resizewins */
 
+enum {_NET_WM_STATE_REMOVE,_NET_WM_STATE_ADD,_NET_WM_STATE_TOGGLE};  //区分clientmessage是添加请求还是清除请求,第三个是切换请求
+
 typedef struct {
   int i;
   unsigned int ui;
@@ -162,18 +167,22 @@ struct Client {
   int x, y, w, h;
   int oldx, oldy, oldw, oldh;
   int bw, oldbw;
-  int overview_backup_x, overview_backup_y, overview_backup_w, overview_backup_h,overview_backup_bw;
-  int fullscreen_backup_x, fullscreen_backup_y, fullscreen_backup_w, fullscreen_backup_h;
+  int overview_backup_x, overview_backup_y, overview_backup_w,
+      overview_backup_h, overview_backup_bw;
+  int fullscreen_backup_x, fullscreen_backup_y, fullscreen_backup_w,
+      fullscreen_backup_h;
   int isactive;
   int basew, baseh, incw, inch, maxw, maxh, minw, minh;
-  int taskw,no_limit_taskw;
+  int taskw, no_limit_taskw;
   unsigned int tags;
   int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen,
-      isglobal, isnoborder, isscratchpad,overview_isfullscreenbak,overview_isfloatingbak;
+      isglobal, isnoborder, isscratchpad, overview_isfullscreenbak,
+      overview_isfloatingbak;
   Client *next;
   Client *snext;
   Monitor *mon;
   Window win;
+  unsigned int isstop;
 };
 
 typedef struct {
@@ -214,7 +223,6 @@ struct Monitor {
   uint isoverview;
   uint is_in_hotarea;
   int status_w;
-
 };
 
 typedef struct {
@@ -234,7 +242,7 @@ typedef struct {
 typedef struct {
   const char *class;
   const char *style;
-} Icon;    
+} Icon;
 
 typedef struct Systray Systray;
 struct Systray {
@@ -245,7 +253,6 @@ struct Systray {
 /* function declarations */
 static void logtofile(const char *fmt, ...);
 static void lognumtofile(unsigned int num);
-
 
 static void tile(Monitor *m);
 static void rtile(Monitor *m);
@@ -262,11 +269,17 @@ static void attach(Client *c);
 static void attachstack(Client *c);
 static void buttonpress(XEvent *e);
 static void checkotherwm(void);
+static unsigned int judge_win_contain_state(Window w, Atom prop);
 static void cleanup(void);
 static void cleanupmon(Monitor *mon);
 static void clientmessage(XEvent *e);
 static void configure(Client *c);
 static void configurenotify(XEvent *e);
+static unsigned long get_win_pid(Window win);
+static void stop_win(const Arg *arg);
+static void continue_win(const Arg *arg);
+static void toggle_stop_cont_win(const Arg *arg);
+static Atom getatompropfromwin(Window w, Atom prop);
 static void configurerequest(XEvent *e);
 static void clickstatusbar(const Arg *arg);
 static Monitor *createmon(void);
@@ -337,6 +350,7 @@ static void resizeclient(Client *c, int x, int y, int w, int h);
 static void resizemouse(const Arg *arg);
 static void resizerequest(XEvent *e);
 static void restack(Monitor *m);
+static void clear_client(Client *fc);
 
 static void run(void);
 static void runAutostart(void);
@@ -397,6 +411,9 @@ static void setgap(const Arg *arg);
 static void view(const Arg *arg);
 static void viewtoleft(const Arg *arg);
 static void viewtoright(const Arg *arg);
+static void addtoleft(const Arg *arg);
+static void addtoright(const Arg *arg);
+
 
 static void exchange_client(const Arg *arg);
 static void focusdir(const Arg *arg);
@@ -414,8 +431,11 @@ static void inner_overvew_toggleoverview(const Arg *arg);
 static void inner_overvew_killclient(const Arg *arg);
 static void clear_fullscreen_flag(Client *c);
 static uint get_border_type(Client *c);
-static void toggle_hotarea(int x_root,int y_root);
+static void toggle_hotarea(int x_root, int y_root);
 static void xi_handler(XEvent xevent);
+static void overview_restore(Client *c, const Arg *arg);
+static void overview_backup(Client *c);
+static void fullname_taskbar_activeitem(const Arg *arg);
 
 /* variables */
 static Systray *systray = NULL;
@@ -429,22 +449,23 @@ static int vp;          /* vertical padding for bar */
 static int sp;          /* side padding for bar */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
-static void (*handler[LASTEvent])(XEvent *) = { //给捕获的事件定义处理函数,左边是类型,右边是自定义函数
-    [ButtonPress] = buttonpress,      //按键事件
-    [ClientMessage] = clientmessage,
-    [ConfigureRequest] = configurerequest,
-    [ConfigureNotify] = configurenotify,
-    [DestroyNotify] = destroynotify,
-    [EnterNotify] = enternotify,  //鼠标移动进入窗口事件,比如聚焦的处理
-    [Expose] = expose,
-    [FocusIn] = focusin,
-    [KeyPress] = keypress,
-    [MappingNotify] = mappingnotify,
-    [MapRequest] = maprequest,
-    [MotionNotify] = motionnotify,  //监视器事件,比如鼠标移动到某个位置的处理
-    [PropertyNotify] = propertynotify,
-    [ResizeRequest] = resizerequest,
-    [UnmapNotify] = unmapnotify};
+static void (*handler[LASTEvent])(
+    XEvent *) = { // 给捕获的事件定义处理函数,左边是类型,右边是自定义函数
+    [ButtonPress] = buttonpress, // 按键事件
+    [ClientMessage] = clientmessage, //窗口给x11服务发送的请求比如全屏请求等
+    [ConfigureRequest] = configurerequest, //客户端窗口请求大小和位置变化和边框改变,窗口请求不是用户触发
+    [ConfigureNotify] = configurenotify, //窗口大小和位置变化和边框改变的时候触发
+    [DestroyNotify] = destroynotify, //销毁事件
+    [EnterNotify] = enternotify, // 鼠标移动进入窗口事件,比如聚焦的处理
+    [Expose] = expose,  // 窗口暴露事件,由不可见变成可见的时候触发
+    [FocusIn] = focusin,   //聚焦事件
+    [KeyPress] = keypress, //键盘事件
+    [MappingNotify] = mappingnotify, //键盘映射发生变化时触发
+    [MapRequest] = maprequest,    //窗口映射触发,只有设置了映射窗口才能被看到
+    [MotionNotify] = motionnotify, // 监视器事件,比如鼠标移动到某个位置的处理
+    [PropertyNotify] = propertynotify, //窗口属性改变的时候触发
+    [ResizeRequest] = resizerequest,  //客户端请求重置大小,不是用户触发的
+    [UnmapNotify] = unmapnotify};   //窗口取消映射的时候触发,比如隐藏和杀死都会触发
 
 static Atom wmatom[WMLast], netatom[NetLast], xatom[XLast];
 static int running = 1;
@@ -459,18 +480,8 @@ static int depth;
 static Colormap cmap;
 static Monitor *mons, *selmon;
 static Window root, wmcheckwin;
-
 static int hiddenWinStackTop = -1;
 static Client *hiddenWinStack[100];
-
-static void overview_restore(Client *c,const Arg *arg);
-static void overview_backup(Client *c);
-
-static void fullname_taskbar_activeitem(const Arg *arg);
-
-static void set_tag_fullscreen_flag(Client *c);
-static void clear_tag_fullscreen_flag(Client *c);
-
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -484,11 +495,9 @@ struct Pertag {
   const Layout
       *ltidxs[LENGTH(tags) + 1][2]; /* matrix of tags and layouts indexes  */
   int showbars[LENGTH(tags) + 1];   /* display bar for the current tag */
-  Client *fullscreen_client[LENGTH(tags) + 1]; /*记录每个tag中的全屏窗口*/
 };
 
-
-/* function implementations */ 
+/* function implementations */
 void logtofile(const char *fmt, ...) {
   char buf[256];
   char cmd[256];
@@ -505,36 +514,131 @@ void logtofile(const char *fmt, ...) {
 /* function implementations */
 void lognumtofile(unsigned int num) {
   char cmd[256];
-  sprintf(cmd, "echo '%x' >> ~/log",num);
+  sprintf(cmd, "echo '%x' >> ~/log", num);
   system(cmd);
 }
 
-//扩展输入事件处理函数
-static void xi_handler(XEvent xevent){
-  Client *pointer_in_client; //鼠标所在的窗口
-  XGetEventData (dpy, &xevent.xcookie); //获取扩展事件cookie对应的事件数据
-  if (xevent.xcookie.evtype == XI_RawMotion) { //鼠标移动事件
+//获取窗口的进程pid
+unsigned long get_win_pid(Window win) {
+  Atom prop_name = XInternAtom(dpy, "_NET_WM_PID", False);
+  Atom type;
+  int format;
+  unsigned long nitems;
+  unsigned long bytes_after;
+  unsigned char *prop = NULL;
+  unsigned long pid = 0;
+
+  if (XGetWindowProperty(dpy, win, prop_name, 0, 1, False, XA_CARDINAL,
+                         &type, &format, &nitems, &bytes_after, &prop) == Success) {
+    if (prop) {
+      pid = *((unsigned long *) prop);
+      XFree(prop);
+    }
+  }
+  return pid;
+}
+
+static void stop_win(const Arg *arg)
+{
+  if(!selmon->sel){
+    return;
+  }
+  unsigned long pid = get_win_pid(selmon->sel->win);
+  kill(pid, SIGSTOP);
+  selmon->sel->isstop=1;
+}
+
+
+static void continue_win(const Arg *arg)
+{
+  if(!selmon->sel){
+    return;
+  }
+  unsigned long pid = get_win_pid(selmon->sel->win);
+  kill(pid, SIGCONT);
+  selmon->sel->isstop=0;
+}
+
+
+static void toggle_stop_cont_win(const Arg *arg)
+{
+  uint border_type;
+  if(!selmon->sel){
+    return;
+  } 
+  if(selmon->sel->isstop){
+    continue_win(arg);
+  }else{
+    stop_win(arg);
+  }
+  // 设置窗口的border
+  border_type = get_border_type(selmon->sel);
+  XSetWindowBorder(dpy, selmon->sel->win, scheme[border_type][ColBorder].pixel);
+}
+
+// 扩展输入事件处理函数
+static void xi_handler(XEvent xevent) {
+  Client *pointer_in_client;           // 鼠标所在的窗口
+  XGetEventData(dpy, &xevent.xcookie); // 获取扩展事件cookie对应的事件数据
+  if (xevent.xcookie.evtype == XI_RawMotion) { // 鼠标移动事件
     Window root_return, child_return;
     int root_x_return, root_y_return;
     int win_x_return, win_y_return;
     unsigned int mask_return;
 
-    XQueryPointer(dpy, root, &root_return, &child_return, //获取鼠标位置和鼠标所在的窗口
-                       &root_x_return, &root_y_return,
-                       &win_x_return, &win_y_return,
-                       &mask_return);
+    XQueryPointer(dpy, root, &root_return,
+                  &child_return, // 获取鼠标位置和鼠标所在的窗口
+                  &root_x_return, &root_y_return, &win_x_return, &win_y_return,
+                  &mask_return);
 
-    toggle_hotarea(root_x_return,root_y_return); //判断窗口真全屏状态左下角触发热区
+    toggle_hotarea(root_x_return,
+                   root_y_return); // 判断窗口真全屏状态左下角触发热区
 
     if (child_return != None && mouse_move_toggle_focus == 1) {
-        pointer_in_client = wintoclient(child_return);  //window对象转换为client对象
-        focus(pointer_in_client); //聚焦到鼠标所在的窗口
-    }  
-  }
-  XFreeEventData(dpy, &xevent.xcookie);  //释放函数开头get到内存的数据防止内存泄露
+      pointer_in_client =
+          wintoclient(child_return); // window对象转换为client对象
+      focus(pointer_in_client);      // 聚焦到鼠标所在的窗口
+    }
+  } else if (xevent.xcookie.evtype == XI_RawButtonPress){ //鼠标按键事件
+    Window root_return, child_return;
+    int root_x_return, root_y_return;
+    int win_x_return, win_y_return;
+    unsigned int mask_return;
+
+
+    XQueryPointer(dpy, root, &root_return,
+                  &child_return, // 获取鼠标位置和鼠标所在的窗口
+                  &root_x_return, &root_y_return, &win_x_return, &win_y_return,
+                  &mask_return);
+
+    Atom net_wm_state_skip_pager =                        //_NET_WM_STATE_SKIP_PAGER一些窗口小部件有这个属性比如eww面板
+    XInternAtom(dpy, "_NET_WM_STATE_SKIP_PAGER", False); //最后一个参数表示是否系统本来就存在该原子的时候才返回,这里表示可以自定义不管系统有没有
+
+    Atom normal_win =                        //_NET_WM_STATE_SKIP_PAGER一些窗口小部件有这个属性比如eww面板
+    XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_NORMAL", False); //最后一个参数表示是否系统本来就存在该原子的时候才返回,这里表示可以自定义不管系统有没有
+
+
+    unsigned int isinbacklist = judge_win_contain_state(child_return, net_wm_state_skip_pager);
+
+    Atom wtype = getatompropfromwin(child_return, netatom[NetWMWindowType]);
+
+    if(!child_return || child_return == selmon->barwin || child_return == systray->win || isinbacklist == 1 || wtype != normal_win){
+      goto FreeEventData;
+    }
+    pointer_in_client =
+        wintoclient(child_return); // window对象转换为client对象
+    focus(pointer_in_client);      // 聚焦到鼠标所在的窗口
+    if(pointer_in_client && pointer_in_client->isfloating){
+      XRaiseWindow(dpy,pointer_in_client->win);   //提升浮动窗口到顶层
+    }
+  } 
+
+FreeEventData:
+  XFreeEventData(dpy,
+                 &xevent.xcookie); // 释放函数开头get到内存的数据防止内存泄露
 }
 
-void applyrules(Client *c) {   //读取config.h的窗口配置规则处理
+void applyrules(Client *c) { // 读取config.h的窗口配置规则处理
   const char *class, *instance;
   unsigned int i;
   const Rule *r;
@@ -558,7 +662,6 @@ void applyrules(Client *c) {   //读取config.h的窗口配置规则处理
 
     r = &rules[i];
 
-
     // 当rule中定义了一个或多个属性时，只要有一个属性匹配，就认为匹配成功
     if ((r->title && !strcmp(c->name, r->title)) ||
         (r->class && !strcmp(class, r->class)) ||
@@ -576,10 +679,10 @@ void applyrules(Client *c) {   //读取config.h的窗口配置规则处理
 
       // 如果设定了isfloating 且设置窗口的长和宽
       if (r->isfloating && r->width != 0 && r->high != 0) {
-          c->w = r->width;
-          c->h = r->high;
-      }        
-  
+        c->w = r->width;
+        c->h = r->high;
+      }
+
       // 如果设定了floatposition 设定窗口位置
       if (r->isfloating && r->floatposition != 0) {
         switch (r->floatposition) {
@@ -704,7 +807,7 @@ int applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact) {
   return *x != c->x || *y != c->y || *w != c->w || *h != c->h;
 }
 
-void arrange(Monitor *m) {  //布局管理
+void arrange(Monitor *m) { // 布局管理
   if (m)
     showtag(m->stack);
   else
@@ -718,29 +821,29 @@ void arrange(Monitor *m) {  //布局管理
       arrangemon(m);
 }
 
-void arrangemon(Monitor *m) {  //确认选用的布局
+void arrangemon(Monitor *m) { // 确认选用的布局
   if (m->isoverview) {
     strncpy(m->ltsymbol, overviewlayout.symbol, sizeof overviewlayout.symbol);
     overviewlayout.arrange(m);
   } else {
-    strncpy(m->ltsymbol, m->lt[m->sellt]->symbol, sizeof m->lt[m->sellt]->symbol);
+    strncpy(m->ltsymbol, m->lt[m->sellt]->symbol,
+            sizeof m->lt[m->sellt]->symbol);
     m->lt[m->sellt]->arrange(m);
   }
 }
 
-void attach(Client *c) {  //新打开的窗口放入窗口链表中
-  Client *fc;
 
-  //如果当前的tag中有新创建的窗口,就让当前tag中的全屏窗口退出全屏参与平铺
-  fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
-  if (fc){
-    clear_fullscreen_flag(fc);
+void attach(Client *c) { // 新打开的窗口放入窗口链表中
+
+  Client **tc;
+  for (tc = &c->mon->clients; *tc; tc = &(*tc)->next){
+    // 如果当前的tag中有新创建的窗口,就让当前tag中的全屏窗口退出全屏参与平铺
+    if((*tc) && !c->isfloating && (*tc)->tags & c->tags){
+      clear_fullscreen_flag(*tc);
+    }
   }
 
-  if (!newclientathead) { 
-    Client **tc;
-    for (tc = &c->mon->clients; *tc; tc = &(*tc)->next)
-      ;
+  if (!newclientathead) {
     *tc = c;
     c->next = NULL;
   } else {
@@ -749,22 +852,21 @@ void attach(Client *c) {  //新打开的窗口放入窗口链表中
   }
 }
 
-void attachstack(Client *c) { //放入栈中
+void attachstack(Client *c) { // 放入栈中
   c->snext = c->mon->stack;
   c->mon->stack = c;
 }
 
-void buttonpress(XEvent *e) { //鼠标按键事件处理函数
+void buttonpress(XEvent *e) { // 鼠标按键事件处理函数
   unsigned int i, x, click, occ = 0;
   Arg arg = {0};
   Monitor *m;
   XButtonPressedEvent *ev = &e->xbutton;
   Client *c = wintoclient(ev->window);
 
-  //滚轮加按键事件直接操作,不进行下面鼠标位置判断
-  for (i = 0; i < LENGTH(buttons); i++){
-    if (buttons[i].func && 
-        buttons[i].button == ev->button && 
+  // 滚轮加按键事件直接操作,不进行下面鼠标位置判断
+  for (i = 0; i < LENGTH(buttons); i++) {
+    if (buttons[i].func && buttons[i].button == ev->button &&
         (ev->button == Button4 || ev->button == Button5) &&
         CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state) &&
         CLEANMASK(buttons[i].mask) != 0) {
@@ -843,8 +945,8 @@ void buttonpress(XEvent *e) { //鼠标按键事件处理函数
   } else if ((c = wintoclient(ev->window))) {
     focus(c);
     restack(selmon);
-    //这句代码好像是多余的,因为不停止捕获,重新发送的事件还是会被再次拦截捕获,不会传到原本的客户端
-    XAllowEvents(dpy, ReplayPointer, CurrentTime); 
+    // 这句代码好像是多余的,因为不停止捕获,重新发送的事件还是会被再次拦截捕获,不会传到原本的客户端
+    XAllowEvents(dpy, ReplayPointer, CurrentTime);
     click = ClkClientWin;
   }
   // 增加ClkRootWin也可以触发鼠标按键事件,这样tab无窗口才能使用鼠标中键加滚轮切换tab
@@ -852,14 +954,12 @@ void buttonpress(XEvent *e) { //鼠标按键事件处理函数
     if (click == buttons[i].click && buttons[i].func &&
         buttons[i].button == ev->button &&
         CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state)) {
-      
 
-      buttons[i].func((click == ClkTagBar || click == ClkRootWin || click == ClkWinTitle ||
-                       click == ClkStatusText) &&
+      buttons[i].func((click == ClkTagBar || click == ClkRootWin ||
+                       click == ClkWinTitle || click == ClkStatusText) &&
                               buttons[i].arg.i == 0
                           ? &arg
                           : &buttons[i].arg);
-
     }
 }
 
@@ -877,12 +977,14 @@ void cleanup(void) {
   Layout foo = {"", NULL};
   Monitor *m;
   size_t i;
-
   view(&a);
   selmon->lt[selmon->sellt] = &foo;
-  for (m = mons; m; m = m->next)
-    while (m->stack)
+  for (m = mons; m; m = m->next){
+    while (m->stack){
       unmanage(m->stack, 0);
+    }
+  }
+      
   XUngrabKey(dpy, AnyKey, AnyModifier, root);
   while (mons)
     cleanupmon(mons);
@@ -979,8 +1081,17 @@ void clientmessage(XEvent *e) {
     return;
   if (cme->message_type == netatom[NetWMState]) {
     if (cme->data.l[1] == netatom[NetWMFullscreen] ||
-        cme->data.l[2] == netatom[NetWMFullscreen])
-      setfullscreen(c);
+        cme->data.l[2] == netatom[NetWMFullscreen]){
+          if(cme->data.l[0] == _NET_WM_STATE_ADD){
+            c->isfullscreen = 0;
+            setfullscreen(c);
+          } else if(cme->data.l[0] == _NET_WM_STATE_REMOVE){
+            c->isfullscreen = 1;
+            setfullscreen(c);
+          } else if(cme->data.l[0] == _NET_WM_STATE_TOGGLE){
+            setfullscreen(c);
+          } 
+    }
   } else if (cme->message_type == netatom[NetActiveWindow]) {
     if (c != selmon->sel && !c->isurgent)
       seturgent(c, 1);
@@ -1091,7 +1202,7 @@ void configurerequest(XEvent *e) {
   XSync(dpy, False);
 }
 
-Monitor *createmon(void) { //初始化新的显示器数据结构
+Monitor *createmon(void) { // 初始化新的显示器数据结构
   Monitor *m;
   unsigned int i;
 
@@ -1174,7 +1285,8 @@ Monitor *dirtomon(int dir) {
   return m;
 }
 
-void drawbar(Monitor *m) {  //绘制bar
+void drawbar(Monitor *m) { // 绘制bar
+
   int x, empty_w;
   int w = 0;
   int system_w = 0, tasks_w = 0, status_w;
@@ -1185,6 +1297,10 @@ void drawbar(Monitor *m) {  //绘制bar
 
   if (!m->showbar)
     return;
+
+  XLowerWindow(dpy,m->barwin);
+  XLowerWindow(dpy,systray->win);
+
 
   // 获取系统托盘的宽度
   if (showsystray && m == systraytomon(m))
@@ -1239,7 +1355,6 @@ void drawbar(Monitor *m) {  //绘制bar
   drw_setscheme(drw, scheme[SchemeNorm]);
   x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 
-
   // 绘制TASKS
   for (c = m->clients; c; c = c->next) {
     // 判断是否需要绘制 && 判断颜色设置
@@ -1253,21 +1368,21 @@ void drawbar(Monitor *m) {  //绘制bar
       scm = SchemeNorm;
     drw_setscheme(drw, scheme[scm]);
 
-    //task是否使用图标表示
-    if(taskbar_icon == 1 && c->no_limit_taskw == 0 ) {
+    // task是否使用图标表示
+    if (taskbar_icon == 1 && c->no_limit_taskw == 0) {
       task_content = c->icon;
     } else {
       task_content = c->name;
     }
 
     // 绘制TASK
-    if(c->no_limit_taskw == 1){
+    if (c->no_limit_taskw == 1) {
       w = TEXTW(task_content);
     } else {
       w = MIN(TEXTW(task_content), TEXTW("           "));
     }
 
-    //剩余的空白区域宽度
+    // 剩余的空白区域宽度
     empty_w = m->ww - x - status_w - system_w;
 
     if (w > empty_w) { // 如果当前TASK绘制后长度超过最大宽度
@@ -1297,7 +1412,7 @@ void drawbar(Monitor *m) {  //绘制bar
   resizebarwin(m);
 }
 
-//绘制全部显示器的bar
+// 绘制全部显示器的bar
 void drawbars(void) {
   Monitor *m;
 
@@ -1534,7 +1649,7 @@ void enternotify(XEvent *e) {
   focus(c);
 }
 
-void expose(XEvent *e) { //窗口创建事件
+void expose(XEvent *e) { // 窗口暴露事件,由不可见变成可见的时候触发
   Monitor *m;
   XExposeEvent *ev = &e->xexpose;
 
@@ -1545,24 +1660,29 @@ void expose(XEvent *e) { //窗口创建事件
   }
 }
 
-uint get_border_type(Client *c){
-  if(c->isglobal && !c->isfullscreen){
+uint get_border_type(Client *c) {  //判断border颜色
+  if(c->isstop && c->isfullscreen){
+    return SchemeSelFakeFullStop;
+  } else if(c->isstop && ! c->isfullscreen){
+    return SchemeSelStop;
+  } else if (c->isglobal && !c->isfullscreen) {
     return SchemeSelGlobal;
-  } else if(c->isfullscreen && !c->isglobal){
+  } else if (c->isfullscreen && !c->isglobal) {
     return SchemeSelFakeFull;
-  } else if(c->isglobal && c->isfullscreen) {
+  } else if (c->isglobal && c->isfullscreen) {
     return SchemeSelFakeFullGLObal;
   } else {
     return SchemeSel;
   }
 }
 
-//聚焦函数
+// 聚焦函数
 void focus(Client *c) {
   uint border_type = SchemeSel;
 
-  if (c && c->isactive) {  //已经设置过了什么也不做,针对设置了全局鼠标聚焦监测mouse_move_toggle_focus
-    return;                //避免反复设置损耗性能
+  if (c &&
+      c->isactive) { // 已经设置过了什么也不做,针对设置了全局鼠标聚焦监测mouse_move_toggle_focus
+    return;          // 避免反复设置损耗性能
   }
 
   if (!c || !ISVISIBLE(c) || HIDDEN(c))
@@ -1579,14 +1699,15 @@ void focus(Client *c) {
     detachstack(c);
     attachstack(c);
     grabbuttons(c, 1);
-    c->isactive = 1; //标记已经设置过了
-    //设置窗口的border
+    c->isactive = 1; // 标记已经设置过了
+    // 设置窗口的border
     border_type = get_border_type(c);
-    XSetWindowBorder(dpy, c->win,scheme[border_type][ColBorder].pixel);
+    XSetWindowBorder(dpy, c->win, scheme[border_type][ColBorder].pixel);
     setfocus(c);
-    if(c->isfloating){
-      XRaiseWindow(dpy,c->win);  //浮动窗口聚焦后把视图提到最高层,不被其他窗口覆盖
-    }
+    // if (c->isfloating) {
+    //   XRaiseWindow(dpy,
+    //                c->win); // 浮动窗口聚焦后把视图提到最高层,不被其他窗口覆盖
+    // }
   } else {
     XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
     XDeleteProperty(dpy, root, netatom[NetActiveWindow]);
@@ -1691,6 +1812,64 @@ Atom getatomprop(Client *c, Atom prop) {
   return atom;
 }
 
+
+Atom getatompropfromwin(Window w, Atom prop) {
+  int di;
+  unsigned long dl;
+  unsigned char *p = NULL;
+  Atom da, atom = None;
+  /* FIXME getatomprop should return the number of items and a pointer to
+   * the stored data instead of this workaround */
+  Atom req = XA_ATOM;
+  if (prop == xatom[XembedInfo])
+    req = xatom[XembedInfo];
+
+  if (XGetWindowProperty(dpy, w, prop, 0L, sizeof atom, False, req, &da,
+                         &di, &dl, &dl, &p) == Success &&
+      p) {
+    atom = *(Atom *)p;
+    if (da == xatom[XembedInfo] && dl == 2)
+      atom = ((Atom *)p)[1];
+    XFree(p);
+  }
+  return atom;
+}
+
+
+unsigned int 
+judge_win_contain_state(Window w, Atom want_net_wm_state) 
+{
+
+    Atom net_wm_state = XInternAtom(dpy, "_NET_WM_STATE", False);
+    // Atom net_wm_state_skip_pager = XInternAtom(dpy, "_NET_WM_STATE_SKIP_PAGER", False);
+
+    Atom actual_type;
+    int actual_format;
+    unsigned long nitems;
+    unsigned long bytes_after;
+    unsigned char *prop;
+
+    int status = XGetWindowProperty(dpy, w, net_wm_state, 0, (~0L), False, AnyPropertyType,
+                                    &actual_type, &actual_format, &nitems, &bytes_after, &prop);
+
+    if (status == Success && actual_type == XA_ATOM && nitems > 0)
+    {
+        Atom *atoms = (Atom *)prop;
+        int i;
+        for (i = 0; i < nitems; i++)
+        {
+            if (atoms[i] == want_net_wm_state)
+            {
+                XFree(prop);
+                return 1;
+            }
+        }
+        XFree(prop);
+    }
+    return 0;
+}
+
+
 int getrootptr(int *x, int *y) {
   int di;
   unsigned int dui;
@@ -1761,24 +1940,28 @@ void grabbuttons(Client *c, int focused) {
       XGrabButton(dpy, AnyButton, AnyModifier, c->win, False, BUTTONMASK,
                   GrabModeSync, GrabModeSync, None, None);
     for (i = 0; i < LENGTH(buttons); i++)
-    /*overview模式可以捕获任何在配置定义的鼠标按键事件，非overivew模式只能捕获
-    键盘加鼠标事件，是为了让在overview模式可以用鼠标切换到窗口所在的tag,此外还要兼容非
-    overview视图下的中键全屏*/
+      /*overview模式可以捕获任何在配置定义的鼠标按键事件，非overivew模式只能捕获
+      键盘加鼠标事件，是为了让在overview模式可以用鼠标切换到窗口所在的tag,此外还要兼容非
+      overview视图下的中键全屏*/
       if (buttons[i].click == ClkClientWin && c->mon->isoverview == 1) {
         for (j = 0; j < LENGTH(modifiers); j++)
           XGrabButton(dpy, buttons[i].button, buttons[i].mask | modifiers[j],
                       c->win, False, BUTTONMASK, GrabModeAsync, GrabModeSync,
                       None, None);
-      } else if ( buttons[i].click == ClkClientWin && c->mon->isoverview == 0 && CLEANMASK(buttons[i].mask) != 0 ) {
-          for (j = 0; j < LENGTH(modifiers); j++)
-            XGrabButton(dpy, buttons[i].button, buttons[i].mask | modifiers[j],
-                        c->win, False, BUTTONMASK, GrabModeAsync, GrabModeSync,
-                        None, None);      
-      } else if ( buttons[i].click == ClkClientWin && c->mon->isoverview == 0 && CLEANMASK(buttons[i].mask) == 0 && buttons[i].button == Button2 ) { //允许捕获非overview模式的单独中键
-          for (j = 0; j < LENGTH(modifiers); j++)
-            XGrabButton(dpy, buttons[i].button, buttons[i].mask | modifiers[j],
-                        c->win, False, BUTTONMASK, GrabModeAsync, GrabModeSync,
-                        None, None);      
+      } else if (buttons[i].click == ClkClientWin && c->mon->isoverview == 0 &&
+                 CLEANMASK(buttons[i].mask) != 0) {
+        for (j = 0; j < LENGTH(modifiers); j++)
+          XGrabButton(dpy, buttons[i].button, buttons[i].mask | modifiers[j],
+                      c->win, False, BUTTONMASK, GrabModeAsync, GrabModeSync,
+                      None, None);
+      } else if (buttons[i].click == ClkClientWin && c->mon->isoverview == 0 &&
+                 CLEANMASK(buttons[i].mask) == 0 &&
+                 buttons[i].button ==
+                     Button2) { // 允许捕获非overview模式的单独中键
+        for (j = 0; j < LENGTH(modifiers); j++)
+          XGrabButton(dpy, buttons[i].button, buttons[i].mask | modifiers[j],
+                      c->win, False, BUTTONMASK, GrabModeAsync, GrabModeSync,
+                      None, None);
       }
   }
 }
@@ -1866,7 +2049,7 @@ static int isuniquegeom(XineramaScreenInfo *unique, size_t n,
 }
 #endif /* XINERAMA */
 
-//键盘按键事件处理函数
+// 键盘按键事件处理函数
 void keypress(XEvent *e) {
   unsigned int i;
   KeySym keysym;
@@ -1874,19 +2057,40 @@ void keypress(XEvent *e) {
 
   ev = &e->xkey;
   keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
-  //纠正右边数字键盘的keycode to keysym错误
-  switch(keysym){
-    case 0xff9e: keysym=0xffb0; break;
-    case 0xff9c: keysym=0xffb1; break;
-    case 0xff99: keysym=0xffb2; break;
-    case 0xff9b: keysym=0xffb3; break;
-    case 0xff96: keysym=0xffb4; break;
-    case 0xff9d: keysym=0xffb5; break;
-    case 0xff98: keysym=0xffb6; break;
-    case 0xff95: keysym=0xffb7; break;
-    case 0xff97: keysym=0xffb8; break;
-    case 0xff9a: keysym=0xffb9; break;
-    default: ; break;
+  // 纠正右边数字键盘的keycode to keysym错误
+  switch (keysym) {
+  case 0xff9e:
+    keysym = 0xffb0;
+    break;
+  case 0xff9c:
+    keysym = 0xffb1;
+    break;
+  case 0xff99:
+    keysym = 0xffb2;
+    break;
+  case 0xff9b:
+    keysym = 0xffb3;
+    break;
+  case 0xff96:
+    keysym = 0xffb4;
+    break;
+  case 0xff9d:
+    keysym = 0xffb5;
+    break;
+  case 0xff98:
+    keysym = 0xffb6;
+    break;
+  case 0xff95:
+    keysym = 0xffb7;
+    break;
+  case 0xff97:
+    keysym = 0xffb8;
+    break;
+  case 0xff9a:
+    keysym = 0xffb9;
+    break;
+  default:;
+    break;
   }
   for (i = 0; i < LENGTH(keys); i++)
     if (keysym == keys[i].keysym &&
@@ -1916,6 +2120,30 @@ void killclient(const Arg *arg) {
   if (n <= 1)
     focusstack(NULL);
 }
+
+void clear_client(Client *fc) {
+  Client *c;
+  int n = 0;
+
+  if (!fc)
+    return;
+  if (!sendevent(fc->win, wmatom[WMDelete], NoEventMask,
+                 wmatom[WMDelete], CurrentTime, 0, 0, 0)) {
+    XGrabServer(dpy);
+    XSetErrorHandler(xerrordummy);
+    XSetCloseDownMode(dpy, DestroyAll);
+    XKillClient(dpy, fc->win);
+    XSync(dpy, False);
+    XSetErrorHandler(xerror);
+    XUngrabServer(dpy);
+  }
+  for (c = selmon->clients; c; c = c->next)
+    if (ISVISIBLE(c) && !HIDDEN(c))
+      n++;
+  if (n <= 1)
+    focusstack(NULL);
+}
+
 
 void forcekillclient(const Arg *arg) {
   if (!selmon->sel)
@@ -1952,7 +2180,6 @@ void managefloating(Client *c) {
   }
 }
 
-
 void manage(Window w, XWindowAttributes *wa) {
   Client *c, *t = NULL;
   Window trans = None;
@@ -1971,6 +2198,7 @@ void manage(Window w, XWindowAttributes *wa) {
   c->isfullscreen = 0;
   c->no_limit_taskw = 0;
   c->isactive = 0;
+  c->isstop = 0;
   updatetitle(c);
   updateicon(c);
   if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
@@ -2060,17 +2288,21 @@ void maprequest(XEvent *e) {
     manage(ev->window, &wa);
 }
 
-void toggle_hotarea(int x_root,int y_root){
-  //左下角热区坐标计算,兼容多显示屏
+void toggle_hotarea(int x_root, int y_root) {
+  // 左下角热区坐标计算,兼容多显示屏
   Arg arg = {0};
   unsigned hx = selmon->mx + hotarea_size;
   unsigned hy = selmon->my + selmon->mh - hotarea_size;
 
-  if(enable_hotarea == 1 &&  selmon->is_in_hotarea == 0 && y_root > hy && x_root < hx && x_root >= selmon->mx && y_root <= (selmon->my +selmon->mh) ){
-      toggleoverview(&arg);
-      selmon->is_in_hotarea = 1;   
-  } else if(enable_hotarea == 1 && selmon->is_in_hotarea == 1 && (y_root <= hy || x_root >= hx || x_root < selmon->mx || y_root > (selmon->my +selmon->mh) ) ) {
-      selmon->is_in_hotarea = 0;
+  if (enable_hotarea == 1 && selmon->is_in_hotarea == 0 && y_root > hy &&
+      x_root < hx && x_root >= selmon->mx &&
+      y_root <= (selmon->my + selmon->mh)) {
+    toggleoverview(&arg);
+    selmon->is_in_hotarea = 1;
+  } else if (enable_hotarea == 1 && selmon->is_in_hotarea == 1 &&
+             (y_root <= hy || x_root >= hx || x_root < selmon->mx ||
+              y_root > (selmon->my + selmon->mh))) {
+    selmon->is_in_hotarea = 0;
   }
 }
 
@@ -2082,9 +2314,8 @@ void motionnotify(XEvent *e) {
   if (ev->window != root)
     return;
 
-
   // 判断鼠标的位置自动聚焦到鼠标所在的标题的窗口
-  unsigned int i, x,occ = 0;
+  unsigned int i, x, occ = 0;
   Client *c = wintoclient(ev->window);
 
   // click = ClkRootWin;
@@ -2119,13 +2350,16 @@ void motionnotify(XEvent *e) {
         x += TEXTW(tags[i]);
       } while (ev->x_root >= x && ++i < LENGTH(tags));
     }
-    if (i < LENGTH(tags)) {  //点击在tab上
+    if (i < LENGTH(tags)) { // 点击在tab上
       // click = ClkTagBar;
       // arg.ui = 1 << i;
-    } else if (ev->x_root < x + blw){  //点击在布局标签上
+    } else if (ev->x_root < x + blw) { // 点击在布局标签上
       // click = ClkLtSymbol;
-    }
-    else if (ev->x_root > selmon->ww - status_w - 2 * sp - (selmon == systraytomon(selmon)? (system_w ? system_w + systraypinning + 2 : 0): 0)) {
+    } else if (ev->x_root >
+               selmon->ww - status_w - 2 * sp -
+                   (selmon == systraytomon(selmon)
+                        ? (system_w ? system_w + systraypinning + 2 : 0)
+                        : 0)) {
       // click = ClkStatusText;
       // arg.i = ev->x_root - (selmon->ww - status_w - 2 * sp -
       //                  (selmon == systraytomon(selmon)
@@ -2149,12 +2383,12 @@ void motionnotify(XEvent *e) {
       if (c && taskbar_movemouse_focus == 1) {
         // click = ClkWinTitle; //鼠标在标题栏上
         // arg.v = c;
-        focus(c);  //焦点切换到该标题对应的窗口
+        focus(c); // 焦点切换到该标题对应的窗口
       }
     }
   }
 
-  // 监测热区触发overview  
+  // 监测热区触发overview
   // toggle_hotarea(ev->x_root,ev->y_root);
 
   if ((m = recttomon(ev->x_root, ev->y_root, 1, 1)) != mon && mon) {
@@ -2165,7 +2399,7 @@ void motionnotify(XEvent *e) {
   mon = m;
 }
 
-//鼠标拖拽窗口
+// 鼠标拖拽窗口
 void movemouse(const Arg *arg) {
   int x, y, ocx, ocy, nx, ny;
   Client *c;
@@ -2231,7 +2465,7 @@ void movemouse(const Arg *arg) {
   }
 }
 
-//窗口位置移动
+// 窗口位置移动
 void movewin(const Arg *arg) {
   Client *c, *tc;
   int nx, ny;
@@ -2322,7 +2556,7 @@ void movewin(const Arg *arg) {
   restack(selmon);
 }
 
-//窗口大小缩放
+// 窗口大小缩放
 void resizewin(const Arg *arg) {
   Client *c, *tc;
   int nh, nw;
@@ -2388,16 +2622,17 @@ void resizewin(const Arg *arg) {
   restack(selmon);
 }
 
-//查找下一个需要布局窗口
+// 查找下一个需要布局窗口
 Client *nexttiled(Client *c) {
-  // for (; c && (c->isfullscreen || c->isfloating || !ISVISIBLE(c) || HIDDEN(c)); c = c->next)
+  // for (; c && (c->isfullscreen || c->isfloating || !ISVISIBLE(c) ||
+  // HIDDEN(c)); c = c->next)
   //   ;
   // return c;
-  for (; ; c = c->next ){
-    if(c == NULL){
+  for (;; c = c->next) {
+    if (c == NULL) {
       return c;
     }
-    if(!c->isfullscreen && !c->isfloating && ISVISIBLE(c) && !HIDDEN(c)){
+    if (!c->isfullscreen && !c->isfloating && ISVISIBLE(c) && !HIDDEN(c)) {
       return c;
     }
   }
@@ -2457,9 +2692,15 @@ void propertynotify(XEvent *e) {
   }
 }
 
-void quit(const Arg *arg)
-{
-  running = 0;
+void quit(const Arg *arg) 
+{ 
+  Client *c;
+  Monitor *m;
+  for (m = mons; m; m = m->next){
+    for (c = m->clients; c; c = c->next)
+      clear_client(c);
+  }
+  running = 0; 
 }
 
 Monitor *recttomon(int x, int y, int w, int h) {
@@ -2626,13 +2867,14 @@ void run(void) {
   XEvent xevent;
   /* main event loop */
   XSync(dpy, False);
-  while (running && !XNextEvent(dpy, &xevent)){
-    if (xevent.xcookie.type != GenericEvent || xevent.xcookie.extension != xi_opcode) {
-        /* 不是一个xinput2扩展事件,而是xlib的事件 */
-        if (handler[xevent.type])
-          handler[xevent.type](&xevent); /* call handler */
-    } else{ //xinput2扩展输入事件
-      xi_handler(xevent); //处理扩展输入事件
+  while (running && !XNextEvent(dpy, &xevent)) {
+    if (xevent.xcookie.type != GenericEvent ||
+        xevent.xcookie.extension != xi_opcode) {
+      /* 不是一个xinput2扩展事件,而是xlib的事件 */
+      if (handler[xevent.type])
+        handler[xevent.type](&xevent); /* call handler */
+    } else {                           // xinput2扩展输入事件
+      xi_handler(xevent);              // 处理扩展输入事件
     }
   }
 }
@@ -2749,15 +2991,17 @@ void setfocus(Client *c) {
 }
 
 void setfullscreen(Client *c) {
+  unsigned int border_type;
   if (!c->isfullscreen) {
-    XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
-                    PropModeReplace, (unsigned char *)&netatom[NetWMFullscreen],
-                    1); //设置窗口在x11状态,实际xprop并没看到改对了,状态还是normal
+    XChangeProperty(
+        dpy, c->win, netatom[NetWMState], XA_ATOM, 32, PropModeReplace,
+        (unsigned char *)&netatom[NetWMFullscreen],
+        1); // 设置窗口在x11状态,实际xprop并没看到改对了,状态还是normal
     c->isfullscreen = 1;
     c->oldstate = c->isfloating;
     c->oldbw = c->bw;
     c->bw = 0;
-    c->isfloating = 0; //全屏不浮动才能自动退出全屏参与平铺
+    c->isfloating = 0; // 全屏不浮动才能自动退出全屏参与平铺
     c->fullscreen_backup_x = c->x;
     c->fullscreen_backup_y = c->y;
     c->fullscreen_backup_w = c->w;
@@ -2765,74 +3009,72 @@ void setfullscreen(Client *c) {
     resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
     XRaiseWindow(dpy, c->win);
 
-    //记录tag中全屏窗口的指针
-    set_tag_fullscreen_flag(c);
   } else {
+
     XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
                     PropModeReplace, (unsigned char *)0, 0);
+
     c->isfullscreen = 0;
     c->isfloating = c->oldstate;
-    c->bw = c->oldbw;
+    c->bw = borderpx;
+    resizeclient(c, c->fullscreen_backup_x, c->fullscreen_backup_y,
+                 c->fullscreen_backup_w, c->fullscreen_backup_h);
+    border_type = get_border_type(c); // 确认窗口边框的颜色
+    XSetWindowBorder(dpy, c->win, scheme[border_type][ColBorder].pixel);
 
-    resizeclient(c, c->fullscreen_backup_x, c->fullscreen_backup_y, c->fullscreen_backup_w, c->fullscreen_backup_h);
     arrange(c->mon);
 
-    //清除tag中全屏窗口的指针
-    clear_tag_fullscreen_flag(c);
   }
 }
 
-//假全屏切换
+// 假全屏切换
 void set_fake_fullscreen(Client *c) {
   uint border_type;
   if (!c->isfullscreen) {
     // XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
-    //                 PropModeReplace, (unsigned char *)&netatom[NetWMFullscreen],
-    //                 1);
+    //                 PropModeReplace, (unsigned char
+    //                 *)&netatom[NetWMFullscreen], 1);
     c->isfullscreen = 1;
     c->oldstate = c->isfloating;
     // c->oldbw = c->bw;
     // c->bw = 0;
-    c->isfloating = 0; //全屏不浮动才能自动退出全屏参与平铺
+    c->isfloating = 0; // 全屏不浮动才能自动退出全屏参与平铺
     // 要多减一个gappo,因为mon->wx,wh不包含右边和下边看不见的10px区域
-    //鼠标在屏幕左上都不可以超出去的,右下可以超出10px
+    // 鼠标在屏幕左上都不可以超出去的,右下可以超出10px
     c->fullscreen_backup_x = c->x;
     c->fullscreen_backup_y = c->y;
     c->fullscreen_backup_w = c->w;
     c->fullscreen_backup_h = c->h;
-    resizeclient(c, c->mon->wx + gappo, c->mon->wy + gappo, c->mon->ww-(gappo*2)-gappo, c->mon->wh-(gappo*2)-gappo);
-    XRaiseWindow(dpy, c->win); //提升窗口到顶层
-    border_type = get_border_type(c);  //确认窗口边框的颜色
-    XSetWindowBorder(dpy, c->win,scheme[border_type][ColBorder].pixel);
-
-    //记录tag中全屏窗口的指针
-    set_tag_fullscreen_flag(c);
+    resizeclient(c, c->mon->wx + gappo, c->mon->wy + gappo,
+                 c->mon->ww - (gappo * 2) - gappo,
+                 c->mon->wh - (gappo * 2) - gappo);
+    XRaiseWindow(dpy, c->win);        // 提升窗口到顶层
+    border_type = get_border_type(c); // 确认窗口边框的颜色
+    XSetWindowBorder(dpy, c->win, scheme[border_type][ColBorder].pixel);
 
   } else {
     XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
                     PropModeReplace, (unsigned char *)0, 0);
     c->isfullscreen = 0;
     c->isfloating = c->oldstate;
-    c->bw = c->oldbw;
-    resizeclient(c, c->fullscreen_backup_x, c->fullscreen_backup_y, c->fullscreen_backup_w, c->fullscreen_backup_h);
-    border_type = get_border_type(c);  //确认窗口边框的颜色
-    XSetWindowBorder(dpy, c->win,scheme[border_type][ColBorder].pixel);
+    c->bw = borderpx;
+    resizeclient(c, c->fullscreen_backup_x, c->fullscreen_backup_y,
+                 c->fullscreen_backup_w, c->fullscreen_backup_h);
+    border_type = get_border_type(c); // 确认窗口边框的颜色
+    XSetWindowBorder(dpy, c->win, scheme[border_type][ColBorder].pixel);
     arrange(c->mon);
 
-    //清除tag中全屏窗口的指针
-    clear_tag_fullscreen_flag(c);
   }
 }
 
-
 void fullscreen(const Arg *arg) {
-  if (selmon->sel) { //显示器有窗口
-    setfullscreen(selmon->sel); 
+  if (selmon->sel) { // 显示器有窗口
+    setfullscreen(selmon->sel);
   }
 }
 
 void fake_fullscreen(const Arg *arg) {
-  if (selmon->sel) { //显示器有窗口
+  if (selmon->sel) { // 显示器有窗口
     set_fake_fullscreen(selmon->sel);
   }
 }
@@ -2946,36 +3188,37 @@ void setup(void) {
                   LeaveWindowMask | StructureNotifyMask | PropertyChangeMask;
   XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
 
-  //引入xinput2扩展的原始输入事件监测
+  // 引入xinput2扩展的原始输入事件监测
   /* 检查XInput2扩展的可用性 */
   int event, error;
-  if (!XQueryExtension (dpy, "XInputExtension", &xi_opcode, &event, &error)) {
-      printf ("XInput扩展不可用。\n");
-      return;
+  if (!XQueryExtension(dpy, "XInputExtension", &xi_opcode, &event, &error)) {
+    printf("XInput扩展不可用。\n");
+    return;
   }
 
   /* 检查XInput2扩展的版本 */
   int major = 2, minor = 0;
-  if (XIQueryVersion (dpy, &major, &minor) == BadRequest) {
-      printf ("不支持XInput2扩展的版本%d.%d。\n", major, minor);
-      return;
+  if (XIQueryVersion(dpy, &major, &minor) == BadRequest) {
+    printf("不支持XInput2扩展的版本%d.%d。\n", major, minor);
+    return;
   }
 
-  //xlib非扩展的窗口事件
+  // xlib非扩展的窗口事件
   XSelectInput(dpy, root, wa.event_mask);
 
   /* 设置掩码以接收所有主设备的事件 */
-  unsigned char mask_bytes [XIMaskLen (XI_LASTEVENT)];
-  memset (mask_bytes, 0, sizeof (mask_bytes));
-  XISetMask (mask_bytes, XI_RawMotion);  //鼠标移动事件
+  unsigned char mask_bytes[XIMaskLen(XI_LASTEVENT)];
+  memset(mask_bytes, 0, sizeof(mask_bytes));
+  XISetMask(mask_bytes, XI_RawMotion); // 鼠标移动事件捕获
+  XISetMask(mask_bytes, XI_RawButtonPress); // 鼠标按键事件捕获
 
-  XIEventMask evmasks [1];
-  evmasks [0].deviceid = XIAllMasterDevices;
-  evmasks [0].mask_len = sizeof (mask_bytes);
-  evmasks [0].mask = mask_bytes;
+  XIEventMask evmasks[1];
+  evmasks[0].deviceid = XIAllMasterDevices;
+  evmasks[0].mask_len = sizeof(mask_bytes);
+  evmasks[0].mask = mask_bytes;
 
-  XISelectEvents (dpy, root, evmasks, 1);
-  
+  XISelectEvents(dpy, root, evmasks, 1);
+
   grabkeys();
   focus(NULL);
 }
@@ -3020,14 +3263,15 @@ void showtag(Client *c) {
 
     showtag(c->snext);
 
-    //判断tags是不是2的次方根,从而判断窗口是不是只是属于一个tag
+    // 判断tags是不是2的次方根,从而判断窗口是不是只是属于一个tag
     unsigned int c_is_one_tag = 1;
-    if (c->tags&(c->tags - 1)){   //去掉一个1，判断是否为0
+    if (c->tags & (c->tags - 1)) { // 去掉一个1，判断是否为0
       c_is_one_tag = 0;
-    }  
-		//通过get_tag_bit_position 解析tags,判断要移动的窗口属于哪个tag
-    //如果要移动的窗口只属于一个tag而且他在当前监视器所在tag的右边,就往右边隐藏
-    if (c_is_one_tag == 1 && get_tag_bit_position(c->tags) > c->mon->pertag->curtag) {
+    }
+    // 通过get_tag_bit_position 解析tags,判断要移动的窗口属于哪个tag
+    // 如果要移动的窗口只属于一个tag而且他在当前监视器所在tag的右边,就往右边隐藏
+    if (c_is_one_tag == 1 &&
+        get_tag_bit_position(c->tags) > c->mon->pertag->curtag) {
       XMoveWindow(dpy, c->win, WIDTH(c) * 10, c->y);
     } else {
       XMoveWindow(dpy, c->win, WIDTH(c) * -10, c->y);
@@ -3055,13 +3299,30 @@ void spawn(const Arg *arg) {
 }
 
 void tag(const Arg *arg) {
-  if (selmon->sel && !selmon->sel->isglobal && arg->ui & TAGMASK) {
-    selmon->sel->tags = arg->ui & TAGMASK;
+  Client *target_client = selmon->sel;
+  if (target_client && !target_client->isglobal && arg->ui & TAGMASK) {
+    target_client->tags = arg->ui & TAGMASK;
+
+    Client **tc;
+    for (tc = &target_client; *tc; tc = &(*tc)->next){
+      // 让目标tag中的全屏窗口退出全屏参与平铺
+      if(!target_client->isfloating && (*tc) != target_client && (*tc) && (*tc)->isfullscreen  && (*tc)->tags & target_client->tags){
+        clear_fullscreen_flag(*tc);
+      }
+    }
     focus(NULL);
     arrange(selmon);
     view(&(Arg){.ui = arg->ui});
-  } else
+  } else{
     view(arg);
+  }
+  //如果是浮动的移动过去就让他置于顶层
+  if(target_client && target_client->isfloating){
+    XRaiseWindow(dpy, target_client->win);
+    focus(target_client);
+  }else {
+    focus(target_client);
+  }
 }
 
 void tagmon(const Arg *arg) {
@@ -3106,14 +3367,16 @@ void togglebar(const Arg *arg) {
     XConfigureWindow(dpy, systray->win, CWY, &wc);
   }
 
-  //在bar栏改动后让当前tag的假全屏窗口重新适应屏幕窗口大小
-  for (fc = selmon->clients; fc; fc = fc->next){ 
-    if(fc->isfullscreen && fc->bw != 0) {
-      resizeclient(fc, fc->mon->wx + gappo, fc->mon->wy + gappo, fc->mon->ww-(gappo*2)-gappo, fc->mon->wh-(gappo*2)-gappo);
-      XRaiseWindow(dpy, fc->win); //提升窗口到顶层      
+  // 在bar栏改动后让当前tag的假全屏窗口重新适应屏幕窗口大小
+  for (fc = selmon->clients; fc; fc = fc->next) {
+    if (fc->isfullscreen && fc->bw != 0) {
+      resizeclient(fc, fc->mon->wx + gappo, fc->mon->wy + gappo,
+                   fc->mon->ww - (gappo * 2) - gappo,
+                   fc->mon->wh - (gappo * 2) - gappo);
+      XRaiseWindow(dpy, fc->win); // 提升窗口到顶层
     }
   }
-  //非悬浮和全屏窗口也重新调整大小
+  // 非悬浮和全屏窗口也重新调整大小
   arrange(selmon);
   updatesystray();
 }
@@ -3186,8 +3449,8 @@ void toggleallfloating(const Arg *arg) {
 //       focus(c);
 //       if (c->isfloating) {
 //         resize(c, selmon->mx + (selmon->mw - selmon->sel->w) / 2,
-//                selmon->my + (selmon->mh - selmon->sel->h) / 2, selmon->sel->w,
-//                selmon->sel->h, 0);
+//                selmon->my + (selmon->mh - selmon->sel->h) / 2,
+//                selmon->sel->w, selmon->sel->h, 0);
 //       }
 //       pointerfocuswin(c);
 //     }
@@ -3282,7 +3545,7 @@ void toggleborder(const Arg *arg) {
 void unfocus(Client *c, int setfocus) {
   if (!c)
     return;
-  c->isactive = 0; //取消已经在窗口设置过聚焦的标志
+  c->isactive = 0; // 取消已经在窗口设置过聚焦的标志
   grabbuttons(c, 0);
   XSetWindowBorder(dpy, c->win, scheme[SchemeNorm][ColBorder].pixel);
   if (setfocus) {
@@ -3291,37 +3554,14 @@ void unfocus(Client *c, int setfocus) {
   }
 }
 
-void set_tag_fullscreen_flag(Client *c){
-  unsigned int tags,i;
-  unsigned mask = 1;
-
-  for(tags=c->tags,i=0;tags > 0;i++,tags= tags >> 1 ){
-    if(tags & mask){
-      c->mon->pertag->fullscreen_client[i+1] = c;
-    }
-  }
-}
-
-void clear_tag_fullscreen_flag(Client *c){
-  unsigned int tags,i;
-  unsigned mask = 1;
-
-  for(tags=c->tags,i=0;tags > 0;i++,tags= tags >> 1 ){
-    if(tags & mask){
-      c->mon->pertag->fullscreen_client[i+1] = NULL;
-    }
-  }
-}
-
 void unmanage(Client *c, int destroyed) {
   Monitor *m = c->mon;
   XWindowChanges wc;
 
-
-  //从窗口栈中移除
+  // 从窗口栈中移除
   detach(c);
   detachstack(c);
-  
+
   if (!destroyed) {
     wc.border_width = c->oldbw;
     XGrabServer(dpy); /* avoid race conditions */
@@ -3334,23 +3574,26 @@ void unmanage(Client *c, int destroyed) {
     XUngrabServer(dpy);
   }
 
-  //如果全屏窗口还没退出全屏就被删除了,就清空他所在tag的全屏指针
-  clear_tag_fullscreen_flag(c);
-
-
-  //取消窗口的相关事件监听
-  XSelectInput(dpy, c->win,NoEventMask);
-  //释放窗口资源
+  // 取消窗口的相关事件监听
+  XSelectInput(dpy, c->win, NoEventMask);
+  // 释放窗口资源
   free(c);
   focus(NULL);
   updateclientlist();
   arrange(m);
+  if(selmon->clients == NULL){
+		if(selmon->isoverview){
+			Arg arg = {0};
+			toggleoverview(&arg);
+		}	    
+  }
 }
 
 void unmapnotify(XEvent *e) {
   Client *c;
   XUnmapEvent *ev = &e->xunmap;
-
+  XLowerWindow(dpy,systray->win);
+  XLowerWindow(dpy,selmon->barwin);
   if ((c = wintoclient(ev->window))) {
     if (ev->send_event)
       setclientstate(c, WithdrawnState);
@@ -3672,16 +3915,16 @@ void updateicon(Client *c) {
   int i;
   XClassHint ch = {NULL, NULL};
   XGetClassHint(dpy, c->win, &ch);
-  if(ch.res_class){
+  if (ch.res_class) {
     for (i = 0; i < LENGTH(icons); i++) {
-      if(!strcmp(ch.res_class,(&icons[i])->class)){
+      if (!strcmp(ch.res_class, (&icons[i])->class)) {
         strcpy(c->icon, (&icons[i])->style);
-        return ;
+        return;
       }
     }
   }
   strcpy(c->icon, default_icon);
-  return ;
+  return;
 }
 
 void updatetitle(Client *c) {
@@ -3700,6 +3943,9 @@ void updatewindowtype(Client *c) {
   if (wtype == netatom[NetWMWindowTypeDialog])
     c->isfloating = 1;
 }
+
+
+
 
 void updatewmhints(Client *c) {
   XWMHints *wmh;
@@ -3727,7 +3973,7 @@ void setgap(const Arg *arg) {
 void view(const Arg *arg) {
   int i;
   unsigned int tmptag;
-  Client *c,*fc;
+  Client *c;
   int n = 0;
 
   selmon->seltags ^= 1; /* toggle sel tagset */
@@ -3772,26 +4018,27 @@ void view(const Arg *arg) {
     }
   }
 
-  //如果目标tag有窗口全屏,就把他置于最高层
-  fc = selmon->pertag->fullscreen_client[selmon->pertag->curtag];
-  if(fc){
-    XRaiseWindow(dpy,fc->win);   
-    focus(fc);
+  Client **tc;
+  for (tc = &selmon->clients; *tc; tc = &(*tc)->next){
+    // 目标窗口有全屏窗口的话把它提升到最高层
+    if((*tc) && (*tc)->isfullscreen){
+      XRaiseWindow(dpy, (*tc)->win);
+      focus(*tc);;
+    }
   }
 
 }
 
-
 /* overview 模式左键跳转窗口 */
 void inner_overvew_toggleoverview(const Arg *arg) {
-  if(selmon->isoverview) {
+  if (selmon->isoverview) {
     toggleoverview(arg);
   }
 }
 
 /* overview 模式右键关闭窗口 */
 void inner_overvew_killclient(const Arg *arg) {
-  if(selmon->isoverview) {
+  if (selmon->isoverview) {
     killclient(arg);
   }
 }
@@ -3803,20 +4050,25 @@ void toggleoverview(const Arg *arg) {
                                                             : selmon->seltags;
   selmon->isoverview ^= 1;
   Client *c;
+  Client *target_client =selmon->sel ;
   // 正常视图到overview,退出所有窗口的浮动和全屏状态参与平铺,
-  //overview到正常视图,还原之前退出的浮动和全屏窗口状态 
-  if(selmon->isoverview) {
-    for (c = selmon->clients; c; c = c->next){
+  // overview到正常视图,还原之前退出的浮动和全屏窗口状态
+  if (selmon->isoverview) {
+    for (c = selmon->clients; c; c = c->next) {
       overview_backup(c);
     }
   } else {
-    for (c = selmon->clients; c; c = c->next){
-      overview_restore(c,&(Arg){.ui = target});
+    for (c = selmon->clients; c; c = c->next) {
+      overview_restore(c, &(Arg){.ui = target});
     }
   }
 
   view(&(Arg){.ui = target});
-  // pointerfocuswin(selmon->sel); //我不需要自动鼠标跳转窗口
+
+  if(target_client){
+    XRaiseWindow(dpy,target_client->win);
+    focus(target_client);
+  }
 }
 
 void viewtoleft(const Arg *arg) {
@@ -3829,26 +4081,40 @@ void viewtoleft(const Arg *arg) {
   while (1) {
     pre = target;
     target >>= 1;
-    if (target == pre){
-      if(circle == 0 || tag_circle == 0){
+    if (target == pre) {
+      if (circle == 0 || tag_circle == 0) {
         return;
       }
-      for(tags_num >>= 1;tags_num != 0;tags_num >>= 1){ //计算最大的tag的值
-          max_target <<= 1;
+      for (tags_num >>= 1; tags_num != 0; tags_num >>= 1) { // 计算最大的tag的值
+        max_target <<= 1;
       }
-      target = max_target;  //向左边尽头找不到有窗口的tag,重新从最右边开始找
-      circle = 0;           //只重新找一次
+      target = max_target; // 向左边尽头找不到有窗口的tag,重新从最右边开始找
+      circle = 0; // 只重新找一次
     }
     for (c = selmon->clients; c; c = c->next) {
       if (c->isglobal && c->tags == TAGMASK)
         continue;
       if (c->tags & target &&
-          __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1 && (selmon->tagset[selmon->seltags] > 1 || tag_circle == 1)) {
+          __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1 &&
+          (selmon->tagset[selmon->seltags] > 1 || tag_circle == 1)) {
         view(&(Arg){.ui = target});
         return;
       }
     }
   }
+}
+
+void addtoleft(const Arg *arg) {
+  unsigned int target = selmon->tagset[selmon->seltags];
+  unsigned int tag_len = LENGTH(tags);
+  target >>= 1;
+  if (target == 0 && tag_circle){ //如果开启了循环到最左边的下一个是右边最后一个tag
+    target = (1 << (tag_len - 1));
+  } else if(target == 0 && !tag_circle) {
+    return;
+  }
+  view(&(Arg){.ui = target});
+  return;
 }
 
 void viewtoright(const Arg *arg) {
@@ -3857,19 +4123,19 @@ void viewtoright(const Arg *arg) {
   unsigned int circle = 1;
   while (1) {
     target = target == 0 ? 1 : target << 1;
-    if (!(target & TAGMASK)){
-      if(circle == 0 || tag_circle == 0){
+    if (!(target & TAGMASK)) {
+      if (circle == 0 || tag_circle == 0) {
         return;
       }
-      target = 1;  //向右边尽头找不到有窗口的tag,重新从最左边开始找
-      circle = 0;  //只重新找一次
+      target = 1; // 向右边尽头找不到有窗口的tag,重新从最左边开始找
+      circle = 0; // 只重新找一次
     }
     for (c = selmon->clients; c; c = c->next) {
       if (c->isglobal && c->tags == TAGMASK)
         continue;
       if (c->tags & target &&
           __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1 &&
-          selmon->tagset[selmon->seltags] & (TAGMASK >> 1)) {
+          (selmon->tagset[selmon->seltags] & (TAGMASK >> 1) || tag_circle)) {
         view(&(Arg){.ui = target});
         return;
       }
@@ -3877,17 +4143,30 @@ void viewtoright(const Arg *arg) {
   }
 }
 
-/*清除全屏标志,还原全屏时清0的border*/
-void clear_fullscreen_flag(Client *c) {
-  if (c->isfullscreen){
-    c->isfullscreen=0;
-    c->bw = c->oldbw ;
-    XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,PropModeReplace, (unsigned char *)0, 0); //清除窗口在x11服务中标记的全屏属性
-    clear_tag_fullscreen_flag(c);
-  } 
+void addtoright(const Arg *arg) {
+  unsigned int target = selmon->tagset[selmon->seltags];
+  target <<= 1;
+  if (!(target & TAGMASK) && tag_circle){ //如果开启了循环到最右边边的下一个是左边第一个tag
+    target = 1;
+  } else if(!(target & TAGMASK) && !tag_circle) {
+    return;
+  }
+  view(&(Arg){.ui = target});
+  return;
 }
 
-//普通视图切换到overview时保存窗口的旧状态
+/*清除全屏标志,还原全屏时清0的border*/
+void clear_fullscreen_flag(Client *c) {
+  if (c->isfullscreen) {
+    c->isfullscreen = 0;
+    c->bw = borderpx; // 恢复非全屏的border
+    XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
+                    PropModeReplace, (unsigned char *)0,
+                    0); // 清除窗口在x11服务中标记的全屏属性
+  }
+}
+
+// 普通视图切换到overview时保存窗口的旧状态
 void overview_backup(Client *c) {
   c->overview_isfloatingbak = c->isfloating;
   c->overview_isfullscreenbak = c->isfullscreen;
@@ -3896,46 +4175,46 @@ void overview_backup(Client *c) {
   c->overview_backup_w = c->w;
   c->overview_backup_h = c->h;
   c->overview_backup_bw = c->bw;
-  if(c->isfloating){
+  if (c->isfloating) {
     c->isfloating = 0;
   }
-  if (c->isfullscreen){
-    if(c->bw == 0){ //真全屏窗口清除x11全屏属性
+  if (c->isfullscreen) {
+    if (c->bw == 0) { // 真全屏窗口清除x11全屏属性
       XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
                       PropModeReplace, (unsigned char *)0, 0);
     }
-    c->isfullscreen = 0; //清除窗口全屏标志
+    c->isfullscreen = 0; // 清除窗口全屏标志
   }
-  c->bw = c->oldbw ; //恢复非全屏的border
+  c->bw = borderpx; // 恢复非全屏的border
 }
 
-//overview切回到普通视图还原窗口的状态
-void overview_restore(Client *c,const Arg *arg) {
+// overview切回到普通视图还原窗口的状态
+void overview_restore(Client *c, const Arg *arg) {
   c->isfloating = c->overview_isfloatingbak;
   c->isfullscreen = c->overview_isfullscreenbak;
-  c->overview_isfloatingbak  = 0 ;
+  c->overview_isfloatingbak = 0;
   c->overview_isfullscreenbak = 0;
   c->bw = c->overview_backup_bw;
   if (c->isfloating) {
-    XRaiseWindow(dpy, c->win); //提升悬浮窗口到顶层
-    resize(c, c->overview_backup_x , c->overview_backup_y,c->overview_backup_w,c->overview_backup_h, 0);  
+    XRaiseWindow(dpy, c->win); // 提升悬浮窗口到顶层
+    resize(c, c->overview_backup_x, c->overview_backup_y, c->overview_backup_w,
+           c->overview_backup_h, 0);
   }
   if (c->isfullscreen) {
-    if(c->overview_backup_bw == 0){ //真全屏窗口设置x11全屏属性
+    if (c->overview_backup_bw == 0) { // 真全屏窗口设置x11全屏属性
       XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
-                PropModeReplace, (unsigned char *)&netatom[NetWMFullscreen],
-                1); //设置窗口在x11状态
+                      PropModeReplace,
+                      (unsigned char *)&netatom[NetWMFullscreen],
+                      1); // 设置窗口在x11状态
     }
-    resizeclient(c, c->overview_backup_x , c->overview_backup_y,c->overview_backup_w,c->overview_backup_h);
-
-    //记录tag中全屏窗口的指针
-    set_tag_fullscreen_flag(c);
+    resizeclient(c, c->overview_backup_x, c->overview_backup_y,
+                 c->overview_backup_w, c->overview_backup_h);
   }
 }
 
-//栈底部入栈布局位置大小计算
+// 栈底部入栈布局位置大小计算
 void tile(Monitor *m) {
-  newclientathead = 1; //头部入栈
+  newclientathead = 1; // 头部入栈
   unsigned int i, n, mw, mh, sh, my,
       sy; // mw: master的宽度, mh: master的高度, sh: stack的高度, my:
           // master的y坐标, sy: stack的y坐标
@@ -3960,7 +4239,7 @@ void tile(Monitor *m) {
 
   for (i = 0, my = sy = gappo, c = nexttiled(m->clients); c;
        c = nexttiled(c->next), i++) {
-    
+
     if (i < m->nmaster) {
       resize(c, m->wx + gappo, m->wy + my, mw - 2 * c->bw - gappi,
              mh - 2 * c->bw, 0);
@@ -3971,12 +4250,11 @@ void tile(Monitor *m) {
       sy += HEIGHT(c) + gappi;
     }
   }
-
 }
 
-//栈头部入栈布局位置大小计算
+// 栈头部入栈布局位置大小计算
 void rtile(Monitor *m) {
-  newclientathead = 0; //尾部入栈
+  newclientathead = 0; // 尾部入栈
   unsigned int i, n, mw, mh, sh, my,
       sy; // mw: master的宽度, mh: master的高度, sh: stack的高度, my:
           // master的y坐标, sy: stack的y坐标
@@ -4001,7 +4279,7 @@ void rtile(Monitor *m) {
 
   for (i = 0, my = sy = gappo, c = nexttiled(m->clients); c;
        c = nexttiled(c->next), i++) {
-    
+
     if (i < m->nmaster) {
       resize(c, m->wx + gappo, m->wy + my, mw - 2 * c->bw - gappi,
              mh - 2 * c->bw, 0);
@@ -4012,15 +4290,13 @@ void rtile(Monitor *m) {
       sy += HEIGHT(c) + gappi;
     }
   }
-
 }
-
 
 void magicgrid(Monitor *m) { grid(m, gappo, gappi); }
 
 void overview(Monitor *m) { grid(m, overviewgappo, overviewgappi); }
 
-//网格布局窗口大小和位置计算
+// 网格布局窗口大小和位置计算
 void grid(Monitor *m, uint gappo, uint gappi) {
   unsigned int i, n;
   unsigned int cx, cy, cw, ch;
@@ -4036,18 +4312,18 @@ void grid(Monitor *m, uint gappo, uint gappi) {
     c = nexttiled(m->clients);
     cw = (m->ww - 2 * gappo) * 0.7;
     ch = (m->wh - 2 * gappo) * 0.8;
-    resize(c, m->wx + (m->mw - cw) / 2 ,
-           m->wy + (m->wh - ch) / 2, cw - 2 * c->bw, ch - 2 * c->bw, 0);
+    resize(c, m->wx + (m->mw - cw) / 2, m->wy + (m->wh - ch) / 2,
+           cw - 2 * c->bw, ch - 2 * c->bw, 0);
     return;
   }
   if (n == 2) {
     c = nexttiled(m->clients);
     cw = (m->ww - 2 * gappo - gappi) / 2;
     ch = (m->wh - 2 * gappo) * 0.65;
-    resize(c, m->mx + cw + gappo + gappi,
-           m->my + (m->mh - ch) / 2 + gappo, cw - 2 * c->bw, ch - 2 * c->bw, 0);
-    resize(nexttiled(c->next), m->mx + gappo, m->my + (m->mh - ch) / 2 + gappo, cw - 2 * c->bw,
-           ch - 2 * c->bw, 0);
+    resize(c, m->mx + cw + gappo + gappi, m->my + (m->mh - ch) / 2 + gappo,
+           cw - 2 * c->bw, ch - 2 * c->bw, 0);
+    resize(nexttiled(c->next), m->mx + gappo, m->my + (m->mh - ch) / 2 + gappo,
+           cw - 2 * c->bw, ch - 2 * c->bw, 0);
 
     return;
   }
@@ -4196,7 +4472,6 @@ void zoom(const Arg *arg) {
   pop(c);
 }
 
-
 Client *direction_select(const Arg *arg) {
   Client *tempClients[100];
   Client *c = NULL, *tc = selmon->sel;
@@ -4215,7 +4490,7 @@ Client *direction_select(const Arg *arg) {
       last++;
       tempClients[last] = c;
       // if (c == tc)
-        // cur = last;
+      // cur = last;
     }
   }
 
@@ -4240,24 +4515,18 @@ Client *direction_select(const Arg *arg) {
         }
       }
     }
-    if (!tempFocusClients) {
-      distance = LLONG_MAX;
+    if(!tempFocusClients){
       for (int _i = 0; _i <= last; _i++) {
         if (tempClients[_i]->y < sel_y) {
           int dis_x = tempClients[_i]->x - sel_x;
           int dis_y = tempClients[_i]->y - sel_y;
-          long long int tmp_distance =
-              dis_x * dis_x + dis_y * dis_y; // 计算距离
+          long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
           if (tmp_distance < distance) {
             distance = tmp_distance;
             tempFocusClients = tempClients[_i];
           }
         }
       }
-    }
-    if (tempFocusClients && tempFocusClients->x <= 16384 &&
-        tempFocusClients->y <= 16384) {
-      c = tempFocusClients;
     }
     break;
   case DOWN:
@@ -4272,24 +4541,18 @@ Client *direction_select(const Arg *arg) {
         }
       }
     }
-    if (!tempFocusClients) {
-      distance = LLONG_MAX;
+    if(!tempFocusClients){
       for (int _i = 0; _i <= last; _i++) {
-        if (tempClients[_i]->y > sel_y) {
+        if (tempClients[_i]->y > sel_y ) {
           int dis_x = tempClients[_i]->x - sel_x;
           int dis_y = tempClients[_i]->y - sel_y;
-          long long int tmp_distance =
-              dis_x * dis_x + dis_y * dis_y; // 计算距离
+          long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
           if (tmp_distance < distance) {
             distance = tmp_distance;
             tempFocusClients = tempClients[_i];
           }
         }
-      }
-    }
-    if (tempFocusClients && tempFocusClients->x <= 16384 &&
-        tempFocusClients->y <= 16384) {
-      c = tempFocusClients;
+      }      
     }
     break;
   case LEFT:
@@ -4304,29 +4567,22 @@ Client *direction_select(const Arg *arg) {
         }
       }
     }
-    if (!tempFocusClients) {
-      distance = LLONG_MAX;
+    if(!tempFocusClients){
       for (int _i = 0; _i <= last; _i++) {
         if (tempClients[_i]->x < sel_x) {
           int dis_x = tempClients[_i]->x - sel_x;
           int dis_y = tempClients[_i]->y - sel_y;
-          long long int tmp_distance =
-              dis_x * dis_x + dis_y * dis_y; // 计算距离
+          long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
           if (tmp_distance < distance) {
             distance = tmp_distance;
             tempFocusClients = tempClients[_i];
           }
         }
-      }
-    }
-    if (tempFocusClients && tempFocusClients->x <= 16384 &&
-        tempFocusClients->y <= 16384) {
-      c = tempFocusClients;
+      }      
     }
     break;
   case RIGHT:
     for (int _i = 0; _i <= last; _i++) {
-      // 第一步先筛选出右边的窗口 优先选择同一层次的
       if (tempClients[_i]->x > sel_x && tempClients[_i]->y == sel_y) {
         int dis_x = tempClients[_i]->x - sel_x;
         int dis_y = tempClients[_i]->y - sel_y;
@@ -4337,29 +4593,22 @@ Client *direction_select(const Arg *arg) {
         }
       }
     }
-    // 没筛选到,再去除同一层次的要求,重新筛选
-    if (!tempFocusClients) {
-      distance = LLONG_MAX;
+    if(!tempFocusClients){
       for (int _i = 0; _i <= last; _i++) {
         if (tempClients[_i]->x > sel_x) {
           int dis_x = tempClients[_i]->x - sel_x;
           int dis_y = tempClients[_i]->y - sel_y;
-          long long int tmp_distance =
-              dis_x * dis_x + dis_y * dis_y; // 计算距离
+          long long int tmp_distance = dis_x * dis_x + dis_y * dis_y; // 计算距离
           if (tmp_distance < distance) {
             distance = tmp_distance;
             tempFocusClients = tempClients[_i];
           }
         }
-      }
-    }
-    // 确认选择
-    if (tempFocusClients && tempFocusClients->x <= 16384 &&
-        tempFocusClients->y <= 16384) {
-      c = tempFocusClients;
+      }      
     }
   }
-  return c;
+
+  return tempFocusClients;
 }
 
 void focusdir(const Arg *arg) {
@@ -4461,12 +4710,11 @@ void exchange_client(const Arg *arg) {
   exchange_two_client(c, direction_select(arg));
 }
 
-
 // 切换task标签完整title(或者icon),限长title
-void fullname_taskbar_activeitem(const Arg *arg) { 
+void fullname_taskbar_activeitem(const Arg *arg) {
   if (!selmon->sel)
     return;
-  if(selmon->sel->no_limit_taskw == 1){
+  if (selmon->sel->no_limit_taskw == 1) {
     selmon->sel->no_limit_taskw = 0;
   } else {
     selmon->sel->no_limit_taskw = 1;
@@ -4496,4 +4744,3 @@ int main(int argc, char *argv[]) {
   XCloseDisplay(dpy);
   return EXIT_SUCCESS;
 }
-
