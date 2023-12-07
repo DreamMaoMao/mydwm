@@ -3611,6 +3611,7 @@ void unmapnotify(XEvent *e) {
 void updatebars(void) {
   unsigned int w;
   Monitor *m;
+  Atom window_type,dock_type;
   XSetWindowAttributes wa = {.override_redirect = True,
                              .background_pixel = 0,
                              .border_pixel = 0,
@@ -3633,6 +3634,10 @@ void updatebars(void) {
       XMapRaised(dpy, systray->win);
     XMapRaised(dpy, m->barwin);
     XSetClassHint(dpy, m->barwin, &ch);
+
+    window_type = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", False); // 获取窗口类型的原子
+    dock_type = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DOCK", False); // 获取dock类型的原子
+    XChangeProperty(dpy, m->barwin, window_type, XA_ATOM, 32, PropModeReplace, (unsigned char *)&dock_type, 1); // 将窗口类型设置为dock
   }
 }
 
