@@ -436,6 +436,7 @@ static void xi_handler(XEvent xevent);
 static void overview_restore(Client *c, const Arg *arg);
 static void overview_backup(Client *c);
 static void fullname_taskbar_activeitem(const Arg *arg);
+static unsigned int want_restore_fullscreen(Client *target_client);
 
 /* variables */
 static Systray *systray = NULL;
@@ -4166,6 +4167,16 @@ void clear_fullscreen_flag(Client *c) {
   }
 }
 
+unsigned int want_restore_fullscreen(Client *target_client) {
+  Client *c = NULL;
+  for (c = nexttiled(target_client->mon->clients); c; c = nexttiled(c->next)) {
+    if (c && c != target_client && c->tags == target_client->tags && c == selmon->sel) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
 // 普通视图切换到overview时保存窗口的旧状态
 void overview_backup(Client *c) {
   c->overview_isfloatingbak = c->isfloating;
@@ -4201,6 +4212,12 @@ void overview_restore(Client *c, const Arg *arg) {
            c->overview_backup_h, 0);
   }
   if (c->isfullscreen) {
+    
+    if(!want_restore_fullscreen(c)) {
+       c->isfullscreen = c->overview_isfullscreenbak = 0;
+      return;
+    }
+
     if (c->overview_backup_bw == 0) { // 真全屏窗口设置x11全屏属性
       XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
                       PropModeReplace,
