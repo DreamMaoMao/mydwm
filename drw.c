@@ -264,7 +264,9 @@ drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, unsigned int lp
 		w = ~w;
 	} else {
 		XSetForeground(drw->dpy, drw->gc, drw->scheme[invert ? ColFg : ColBg].pixel);
-		XFillRectangle(drw->dpy, drw->drawable, drw->gc, x, y, w, h);
+		XFillArc(drw->dpy, drw->drawable, drw->gc, x, y, h, h, 90 * 64, 180 * 64);
+		XFillRectangle(drw->dpy, drw->drawable, drw->gc, x+(h/2), y, w-h, h);
+		XFillArc(drw->dpy, drw->drawable, drw->gc, x+w-(h), y, h, h, -90 * 64, 180 * 64);
 		d = XftDrawCreate(drw->dpy, drw->drawable, drw->visual, drw->cmap);
 		x += lpad;
 		w -= lpad;

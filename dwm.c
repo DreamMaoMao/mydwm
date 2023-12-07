@@ -436,6 +436,7 @@ static void xi_handler(XEvent xevent);
 static void overview_restore(Client *c, const Arg *arg);
 static void overview_backup(Client *c);
 static void fullname_taskbar_activeitem(const Arg *arg);
+static unsigned int want_restore_fullscreen(Client *target_client);
 
 /* variables */
 static Systray *systray = NULL;
@@ -3610,6 +3611,7 @@ void unmapnotify(XEvent *e) {
 void updatebars(void) {
   unsigned int w;
   Monitor *m;
+  Atom window_type,dock_type;
   XSetWindowAttributes wa = {.override_redirect = True,
                              .background_pixel = 0,
                              .border_pixel = 0,
@@ -3632,6 +3634,10 @@ void updatebars(void) {
       XMapRaised(dpy, systray->win);
     XMapRaised(dpy, m->barwin);
     XSetClassHint(dpy, m->barwin, &ch);
+
+    window_type = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", False); // 获取窗口类型的原子
+    dock_type = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DOCK", False); // 获取dock类型的原子
+    XChangeProperty(dpy, m->barwin, window_type, XA_ATOM, 32, PropModeReplace, (unsigned char *)&dock_type, 1); // 将窗口类型设置为dock
   }
 }
 
@@ -4166,6 +4172,16 @@ void clear_fullscreen_flag(Client *c) {
   }
 }
 
+unsigned int want_restore_fullscreen(Client *target_client) {
+  Client *c = NULL;
+  for (c = nexttiled(target_client->mon->clients); c; c = nexttiled(c->next)) {
+    if (c && c != target_client && c->tags == target_client->tags && c == selmon->sel) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
 // 普通视图切换到overview时保存窗口的旧状态
 void overview_backup(Client *c) {
   c->overview_isfloatingbak = c->isfloating;
@@ -4201,6 +4217,12 @@ void overview_restore(Client *c, const Arg *arg) {
            c->overview_backup_h, 0);
   }
   if (c->isfullscreen) {
+    
+    if(!want_restore_fullscreen(c)) {
+       c->isfullscreen = c->overview_isfullscreenbak = 0;
+      return;
+    }
+
     if (c->overview_backup_bw == 0) { // 真全屏窗口设置x11全屏属性
       XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
                       PropModeReplace,
