@@ -232,8 +232,8 @@ static Key keys[] = {
     { AltMask,                  XK_Return, spawn, SHCMD("xfce4-terminal") },  
     { SuperMask,                XK_Return, spawn, SHCMD("google-chrome") },
     { ControlMask,              XK_Return, spawn, SHCMD("bash ~/tool/clash.sh") },                                                                                              /* alt enter      | 打开终端             */
-    { SuperMask,                XK_d,      spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/dwmdrun.rasi -show run") },                                                       /* super d          | rofi: 执行run          */
-    { AltMask,                  XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/dwmdrun.rasi -show drun") },                                                      /* alt space        | rofi: 执行drun          */
+    { SuperMask,                XK_d,      spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show run") },                                                       /* super d          | rofi: 执行run          */
+    { AltMask,                  XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show drun") },                                                      /* alt space        | rofi: 执行drun          */
     { SuperMask|ControlMask,    XK_Return, spawn, SHCMD("konsole -e /usr/local/bin/yazi") },                                                                                                          /* ctrl win enter   | rofi: nautilus 文件浏览器          */
     { ControlMask,              XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },              /* ctrl space       | rofi: 执行自定义脚本   */
     { SuperMask,                XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },     /* super space      | rofi: 执行自定义脚本   */
