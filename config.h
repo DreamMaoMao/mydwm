@@ -313,5 +313,5 @@ static Button buttons[] = {
     { ClkLtSymbol,           0,             Button3,          selectlayout,{.v = &layouts[2]} },                                                        // 右键        |  点击布局图表      |  切换从头部入栈还是尾部                                                                                                      //
     /* 点击bar空白处 */
     { ClkBarEmpty,         0,               Button1,          spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/dwmwin.rasi -show window") },         // 左键        |  bar空白处    |  rofi 执行 window
-    { ClkBarEmpty,         0,               Button3,          spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/all.rasi -show drun") },               // 右键        |  bar空白处    |  rofi 执行 drun
+    { ClkBarEmpty,         0,               Button3,          spawn, SHCMD("/usr/bin/rofi -theme ~/.config/rofi/themes/fancy2.rasi -show website") },               // 右键        |  bar空白处    |  rofi 执行 drun
 };
