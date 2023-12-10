@@ -236,7 +236,8 @@ static Key keys[] = {
     { AltMask,                  XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show drun") },                                                      /* alt space        | rofi: 执行drun          */
     { SuperMask|ControlMask,    XK_Return, spawn, SHCMD("konsole -e /usr/local/bin/yazi") },                                                                                                          /* ctrl win enter   | rofi: nautilus 文件浏览器          */
     { ControlMask,              XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },              /* ctrl space       | rofi: 执行自定义脚本   */
-    { SuperMask,                XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },     /* super space      | rofi: 执行自定义脚本   */
+    { SuperMask,                XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },     /* super space      | rofi: 执行自定义脚本   */
+    { SuperMask|AltMask,        XK_Return, spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },     /* super space      | rofi: 执行自定义脚本   */
     { SuperMask,                XK_l,      spawn, SHCMD("$DWM/scripts/blurlock.sh") },                                   /* super l     | 锁定屏幕               */
     { AltMask,                  XK_period, spawn, SHCMD("$DWM/scripts/volume.sh up") },                                 /* alt >       | 音量加                 */
     { AltMask,                  XK_comma,  spawn, SHCMD("$DWM/scripts/volume.sh down") },                               /* alt <       | 音量减                 */
