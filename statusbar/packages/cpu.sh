@@ -52,9 +52,9 @@ call_btop() {
 
 click() {
 	case "$1" in
-	L) gnome-system-monitor ;;
+	L) /usr/bin/rofi -config ~/.config/rofi/themes/fullscreen-preview.rasi -show drun;;
 	M) ;;
-	R) ;;
+	R) gnome-system-monitor;;
 	U) ;;
 	D) ;;
 	esac
