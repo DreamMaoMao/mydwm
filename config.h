@@ -167,8 +167,8 @@ static Key keys[] = {
     { SuperMask,                XK_period,       setmfact,         {.f = +0.05} },            /* super .            |  放大主工作区 */
 
     { SuperMask|AltMask,        XK_f,            toggle_stop_cont_win,          {0} },         /* super alt f            |  暂停,启动 窗口 */
-    { SuperMask,                XK_i,            hidewin,          {0} },                     /* super i            |  隐藏 窗口 */
-    { SuperMask|ShiftMask,      XK_i,            restorewin,       {0} },                     /* super shift i      |  取消隐藏 窗口 */
+    { AltMask,                  XK_i,            hidewin,          {0} },                     /* super i            |  隐藏 窗口 */
+    { AltMask|ShiftMask,        XK_i,            restorewin,       {0} },                     /* super shift i      |  取消隐藏 窗口 */
 
     { AltMask,    XK_s,         zoom,             {0} },                                      /* alt s              |  将当前聚焦窗口置为主窗口 */
 
