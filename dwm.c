@@ -101,8 +101,6 @@ enum {
   SchemeUnderline,         // 下划线
   SchemeBarEmpty,          // 状态栏空白部分
   SchemeStatusText,         // 状态栏文本
-  SchemeSelStop,             //窗口进程暂停
-  SchemeSelFakeFullStop      //窗口暂停假全屏
 };                         /* color schemes */
 enum {
   NetSupported,
@@ -182,7 +180,6 @@ struct Client {
   Client *snext;
   Monitor *mon;
   Window win;
-  unsigned int isstop;
 };
 
 typedef struct {
@@ -276,9 +273,6 @@ static void clientmessage(XEvent *e);
 static void configure(Client *c);
 static void configurenotify(XEvent *e);
 static unsigned long get_win_pid(Window win);
-static void stop_win(const Arg *arg);
-static void continue_win(const Arg *arg);
-static void toggle_stop_cont_win(const Arg *arg);
 static Atom getatompropfromwin(Window w, Atom prop);
 static void configurerequest(XEvent *e);
 static void clickstatusbar(const Arg *arg);
@@ -539,43 +533,6 @@ unsigned long get_win_pid(Window win) {
   return pid;
 }
 
-static void stop_win(const Arg *arg)
-{
-  if(!selmon->sel){
-    return;
-  }
-  unsigned long pid = get_win_pid(selmon->sel->win);
-  kill(pid, SIGSTOP);
-  selmon->sel->isstop=1;
-}
-
-
-static void continue_win(const Arg *arg)
-{
-  if(!selmon->sel){
-    return;
-  }
-  unsigned long pid = get_win_pid(selmon->sel->win);
-  kill(pid, SIGCONT);
-  selmon->sel->isstop=0;
-}
-
-
-static void toggle_stop_cont_win(const Arg *arg)
-{
-  uint border_type;
-  if(!selmon->sel){
-    return;
-  } 
-  if(selmon->sel->isstop){
-    continue_win(arg);
-  }else{
-    stop_win(arg);
-  }
-  // 设置窗口的border
-  border_type = get_border_type(selmon->sel);
-  XSetWindowBorder(dpy, selmon->sel->win, scheme[border_type][ColBorder].pixel);
-}
 
 // 扩展输入事件处理函数
 static void xi_handler(XEvent xevent) {
@@ -1662,11 +1619,7 @@ void expose(XEvent *e) { // 窗口暴露事件,由不可见变成可见的时候
 }
 
 uint get_border_type(Client *c) {  //判断border颜色
-  if(c->isstop && c->isfullscreen){
-    return SchemeSelFakeFullStop;
-  } else if(c->isstop && ! c->isfullscreen){
-    return SchemeSelStop;
-  } else if (c->isglobal && !c->isfullscreen) {
+  if (c->isglobal && !c->isfullscreen) {
     return SchemeSelGlobal;
   } else if (c->isfullscreen && !c->isglobal) {
     return SchemeSelFakeFull;
@@ -2199,7 +2152,6 @@ void manage(Window w, XWindowAttributes *wa) {
   c->isfullscreen = 0;
   c->no_limit_taskw = 0;
   c->isactive = 0;
-  c->isstop = 0;
   updatetitle(c);
   updateicon(c);
   if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
