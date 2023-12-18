@@ -431,6 +431,7 @@ static void overview_restore(Client *c, const Arg *arg);
 static void overview_backup(Client *c);
 static void fullname_taskbar_activeitem(const Arg *arg);
 static unsigned int want_restore_fullscreen(Client *target_client);
+static unsigned int want_auto_fullscren(Client *c);
 
 /* variables */
 static Systray *systray = NULL;
@@ -3020,14 +3021,57 @@ void set_fake_fullscreen(Client *c) {
   }
 }
 
+unsigned int want_auto_fullscren(Client *c) {
+	int nodeNumInTargetTag = 1;
+  Client *fc;
+
+	// if client is fullscreen before,don't make it fullscreen
+	if (!c || c->overview_isfullscreenbak) {
+		return 0;
+	}
+
+	// caculate the number of clients that will be in the same workspace with pWindow(don't contain itself)
+  for (fc = selmon->clients; fc; fc = fc->next) {
+    if (fc != selmon->sel && fc->tags == selmon->sel->tags) {
+      nodeNumInTargetTag++;
+    }
+  }
+
+	// if only one client in workspace(pWindow itself), don't make it fullscreen
+	if(nodeNumInTargetTag > 1) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
 void fullscreen(const Arg *arg) {
-  if (selmon->sel) { // 显示器有窗口
+  if (!selmon->sel) { // 显示器有窗口
+    return;
+  }
+
+  if (selmon->isoverview && want_auto_fullscren(selmon->sel)) {
+			toggleoverview(&(Arg){0});
+      setfullscreen(selmon->sel);
+  } else if (selmon->isoverview && !want_auto_fullscren(selmon->sel)) {
+    toggleoverview(&(Arg){0});
+  } else {
     setfullscreen(selmon->sel);
   }
+      
 }
 
 void fake_fullscreen(const Arg *arg) {
-  if (selmon->sel) { // 显示器有窗口
+  if (!selmon->sel) { // 显示器有窗口
+    return;
+  }
+
+  if (selmon->isoverview && want_auto_fullscren(selmon->sel)) {
+			toggleoverview(&(Arg){0});
+      set_fake_fullscreen(selmon->sel);
+  } else if (selmon->isoverview && !want_auto_fullscren(selmon->sel)) {
+    toggleoverview(&(Arg){0});
+  } else {
     set_fake_fullscreen(selmon->sel);
   }
 }
