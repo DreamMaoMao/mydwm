@@ -1,6 +1,6 @@
 #include <X11/XF86keysym.h>
 
-
+static int const auto_fullscreen = 1; /* overview模式左键点击退出overview后自动假全屏窗口*/
 static int const mouse_move_toggle_focus = 1; /* 在非聚焦窗口移动鼠标是否触发聚焦,不启用的话只有从另一个窗口移动到当前窗口才聚焦*/
 static int const taskbar_icon = 1;  /* 任务栏使用的是icon而不是title*/
 static int const taskbar_movemouse_focus = 1;           /* 是否启用鼠标在taskbar移动的时候自动切换焦点 */

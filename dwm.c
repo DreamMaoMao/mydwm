@@ -3050,10 +3050,10 @@ void fullscreen(const Arg *arg) {
     return;
   }
 
-  if (selmon->isoverview && want_auto_fullscren(selmon->sel)) {
+  if (selmon->isoverview && want_auto_fullscren(selmon->sel) && !auto_fullscreen) {
 			toggleoverview(&(Arg){0});
       setfullscreen(selmon->sel);
-  } else if (selmon->isoverview && !want_auto_fullscren(selmon->sel)) {
+  } else if (selmon->isoverview && (!want_auto_fullscren(selmon->sel) || auto_fullscreen)) {
     toggleoverview(&(Arg){0});
   } else {
     setfullscreen(selmon->sel);
@@ -3066,10 +3066,10 @@ void fake_fullscreen(const Arg *arg) {
     return;
   }
 
-  if (selmon->isoverview && want_auto_fullscren(selmon->sel)) {
+  if (selmon->isoverview && want_auto_fullscren(selmon->sel) && !auto_fullscreen) {
 			toggleoverview(&(Arg){0});
       set_fake_fullscreen(selmon->sel);
-  } else if (selmon->isoverview && !want_auto_fullscren(selmon->sel)) {
+  } else if (selmon->isoverview && (!want_auto_fullscren(selmon->sel) || auto_fullscreen)) {
     toggleoverview(&(Arg){0});
   } else {
     set_fake_fullscreen(selmon->sel);
@@ -4062,6 +4062,10 @@ void toggleoverview(const Arg *arg) {
   } else {
     for (c = selmon->clients; c; c = c->next) {
       overview_restore(c, &(Arg){.ui = target});
+    }
+    //退出overview自动全屏
+    if(auto_fullscreen) {
+      set_fake_fullscreen(target_client);
     }
   }
 
