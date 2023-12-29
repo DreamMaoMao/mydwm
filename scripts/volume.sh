@@ -35,7 +35,7 @@ function send_notification {
 	#bar=$(seq -s "" $bn | sed 's/[0-9]//g')
 
 	# Send the notification
-	dunstify "Volume: $overvolume%" -h int:value:$volume -i "$icon_name" -t 1000 --replace=555 -u normal
+	dunstify "Volume: $overvolume%" -h int:value:$volume -i "$icon_name" -t 1000 --replace=555 -u low
 }
 
 case $1 in

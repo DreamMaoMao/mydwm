@@ -3,13 +3,13 @@ configuration {
   drun-display-format: "{name}";
   drun-match-fields: "keywords";
   font: "Iosevka Curly Bold 13";
-  modi: "window,run,drun";
+  modi: "drun,website:~/.config/rofi/website.py";
   show-icons: true;
-  location: 2;
-  // cache-dir: "~/.cache";
+  // location: 2;
+  // cache-dir: "/home/wrq/.cache";
   drun-use-desktop-cache: true;
   drun-reload-desktop-cache:true;
-  yoffset: 200;
+  // yoffset: 200;
 }
 
 @theme "~/.config/rofi/theme.rasi"
@@ -66,7 +66,7 @@ inputbar {
 listview {
   padding: 0 15 15 15;
   background-color: #00000000;
-  columns: 1;
+  columns: 5;
   lines: 5;
   fixed-lines: true;
   //fixed-columns: true;

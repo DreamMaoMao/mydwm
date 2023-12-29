@@ -1739,7 +1739,7 @@ void focusstack(const Arg *arg) {
       c = tempClients[0];
   }
 
-  if (issingle) {
+  if (issingle && single_auto_exit_hide) {
     if (c)
       hideotherwins(&(Arg){.v = c});
   } else {
@@ -4654,8 +4654,10 @@ void focusdir(const Arg *arg) {
   c = direction_select(arg);
 
   if (issingle) {
-    if (c)
+    if (c) {
       hideotherwins(&(Arg){.v = c});
+    }
+      
   } else {
     if (c) {
       pointerfocuswin(c);

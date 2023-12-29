@@ -12,7 +12,7 @@ signal=$(echo "^s$this^" | sed 's/_//')
 [ ! "$(command -v brightnessctl)" ] && echo command not found: brightnessctl && exit
 
 update() {
-    light=$( brightnessctl get )
+    light=$( light )
     light_text=$( echo "${light##* }" | sed 's/[^0-9][^.]*//g' )
     if (( $light_text < 50 ));then 
         light_icon="";

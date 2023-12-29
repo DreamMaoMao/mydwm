@@ -9,7 +9,7 @@ https://wiki.archlinux.org/index.php/NetworkManager#Set_up_PolicyKit_permissions
 OR running the script as root
 
 Add dmenu options and default terminal if desired to
-~/.config/networkmanager-dmenu/config.ini
+~/.config/rofi/networkmanager-dmenu/config.ini
 
 """
 import pathlib
@@ -35,7 +35,7 @@ ENV = os.environ.copy()
 ENC = locale.getpreferredencoding()
 
 CONF = configparser.ConfigParser()
-CONF.read(expanduser("~/.config/networkmanager-dmenu/config.ini"))
+CONF.read(expanduser("~/.config/rofi/networkmanager-dmenu/config.ini"))
 
 
 def cli_args():
@@ -173,16 +173,16 @@ def create_other_actions(client):
 
     bluetooth_enabled = bluetooth_get_enabled()
     bluetooth_action = "Disable" if bluetooth_enabled else "Enable"
-
-    actions = [Action(f"{wifi_action} Wifi", toggle_wifi,
-                      not wifi_enabled),
-               Action(f"{networking_action} Networking",
-                      toggle_networking, not networking_enabled)]
-    if bluetooth_enabled is not None:
-        actions.append(Action(f"{bluetooth_action} Bluetooth",
-                              toggle_bluetooth, not bluetooth_enabled))
-    actions += [Action("Launch Connection Manager", launch_connection_editor),
-                Action("Delete a Connection", delete_connection)]
+    actions = [Action("Delete a Connection", delete_connection)]
+    # actions += [Action(f"{wifi_action} Wifi", toggle_wifi,
+    #                   not wifi_enabled),
+    #            Action(f"{networking_action} Networking",
+    #                   toggle_networking, not networking_enabled)]
+    # if bluetooth_enabled is not None:
+    #     actions.append(Action(f"{bluetooth_action} Bluetooth",
+    #                           toggle_bluetooth, not bluetooth_enabled))
+    # actions += [Action("Launch Connection Manager", launch_connection_editor),
+    #             Action("Delete a Connection", delete_connection)]
     if wifi_enabled:
         actions.append(Action("Rescan Wifi Networks", rescan_wifi))
     return actions
@@ -527,15 +527,15 @@ def combine_actions(eths, aps, vpns, wgs, gsms, blues, wwan, others, saved):
     compact = CONF.getboolean("dmenu", "compact", fallback=False)
     empty_action = [Action('', None)] if not compact else []
     all_actions = []
-    all_actions += eths + empty_action if eths else []
+    # all_actions += eths + empty_action if eths else []
     all_actions += aps + empty_action if aps else []
-    all_actions += vpns + empty_action if vpns else []
-    all_actions += wgs + empty_action if wgs else []
-    all_actions += gsms + empty_action if (gsms and wwan) else []
-    all_actions += blues + empty_action if blues else []
-    all_actions += wwan + empty_action if wwan else []
+    # all_actions += vpns + empty_action if vpns else []
+    # all_actions += wgs + empty_action if wgs else []
+    # all_actions += gsms + empty_action if (gsms and wwan) else []
+    # all_actions += blues + empty_action if blues else []
+    # all_actions += wwan + empty_action if wwan else []
     all_actions += others + empty_action if others else []
-    all_actions += saved + empty_action if saved else []
+    # all_actions += saved + empty_action if saved else []
     return all_actions
 
 
@@ -661,7 +661,7 @@ def launch_connection_editor():
     """
     terminal = CONF.get("editor", "terminal", fallback="xterm")
     gui_if_available = CONF.getboolean("editor", "gui_if_available", fallback=True)
-    guis = ["gnome-control-center", "nm-connection-editor"]
+    guis = [ "nm-connection-editor","gnome-control-center"]
     if gui_if_available is True:
         for gui in guis:
             if is_installed(gui):

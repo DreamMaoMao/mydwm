@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-STATUS=$(dunstctl is-paused)
+STATUS=$(swaync-client -D)
 
 toggle() {
     if [ $STATUS == "false" ]; then
-        dunstctl set-paused true
+        swaync-client -dn
     else
-        dunstctl set-paused false
-        notify-send --urgency=normal "Do Not Disturb" "Do not Disturb has been turned off!"
+        swaync-client -df
+        notify-send --urgency=low -i $HOME/tool/dnd.jpg "Do Not Disturb" "Do not Disturb has been turned off!"
     fi
 }
 

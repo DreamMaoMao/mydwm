@@ -1,5 +1,6 @@
 #include <X11/XF86keysym.h>
 
+static int const single_auto_exit_hide = 0; /*如果隐藏窗口是tag中唯一的窗口那么自动显示一个隐藏窗口*/
 static int const auto_fullscreen = 0; /* overview模式左键点击退出overview后自动假全屏窗口*/
 static int const mouse_move_toggle_focus = 1; /* 在非聚焦窗口移动鼠标是否触发聚焦,不启用的话只有从另一个窗口移动到当前窗口才聚焦*/
 static int const taskbar_icon = 1;  /* 任务栏使用的是icon而不是title*/
@@ -34,20 +35,20 @@ static const int nmaster = 1;        /* 主工作区 窗口数量 */
 static const unsigned int snap = 10;          /* 边缘依附宽度 */
 static const unsigned int baralpha = 0xc0;    /* 状态栏透明度 */
 static const unsigned int borderalpha = 0xdd; /* 边框透明度 */
-static const char *fonts[] = {"JetBrainsMono Nerd Font:style=Bold:size=13",
+static const char *fonts[] = {"JetBrainsMono Nerd Font:style=Bold:size=15",
                                 };
 static const char *colors[][3] = {
     /* 颜色设置 ColFg, ColBg, ColBorder */
     [SchemeNorm] = {"#ffb871", "#3c2003", "#444444"},
-    [SchemeSel] = {"#61370d", "#e9a25c", "#ad741f"},
+    [SchemeSel] = {"#2d1802", "#ad741f", "#ad741f"},
     [SchemeSelGlobal] = {"#ffffff", "#37474F", "#b153a7"},
     [SchemeSelFakeFull] = {"#ffffff", "#37474F", "#5d8e5d"},
     [SchemeSelFakeFullGLObal] = {"#ffffff", "#37474F", "#881519"},
     [SchemeHid] = {"#462503", NULL, NULL},
     [SchemeSystray] = {NULL, "#dabb77", NULL},
     [SchemeUnderline] = {"#6f0d62", NULL, NULL},
-    [SchemeNormTag] = {"#a8309e", "#e3e0dc", NULL},
-    [SchemeSelTag] = {"#ffffff", "#a8309e", NULL},
+    [SchemeNormTag] = {"#a02a6b", "#d8cbba", NULL},
+    [SchemeSelTag] = {"#ffffff", "#a02a6b", NULL},
     [SchemeBarEmpty] = {NULL, "#111111", NULL},
 };
 static const unsigned int alphas[][3] = {
@@ -110,8 +111,9 @@ static const Rule rules[] = {
     {"obs",                  NULL,                 NULL,             1 << 5,       0,          0,          0,        -1,      0,            0,       0},       // obs        tag6 
     {"Google-chrome",               NULL,                 NULL,             1 << 3,       0,          0,          0,        -1,      0,            0,       0},       // chrome     tag4 
     {"Microsoft-edge",               NULL,                 NULL,             1 << 4,       0,          0,          0,        -1,      0,            0,       0},       // chrome     tag4 
-    {"yesplaymusic",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1200,       800},  // music      浮动
-    {"electron-netease-cloud-music",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1200,       800},  // music      浮动
+    {"qtmv",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1200,       800},  // music      浮动
+    {"yesplaymusic",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1570,       1010},  // music      浮动
+    {"electron-netease-cloud-music",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,     1200,   800},  // music      浮动
     {"baidunetdisk",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},  // 百度云网盘      浮动
     {"alixby3",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1200,       800},  // 阿里云网盘      浮动
     {"QQ",                  NULL,                  NULL,             1 << 2,       0,          0,          0,        -1,      0,            0,       0},       // qq         tag3 
@@ -120,6 +122,7 @@ static const Rule rules[] = {
     {"com.xunlei.download",              NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // 迅雷            浮动
     {"Clash-verge",    NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1590,       892},       // clash            浮动
     {"Pavucontrol",                  NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // pavucontrol            浮动
+    {"Dragon",    NULL,                 NULL,             0,            1,          0,          1,        -1,      5,            0,       0},       // dragon            noborder
 
 
     /** 优先度低 越在上面优先度越低 */
@@ -233,9 +236,9 @@ static Key keys[] = {
     { SuperMask,                XK_d,      spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show run") },                                                       /* super d          | rofi: 执行run          */
     { AltMask,                  XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show drun") },                                                      /* alt space        | rofi: 执行drun          */
     { SuperMask|ControlMask,    XK_Return, spawn, SHCMD("konsole -e  yazi") },                                                                                                          /* ctrl win enter   | rofi: nautilus 文件浏览器          */
-    { ControlMask,              XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },              /* ctrl space       | rofi: 执行自定义脚本   */
+    { ControlMask,              XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },              /* ctrl space       | rofi: 执行自定义脚本   */
     { SuperMask,                XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },     /* super space      | rofi: 执行自定义脚本   */
-    { SuperMask|AltMask,        XK_Return, spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },     /* super space      | rofi: 执行自定义脚本   */
+    { SuperMask|AltMask,        XK_Return, spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },     /* super space      | rofi: 执行自定义脚本   */
     { SuperMask,                XK_l,      spawn, SHCMD("$DWM/scripts/blurlock.sh") },                                   /* super l     | 锁定屏幕               */
     { AltMask,                  XK_period, spawn, SHCMD("$DWM/scripts/volume.sh up") },                                 /* alt >       | 音量加                 */
     { AltMask,                  XK_comma,  spawn, SHCMD("$DWM/scripts/volume.sh down") },                               /* alt <       | 音量减                 */

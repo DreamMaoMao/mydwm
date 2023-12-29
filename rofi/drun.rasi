@@ -6,7 +6,7 @@ configuration {
   modi: "window,run,drun";
   show-icons: true;
   location: 2;
-  // cache-dir: "~/.cache";
+  // cache-dir: "/home/wrq/.cache";
   drun-use-desktop-cache: true;
   drun-reload-desktop-cache:true;
   yoffset: 65;

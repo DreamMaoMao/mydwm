@@ -8,8 +8,8 @@ tempfile=$(
 )/temp
 
 this=_cpu
-icon_color="^c#ffffff^^b#279ACF0xff^"
-text_color="^c#ffffff^^b#279ACF0xff^"
+icon_color="^c#e4e1db^^b#1c79a30xff^"
+text_color="^c#e4e1db^^b#1c79a30xff^"
 signal=$(echo "^s$this^" | sed 's/_//')
 
 with_temp() {

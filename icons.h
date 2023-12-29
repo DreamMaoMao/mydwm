@@ -31,4 +31,7 @@ static const Icon icons[] = {
     {"obs"," 󰻃 "},
     {"flameshot","  "},
     {"Pavucontrol","  "},
+    {"discord"," 󰙯 "},
+    {"TelegramDesktop","  "},
+
 };

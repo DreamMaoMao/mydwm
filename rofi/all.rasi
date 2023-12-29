@@ -5,11 +5,11 @@ configuration {
   font: "Iosevka Curly Bold 13";
   modi: "window,run,drun";
   show-icons: true;
-  location: 2;
-  // cache-dir: "~/.cache";
+  // location: 2;
+  // cache-dir: "/home/wrq/.cache";
   drun-use-desktop-cache: true;
   drun-reload-desktop-cache:true;
-  yoffset: 200;
+  // yoffset: 200;
 }
 
 @theme "~/.config/rofi/theme.rasi"

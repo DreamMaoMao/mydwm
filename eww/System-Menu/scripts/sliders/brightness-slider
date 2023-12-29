@@ -4,11 +4,11 @@ icon() {
     # Lets round the float result
     bri=$(brightnessctl get)
     
-    if [[ "$bri" -gt "90" ]]; then
+    if [[ $bri -gt 90 ]]; then
         echo "󰃠"
-        elif [[ "$bri" -gt "50" ]]; then
+        elif [[ $bri -gt 50 ]]; then
         echo "󰃝"
-        elif [[ "$bri" -gt "30" ]]; then
+        elif [[ $bri -gt 30 ]]; then
         echo "󰃟"
     else
         echo "󰃞"
@@ -16,7 +16,7 @@ icon() {
 }
 
 getbri() {
-    bri=$(brightnessctl i -m | tr , " " | awk '{print $4}' | cut -c 1-2)
+    bri=$(brightnessctl get)
     echo $bri
 }
 

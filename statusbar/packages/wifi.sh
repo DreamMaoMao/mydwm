@@ -79,7 +79,7 @@ switch_mode() {
 click() {
     case "$1" in
         L) switch_mode ;update;;
-        R) ~/.config/eww/System-Menu/scripts/networkmanager_dmenu  ;;
+        R) ~/.config/rofi/networkmanager_dmenu;;
     esac
 }
 

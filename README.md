@@ -1,25 +1,10 @@
-# 之前就有的功能
+![2024-01-19_16-56](https://github.com/DreamMaoMao/mydwm/assets/30348075/e2f543b9-78ca-46ff-8ac9-4c5a34d4547d)
 
 
-- 支持布局 tile(磁块)、magicgrid(进阶的网格布局)
 
-- 键盘移动/调整窗口大小 且移动/调整时有窗口间吸附效果
+https://github.com/DreamMaoMao/mydwm/assets/30348075/d5a898ad-a50b-4206-b161-08c1b5892c06
 
-- 窗口隐藏
 
-- 窗口可自定义是否全局(在所有tag内展示)
-
-- 更好的浮动窗口支持
-
-- 优化后的status2d 状态栏，可用鼠标点击操作
-
-- 系统托盘支持
-
-- overview 概述
-
-- mod + tab, 在窗口间切换 有浮动窗口时仅在浮动窗口切换
-
-- mod + [tag], 切换tag到指定目录时 可指定一个cmd，若目标tag无窗口 则执行该tag
 
 # 改动日志
 
@@ -71,15 +56,6 @@
 
 - 24.增加切换tag方式,不管左右是否有窗口都可以直接切到相临前后的数字窗口
   
-![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/8d1bf508-acfb-4551-bdc2-8258ca3d66f0)
-
-![image](https://github.com/DreamMaoMao/superdwm/assets/30348075/e5796a37-5e35-4bf7-a90f-a75747d254a4)
-
-
-
-
-https://github.com/DreamMaoMao/superdwm/assets/30348075/c48d4bf0-abc6-4faf-a37d-786ba56a3afd
-
 
 
 
@@ -87,7 +63,6 @@ https://github.com/DreamMaoMao/superdwm/assets/30348075/c48d4bf0-abc6-4faf-a37d-
 # 运行需要的相关工具包
 ```
 sudo pacman -S network-manager-applet
-sudo pacman -S nemo
 sudo pacman -S rofi
 sudo pacman -S konsole
 sudo pacman -S gnome-system-monitor 
@@ -103,10 +78,12 @@ sudo pacman -S fish
 sudo pacman -S base-devel
 sudo pacman -S meson ninja
 sudo pacman -S inetutils 
-sudo pacman -S  networkmanager 
-sudo pacman -S  gdm
+sudo pacman -S networkmanager 
+sudo pacman -S gdm
+sudo pacman -S nemo nemo-fileroller
+sudo pacman -S ffmpegthumbnailer
 
-yay -S blueman acpi dunst jq alsa-utils polkit-gnome  rofi-blocks-git light numlockx nemo flameshot feh lm_sensors   mantablockscreen network-manager-applet playerctl python3 parcellite redshift upower xorg-xinit xprintidle xorg wmctrl xdotool tumbler pavucontrol ttf-jetbrains-mono-nerd eww-x11 cpufrequtils asciidoc xclip update-grub os-prober efibootmgr grub-customizer
+yay -S blueman acpi dunst jq alsa-utils polkit-gnome  rofi-blocks-git light numlockx  flameshot feh lm_sensors   mantablockscreen network-manager-applet playerctl python3 parcellite redshift upower xorg-xinit xprintidle xorg wmctrl xdotool tumbler pavucontrol ttf-jetbrains-mono-nerd eww-x11 cpufrequtils asciidoc xclip update-grub os-prober efibootmgr grub-customizer yazi xface4-terminal
 
 
 ```
@@ -124,7 +101,7 @@ sudo ninja -C build install
 ```
 cd ~/.config
 git clone https://github.com/DreamMaoMao/mydwm.git
-cd mydwm
+mv mydwm dwm && cd dwm
 cp rofi -r ~/.config/
 cp dunst -r ~/.config/
 cp fish -r ~/.config/
