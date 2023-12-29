@@ -4,7 +4,7 @@ static int const auto_fullscreen = 0; /* overview模式左键点击退出overvie
 static int const mouse_move_toggle_focus = 1; /* 在非聚焦窗口移动鼠标是否触发聚焦,不启用的话只有从另一个窗口移动到当前窗口才聚焦*/
 static int const taskbar_icon = 1;  /* 任务栏使用的是icon而不是title*/
 static int const taskbar_icon_exclude_active = 1;  /* 任务栏使用的是icon而不是title*/
-static int const taskbar_movemouse_focus = 1;           /* 是否启用鼠标在taskbar移动的时候自动切换焦点 */
+static int const taskbar_movemouse_focus = 0;           /* 是否启用鼠标在taskbar移动的时候自动切换焦点 */
 static int const tag_circle = 0;           /* 是否启用工作区循环 */
 static int const enable_hotarea = 1;           /* 是否启用热区 */
 static int const hotarea_size = 10;           /* 热区大小10x10 */
@@ -207,18 +207,18 @@ static Key keys[] = {
     { SuperMask|AltMask,        XK_Left,         resizewin,        {.ui = H_REDUCE} },        /* super alt left     |  调整窗口大小 */
     { SuperMask|AltMask,        XK_Right,        resizewin,        {.ui = H_EXPAND} },        /* super alt right    |  调整窗口大小 */
 
-  	{ AltMask,                  XK_k,            focusdir,         {.i = UP } },              /* alt k              | 二维聚焦窗口 */
-  	{ AltMask,                  XK_j,            focusdir,         {.i = DOWN } },            /* alt j              | 二维聚焦窗口 */
-  	{ AltMask,                  XK_h,            focusdir,         {.i = LEFT } },            /* alt h              | 二维聚焦窗口 */
-  	{ AltMask,                  XK_l,            focusdir,         {.i = RIGHT } },           /* alt l              | 二维聚焦窗口 */
+  	// { AltMask,                  XK_k,            focusdir,         {.i = UP } },              /* alt k              | 二维聚焦窗口 */
+  	// { AltMask,                  XK_j,            focusdir,         {.i = DOWN } },            /* alt j              | 二维聚焦窗口 */
+  	// { AltMask,                  XK_h,            focusdir,         {.i = LEFT } },            /* alt h              | 二维聚焦窗口 */
+  	// { AltMask,                  XK_l,            focusdir,         {.i = RIGHT } },           /* alt l              | 二维聚焦窗口 */
     { AltMask,                  XK_Left,         focusdir,         {.i = LEFT } },            /* alt left           |  本tag内切换聚焦窗口 */
     { AltMask,                  XK_Right,        focusdir,         {.i = RIGHT } },           /* alt right          |  本tag内切换聚焦窗口 */
     { AltMask,                  XK_Up,           focusdir,         {.i = UP } },              /* alt up             |  本tag内切换聚焦窗口 */
     { AltMask,                  XK_Down,         focusdir,         {.i = DOWN } },            /* alt down           |  本tag内切换聚焦窗口 */
-    { AltMask|ShiftMask,        XK_k,            exchange_client,  {.i = UP } },              /* alt shift k        | 二维交换窗口 (仅平铺) */
-    { AltMask|ShiftMask,        XK_j,            exchange_client,  {.i = DOWN } },            /* alt shift j        | 二维交换窗口 (仅平铺) */
-    { AltMask|ShiftMask,        XK_h,            exchange_client,  {.i = LEFT} },             /* alt shift h        | 二维交换窗口 (仅平铺) */
-    { AltMask|ShiftMask,        XK_l,            exchange_client,  {.i = RIGHT } },           /* alt shift l        | 二维交换窗口 (仅平铺) */
+    // { AltMask|ShiftMask,        XK_k,            exchange_client,  {.i = UP } },              /* alt shift k        | 二维交换窗口 (仅平铺) */
+    // { AltMask|ShiftMask,        XK_j,            exchange_client,  {.i = DOWN } },            /* alt shift j        | 二维交换窗口 (仅平铺) */
+    // { AltMask|ShiftMask,        XK_h,            exchange_client,  {.i = LEFT} },             /* alt shift h        | 二维交换窗口 (仅平铺) */
+    // { AltMask|ShiftMask,        XK_l,            exchange_client,  {.i = RIGHT } },           /* alt shift l        | 二维交换窗口 (仅平铺) */
     { AltMask|ShiftMask,        XK_Up,           exchange_client,  {.i = UP } },              /* alt shift up       | 二维交换窗口 (仅平铺) */
     { AltMask|ShiftMask,        XK_Down,         exchange_client,  {.i = DOWN } },            /* alt shift down     | 二维交换窗口 (仅平铺) */
     { AltMask|ShiftMask,        XK_Left,         exchange_client,  {.i = LEFT} },             /* alt shift left     | 二维交换窗口 (仅平铺) */
@@ -230,7 +230,7 @@ static Key keys[] = {
     { ControlMask,              XK_Return, spawn, SHCMD("bash ~/tool/clash.sh") },                                                                                              /* alt enter      | 打开终端             */
     { SuperMask,                XK_d,      spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show run") },                                                       /* super d          | rofi: 执行run          */
     { AltMask,                  XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show drun") },                                                      /* alt space        | rofi: 执行drun          */
-    { SuperMask|ControlMask,    XK_Return, spawn, SHCMD("konsole -e /usr/local/bin/yazi") },                                                                                                          /* ctrl win enter   | rofi: nautilus 文件浏览器          */
+    { SuperMask|ControlMask,    XK_Return, spawn, SHCMD("konsole -e  yazi") },                                                                                                          /* ctrl win enter   | rofi: nautilus 文件浏览器          */
     { ControlMask,              XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },              /* ctrl space       | rofi: 执行自定义脚本   */
     { SuperMask,                XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },     /* super space      | rofi: 执行自定义脚本   */
     { SuperMask|AltMask,        XK_Return, spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },     /* super space      | rofi: 执行自定义脚本   */
