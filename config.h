@@ -109,6 +109,8 @@ static const Rule rules[] = {
     /** 普通优先度 */
     {"obs",                  NULL,                 NULL,             1 << 5,       0,          0,          0,        -1,      0,            0,       0},       // obs        tag6 
     {"Google-chrome",               NULL,                 NULL,             1 << 3,       0,          0,          0,        -1,      0,            0,       0},       // chrome     tag4 
+    {"Microsoft-edge",               NULL,                 NULL,             1 << 4,       0,          0,          0,        -1,      0,            0,       0},       // chrome     tag4 
+    {"yesplaymusic",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1200,       800},  // music      浮动
     {"electron-netease-cloud-music",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1200,       800},  // music      浮动
     {"baidunetdisk",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},  // 百度云网盘      浮动
     {"alixby3",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1200,       800},  // 阿里云网盘      浮动

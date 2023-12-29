@@ -983,6 +983,11 @@ void clientmessage(XEvent *e) {
   XSetWindowAttributes swa;
   XClientMessageEvent *cme = &e->xclient;
   Client *c = wintoclient(cme->window);
+  Atom atom_max_horz = XInternAtom(dpy, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+  Atom atom_max_vert = XInternAtom(dpy, "_NET_WM_STATE_MAXIMIZED_VERT", False);
+  Atom atom_hidden = XInternAtom(dpy, "_NET_WM_STATE_HIDDEN", False);
+  Atom atom_change_state = XInternAtom(dpy, "WM_CHANGE_STATE", False);
+
 
   if (showsystray && cme->window == systray->win &&
       cme->message_type == netatom[NetSystemTrayOP]) {
@@ -1050,10 +1055,14 @@ void clientmessage(XEvent *e) {
           } else if(cme->data.l[0] == _NET_WM_STATE_TOGGLE){
             setfullscreen(c);
           } 
-    }
+    } else if(cme->data.l[1] == atom_max_horz ||cme->data.l[1] == atom_max_vert || cme->data.l[2] == atom_max_horz ||cme->data.l[2] == atom_max_vert) {
+      set_fake_fullscreen(c); //MAXIMIZED button toggle 
+    } 
   } else if (cme->message_type == netatom[NetActiveWindow]) {
     if (c != selmon->sel && !c->isurgent)
       seturgent(c, 1);
+    if (c && HIDDEN(c))
+      show(c);
     if (c == selmon->sel)
       return;
     // 若不是当前显示器 则跳转到对应显示器
@@ -1064,7 +1073,12 @@ void clientmessage(XEvent *e) {
     if (!ISVISIBLE(c)) {
       view(&(Arg){.ui = c->tags});
     }
-  }
+  } else if(cme->message_type == atom_change_state) {
+    hide(c);
+  } 
+  // else{
+  //     logtofile(XGetAtomName(dpy,cme->message_type));
+  //   }
 }
 
 void configure(Client *c) {
