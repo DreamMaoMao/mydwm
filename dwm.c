@@ -1328,7 +1328,7 @@ void drawbar(Monitor *m) { // 绘制bar
     drw_setscheme(drw, scheme[scm]);
 
     // task是否使用图标表示
-    if (taskbar_icon == 1 && c->no_limit_taskw == 0) {
+    if (taskbar_icon == 1 && c->no_limit_taskw == 0 && !(m->sel == c && taskbar_icon_exclude_active == 1)) {
       task_content = c->icon;
     } else {
       task_content = c->name;
@@ -1338,7 +1338,7 @@ void drawbar(Monitor *m) { // 绘制bar
     if (c->no_limit_taskw == 1) {
       w = TEXTW(task_content);
     } else {
-      w = MIN(TEXTW(task_content), TEXTW("           "));
+      w = MIN(TEXTW(task_content), TEXTW("                                          "));
     }
 
     // 剩余的空白区域宽度
