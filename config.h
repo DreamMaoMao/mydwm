@@ -39,15 +39,15 @@ static const char *fonts[] = {"JetBrainsMono Nerd Font:style=Bold:size=13",
 static const char *colors[][3] = {
     /* 颜色设置 ColFg, ColBg, ColBorder */
     [SchemeNorm] = {"#ffb871", "#3c2003", "#444444"},
-    [SchemeSel] = {"#61370d", "#e9a25c", "#ad741f"},
+    [SchemeSel] = {"#2d1802", "#ad741f", "#ad741f"},
     [SchemeSelGlobal] = {"#ffffff", "#37474F", "#b153a7"},
     [SchemeSelFakeFull] = {"#ffffff", "#37474F", "#5d8e5d"},
     [SchemeSelFakeFullGLObal] = {"#ffffff", "#37474F", "#881519"},
     [SchemeHid] = {"#462503", NULL, NULL},
     [SchemeSystray] = {NULL, "#dabb77", NULL},
     [SchemeUnderline] = {"#6f0d62", NULL, NULL},
-    [SchemeNormTag] = {"#a8309e", "#e3e0dc", NULL},
-    [SchemeSelTag] = {"#ffffff", "#a8309e", NULL},
+    [SchemeNormTag] = {"#a02a6b", "#d8cbba", NULL},
+    [SchemeSelTag] = {"#ffffff", "#a02a6b", NULL},
     [SchemeBarEmpty] = {NULL, "#111111", NULL},
 };
 static const unsigned int alphas[][3] = {
