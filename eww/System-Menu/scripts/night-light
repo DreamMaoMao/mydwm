@@ -13,14 +13,14 @@ toggle() {
         else
             pkill wlsunset
         fi
-        notify-send --icon=window-close --urgency=normal "Night Light" "Night Light has been turned off!"
+        notify-send -i $HOME/tool/sunlight.jpeg --urgency=normal "Night Light" "Night Light has been turned off!"
     else
         if [[ "$XDG_SESSION_TYPE" == "x11" ]];then
-            redshift            
+            redshift &           
         else
-            wlsunset -T 3501 -t 3500
+            wlsunset -T 3501 -t 3500 &
         fi
-        notify-send --icon=checkmark --urgency=normal "Night Light" "Night Light has been turned on!"
+        notify-send -i $HOME/tool/nightlight.jpg --urgency=normal "Night Light" "Night Light has been turned on!"
     fi
 }
 

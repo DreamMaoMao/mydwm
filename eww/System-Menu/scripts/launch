@@ -1,10 +1,6 @@
 #!/bin/bash
 
-if [[ $1 == "picker" ]]; then
-    cd $HOME
-    /usr/local/bin/eww close-all
-    $HOME/.scripts/color-picker
-elif [[ $1 == "settings" ]]; then
+if [[ $1 == "settings" ]]; then
     cd $HOME
     /usr/local/bin/eww close-all
     gnome-tweaks

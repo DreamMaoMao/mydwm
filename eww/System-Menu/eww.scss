@@ -6,8 +6,8 @@
 .system-menu {
   // background-color: $bg;
   border-radius: 20px;
-  border: 4px solid #5a605c;
-  background-color: rgb(14, 14, 14);
+  border: 2px solid #d4c390;
+  background-color: rgba(37, 40, 38,0.8);
 
 }
 
@@ -90,31 +90,31 @@
   font-weight: bold;
 }
 
-.main-airplane-box-on {
+.main-IdleInhibitPlus-box-on {
   background-color: $blue;
   color: $bg;
   margin-left: 30px;
   border-radius: 15px;
 }
 
-.main-airplane-box-off {
+.main-IdleInhibitPlus-box-off {
   background-color: $gray-alt;
   color: $fg;
   margin-left: 30px;
   border-radius: 15px;
 }
 
-.main-airplane-button {
+.main-IdleInhibitPlus-button {
   font-size: 28px;
   padding: 0px 15px 0px 15px;
 }
 
-.airplane-labels-box {
+.IdleInhibitPlus-labels-box {
   margin: 20px 10px 20px 0px;
   font-size: 18px;
 }
 
-.airplane-label-button {
+.IdleInhibitPlus-label-button {
   font-weight: bold;
 }
 
@@ -324,10 +324,10 @@
 
 .menu-exit {
   font-size: 18px;
-  margin: 20px 0px 0px 0px;
+  margin: 20px 5px 0px 0px;
   background-color: $gray-alt;
   border-radius: 100px;
-  padding: 0px 11px 0px 11px;
+  padding: 0px 10px 0px 10px;
 }
 
 .battery-box {

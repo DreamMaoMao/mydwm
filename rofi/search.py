@@ -46,7 +46,7 @@ bilibili_header = {
 
 db_header = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-    'Accept-Encoding': 'gzip, deflate, br',
+    'Accept-Encoding': 'gzip, deflate',
     'Accept-Language': 'zh-CN,zh;q=0.9',
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.43'
 }
@@ -58,11 +58,12 @@ bd_header = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.43'
 }
 
-yd_header = {
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-    'Accept-Encoding': 'gzip, deflate, br',
-    'Accept-Language': 'zh-CN,zh;q=0.9',
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.43'
+dg_header = {
+    'Accept':'*/*',
+    'Accept-Encoding':'gzip',
+    'Accept-Language':'zh-CN,zh;q=0.9',
+    'Referer':'https://duckduckgo.com/',
+    'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 }
 
 search_source = {
@@ -70,7 +71,8 @@ search_source = {
     "bi": r"https://www.bing.com/search?q={q}",
     "bl": r"https://search.bilibili.com/all?keyword={q}",
     "db": r"https://search.douban.com/movie/subject_search?search_text={q}&cat=1002",
-    "bd": r"https://www.baidu.com/#ie=UTF-8&wd={q}"
+    "bd": r"https://www.baidu.com/#ie=UTF-8&wd={q}",
+    "dg": r"https://duckduckgo.com/?t=h_&q={q}"
 }
 
 suggest_source = {
@@ -79,6 +81,7 @@ suggest_source = {
     "bl": r"https://s.search.bilibili.com/main/suggest?func=suggest&suggest_type=accurate&sub_type=tag&main_ver=v1&highlight=&userid=&bangumi_acc_num=1&special_acc_num=1&topic_acc_num=1&upuser_acc_num=3&tag_num=10&special_num=10&bangumi_num=10&upuser_num=3&term={q}&rnd=0.7823559084946734&buvid=EC634950-D7D1-97F4-4D39-FDF868B5E7B705610infoc&spmid=333.1007",
     "db": r"https://movie.douban.com/j/subject_suggest?q={q}",
     "bd": r"http://www.baidu.com/sugrec?pre=1&p=3&ie=utf-8&json=1&prod=pc&from=pc_web&sugsid=31726,1468,31672,21112,31111,31591,31605,31464,30823&wd={q}&csor=4&pwd=isn",
+    "dg": r"https://duckduckgo.com/ac/?q={q}&kl=wt-wt"
 }
 
 
@@ -88,7 +91,7 @@ proxies = {
 }
 
 
-valid_key = ["go","bi","bl","db","bd"]
+valid_key = ["go","bi","bl","db","bd","dg"]
 
 def search(value):
     url = search_source[key].replace(r"{q}", value)
@@ -103,6 +106,17 @@ def suggest(key, value):
         try:
             res = requests.get(url=url, headers=google_header, proxies=proxies)
             result = json.loads(res.text)[1]
+        except:
+            result.append("网络异常,请检查是否已经开启了代理")
+        return result
+    elif key == "dg":
+        result = []
+        url = suggest_source[key].replace(r"{q}", value)
+        try:
+            res = requests.get(url=url, headers=dg_header, proxies=proxies)
+            res_list = json.loads(res.text)
+            for it in res_list:
+                result.append(it["phrase"])
         except:
             result.append("网络异常,请检查是否已经开启了代理")
         return result
@@ -139,8 +153,8 @@ def suggest(key, value):
             res_dict = json.loads(res.text)
             for su in res_dict:
                 result.append(su['title'])
-        except:
-            result.append("db请求异常")
+        except Exception as e:
+            result.append(str(e))
         return result
     elif key == "bd" and value:
         result = []

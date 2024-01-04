@@ -10,10 +10,11 @@
     blue-trans:  #A7c6e2aa;
     darkblue:    #005F87;
     green:       #00330088;
+    dark-green:  #406606;
     black:       #000000;
     grey:        #444444;
     orange:      #e4bd82;
-    dark-orange: #FFA664;
+    dark-orange: #5c3f09;
     light-grey:  #F5F5F5;
     medium-grey: #D0D0D0;
     dark-grey:   #002B36;
@@ -92,8 +93,8 @@ element normal.active {
 }
 element selected.normal {
     border-radius: 0px;
-    color: @black;
-    background-color: @dark-orange;
+    color: @orange;
+    background-color: @dark-green;
 }
 element selected.urgent {
     color: @light-grey;

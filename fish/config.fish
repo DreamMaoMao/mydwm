@@ -5,6 +5,8 @@ end
 function fish_greeting
 end
 set -g fish_color_autosuggestion purple
+
+
 alias api='sudo apt install'
 alias aps='sudo apt search'
 alias s='sudo'

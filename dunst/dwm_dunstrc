@@ -24,10 +24,10 @@
     # dynamic width from 0 to 300
     # width = (0, 300)
     # constant width of 300
-    width = 600
+    width = 400
 
     # The maximum height of a single notification, excluding the frame.
-    height = 200
+    height = 100
 
     # Position the notification in the top right corner
     origin = bottom-right
@@ -118,7 +118,7 @@
 
     ### Text ###
 
-    font = Sofia Pro 16
+    font = Sofia Pro 11
 
     # The spacing between lines.  If the height is smaller than the
     # font height, it will get raised to the font height.

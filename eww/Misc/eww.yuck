@@ -11,12 +11,12 @@
   (box :class "main-box" :orientation "v" :space-evenly "false"
     (label :class "greeting" :text greeting :space-evenly "false")
     (box :class "main-buttons-box" :orientation "h" :space-evenly "false"
-      (button :tooltip "Shutdown" :class "shutdown" :onclick "shutdown now" "󰐥")
-      (button :tooltip "Reboot" :class "reboot" :onclick "reboot" "󰜉")
-      (button :tooltip "Exit" :class "exit" :onclick "~/.config/eww/Misc/scripts/logout" "󰍃")
-      (button :tooltip "Suspend" :class "suspend" :onclick "systemctl suspend" "")
-      (button :tooltip "Hibernate" :class "hibernate" :onclick "sudo systemctl hibernate" "󰒲")
-      (button :tooltip "Lock" :class "lock" :onclick "swaylock -f -c 000000" "󰌾"))))
+      (button :tooltip "Shutdown" :class "shutdown" :onclick "~/.config/eww/Misc/scripts/anction shutdown" "󰐥")
+      (button :tooltip "Reboot" :class "reboot" :onclick "~/.config/eww/Misc/scripts/anction reboot" "󰜉")
+      (button :tooltip "Exit" :class "exit" :onclick "~/.config/eww/Misc/scripts/anction logout" "󰍃")
+      (button :tooltip "Suspend" :class "suspend" :onclick "~/.config/eww/Misc/scripts/anction suspend" "")
+      (button :tooltip "Hibernate" :class "hibernate" :onclick "~/.config/eww/Misc/scripts/anction sleep" "󰒲")
+      (button :tooltip "Lock" :class "lock" :onclick "~/.config/eww/Misc/scripts/anction lock" "󰌾"))))
 
 (defwidget volume-indicator[]
   (box :class "volume-window"

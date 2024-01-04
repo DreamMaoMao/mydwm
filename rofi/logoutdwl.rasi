@@ -1,28 +1,22 @@
 configuration {
-  display-drun: "Run app";
-  drun-display-format: "{name}";
-  drun-match-fields: "keywords";
-  font: "Iosevka Curly Bold 13";
+  font: "JetBrainsMono Nerd Font 20";
   modi: "window,run,drun";
-  show-icons: true;
-  location: 2;
-  // cache-dir: "/home/wrq/.cache";
-  drun-use-desktop-cache: true;
-  drun-reload-desktop-cache:true;
+  location: 3;
+  xoffset: -40;
   yoffset: 65;
 }
 
 @theme "~/.config/rofi/theme.rasi"
 
 window {
-  width: 890;
-  border: 6;
-  border-radius: 0 0 20 20;
+  width: 415;
+  border: 0;
   border-color: @borders;
+  border-radius: 0 0 0 0;
 }
 
 element {
-  padding: 5 0 5 0 ;
+  padding: 15 0 15 0 ;
   text-color: @fg;
   background-color: @bg-alt;
   border-radius: 5;
@@ -38,15 +32,15 @@ element selected {
 
 element-text {
   background-color: inherit;
-  padding: 0 15 5 15;
+  margin: 5 0 5 -4;
   text-color: inherit;
   vertical-align: 0.5;
   horizontal-align: 0.5;
 }
 
 element-icon {
-  size: 50;
-  margin: 0 0 -5 0;
+  size: 64;
+  margin: 0 0 0 0;
   horizontal-align: 0.5;
   background-color: inherit;
 
@@ -55,7 +49,7 @@ element-icon {
 entry {
   background-color: @bg-alt;
   padding: 12;
-  margin: 0 0 0 -15;
+  margin: 0 0 0 -10;
   text-color: @fg;
 }
 
@@ -64,9 +58,9 @@ inputbar {
 }
 
 listview {
-  padding: 0 15 15 15;
+  padding: 15 15 15 15;
   background-color: #00000000;
-  columns: 5;
+  columns: 6;
   lines: 1;
   fixed-lines: true;
   //fixed-columns: true;
@@ -74,7 +68,7 @@ listview {
 
 mainbox {
   background-color: @bg;
-  children: [inputbar, listview];
+  children: [listview];
 }
 
 prompt {
@@ -83,4 +77,5 @@ prompt {
   padding: 12 0 0 12;
   text-color: @fg;
 }
+
 

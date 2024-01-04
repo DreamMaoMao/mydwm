@@ -2,7 +2,7 @@
 AntiAliasFonts=true
 ColorScheme=WhiteOnBlack
 EmojiFont=Noto Color Emoji,32,-1,5,50,0,0,0,0,0
-Font=JetBrainsMono Nerd Font Mono,14,-1,5,50,0,0,0,0,0
+Font=JetBrainsMono Nerd Font Mono,13,-1,5,50,0,0,0,0,0
 TabColor=0,0,0
 WordModeBrahmic=true
 

@@ -1,9 +1,9 @@
 configuration {
-	font: "mono 20";
+	font: "JetBrainsMono Nerd Font 20";
   run-list-command: "";
   drun-match-fields: "keywords,name";
-  modi: "drun";
-  // cache-dir: "~/.cache";
+  modi: "drun,website:~/.config/rofi/website.py";
+  // cache-dir: "/home/wrq/.cache";
   drun-use-desktop-cache: true;
   drun-reload-desktop-cache:true;
   input-method: "fcitx";
@@ -29,4 +29,4 @@ configuration {
 
 //@theme "/usr/local/share/rofi/themes/arthur.rasi"
 
-@theme "/usr/local/share/rofi/themes/fancy2.rasi"
+@theme "~/.config/rofi/themes/fancy2.rasi"
