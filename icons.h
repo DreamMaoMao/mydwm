@@ -6,7 +6,7 @@ static const Icon icons[] = {
     {"Google-chrome","  "},
     {"Microsoft-edge","  "},
     {"firefox","  "},
-    {"Nemo","  "},
+    {"Pcmanfm","  "},
     {"Code"," 󰨞 "},
     {"qtmv"," 󰟞 "},
     {"smplayer","  "},

@@ -87,7 +87,7 @@ https://github.com/DreamMaoMao/superdwm/assets/30348075/c48d4bf0-abc6-4faf-a37d-
 # 运行需要的相关工具包
 ```
 sudo pacman -S network-manager-applet
-sudo pacman -S nemo
+sudo pacman -S pcmanfm
 sudo pacman -S rofi
 sudo pacman -S konsole
 sudo pacman -S gnome-system-monitor 
@@ -106,7 +106,7 @@ sudo pacman -S inetutils
 sudo pacman -S  networkmanager 
 sudo pacman -S  gdm
 
-yay -S blueman acpi dunst jq alsa-utils polkit-gnome  rofi-blocks-git light numlockx nemo flameshot feh lm_sensors   mantablockscreen network-manager-applet playerctl python3 parcellite redshift upower xorg-xinit xprintidle xorg wmctrl xdotool tumbler pavucontrol ttf-jetbrains-mono-nerd eww-x11 cpufrequtils asciidoc xclip update-grub os-prober efibootmgr grub-customizer yazi xface4-terminal
+yay -S blueman acpi dunst jq alsa-utils polkit-gnome  rofi-blocks-git light numlockx pcmanfm flameshot feh lm_sensors   mantablockscreen network-manager-applet playerctl python3 parcellite redshift upower xorg-xinit xprintidle xorg wmctrl xdotool tumbler pavucontrol ttf-jetbrains-mono-nerd eww-x11 cpufrequtils asciidoc xclip update-grub os-prober efibootmgr grub-customizer yazi xface4-terminal
 
 
 ```

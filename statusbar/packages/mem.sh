@@ -44,7 +44,7 @@ call_btop() {
 
 click() {
     case "$1" in
-        L) nemo  ;;
+        L) pcmanfm  ;;
         R) ;;
     esac
 }
