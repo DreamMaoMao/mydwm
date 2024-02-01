@@ -1,8 +1,8 @@
 
 export _bat='^sbat^^c#0a4b55^^b#96d5dd0xff^  100% '
-export _date='^sdate^^c#e4e1db^^b#a21d570xff^  02/01 10:32 '
-export _mem='^smem^^c#3B001B^^b#cba6f70xff^ 󰍛 31%% '
+export _date='^sdate^^c#e4e1db^^b#a21d570xff^  02/01 20:14 '
+export _mem='^smem^^c#3B001B^^b#cba6f70xff^ 󰍛 43%% '
 export _wifi='^swifi^^c#000080^^b#a6e3a10xff^   tpwrq5g '
-export _cpu='^scpu^^c#e4e1db^^b#1c79a30xff^ 󰻠 1.93% 71°C '
 export _vol='^svol^^c#442266^^b#fab3870xff^  50% '
-export _light='^slight^^c#442266^^b#dedbd40xff^  12% '
+export _light='^slight^^c#442266^^b#dedbd40xff^  6% '
+export _cpu='^scpu^^c#e4e1db^^b#1c79a30xff^ 󰻠 2.61% 65°C '
