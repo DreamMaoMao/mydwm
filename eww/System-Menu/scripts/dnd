@@ -1,12 +1,24 @@
 #!/usr/bin/env bash
 
-STATUS=$(swaync-client -D)
+if [[ "$XDG_SESSION_TYPE" == "x11" ]];then
+    STATUS=$(dunstctl is-paused)
+else
+    STATUS=$(swaync-client -D)
+fi
 
 toggle() {
     if [ $STATUS == "false" ]; then
-        swaync-client -dn
+        if [[ "$XDG_SESSION_TYPE" == "x11" ]];then
+            dunstctl set-paused true
+        else
+            swaync-client -dn
+        fi
     else
-        swaync-client -df
+        if [[ "$XDG_SESSION_TYPE" == "x11" ]];then
+            dunstctl set-paused false
+        else
+            swaync-client -df
+        fi
         notify-send --urgency=low -i $HOME/tool/dnd.jpg "Do Not Disturb" "Do not Disturb has been turned off!"
     fi
 }

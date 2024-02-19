@@ -13,7 +13,7 @@ settings() {
 	pkill -f xdg-desktop-portal-gnome
 	pkill clash
 	picom --experimental-backends --config $DWM/scripts/config/picom.conf & # 开启picom
-	#picom --experimental-backends --config $DWM/scripts/config/picom.conf >>/dev/null 2>&1 & # 开启picom
+	# picom --config $DWM/scripts/config/picom.conf &
 	feh --randomize --bg-fill $DWM/wallpaper/caoyuan.jpg & # 壁纸
 	echo "Xft.dpi: 140" | xrdb -merge                      #dpi缩放
 	cp ~/.local/share/x11/konsole -r ~/.local/share/
