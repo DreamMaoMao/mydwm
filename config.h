@@ -248,7 +248,7 @@ static Key keys[] = {
     { AltMask|SuperMask,        XK_q,      spawn, SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") }, /* super alt q | 选中某个窗口并强制kill */
     { SuperMask,                XK_p,      spawn, SHCMD("bash $DWM/scripts/monitor.sh") },                              /* super p     | 关闭内部显示器 */
     { SuperMask|ControlMask,    XK_m,      spawn, SHCMD("$DWM/scripts/rofidwm.sh outopts") },
-    { AltMask|ControlMask,      XK_Return, spawn, SHCMD("konsole -e \"zellij -s temp --layout compact --config /home/wrq/.config/zellij/tempconfigx11.kdl\"") },  /* super alt return | zellij 临时会话 */
+    { AltMask|ControlMask,      XK_Return, spawn, SHCMD("konsole -e \"zellij -s temp --config /home/wrq/.config/zellij/tempconfigx11.kdl\"") },  /* super alt return | zellij 临时会话 */
     { SuperMask,                XK_b,      spawn, SHCMD("systemctl suspend") },      /* super b     | 系统挂起 */ 
 
 

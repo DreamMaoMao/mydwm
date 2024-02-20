@@ -3,16 +3,16 @@
     g-spacing: 10px;
     g-margin: 0;
     b-color: #000000cc;
-    fg-color: #f8f8f2FF;
+    fg-color: #d3d3ce;
     fgp-color: #888888FF;
     b-radius: 15px;
     g-padding: 8px;
-    hl-color: #e2c0f6FF;
+    hl-color: #bca0cc;
     hlt-color: #000000cc;
     alt-color: #111111cc;
     wbg-color: #000000aa;
     w-border: 2px solid;
-    w-border-color: #e2c0f6FF;
+    w-border-color: #bca0cc;
     w-padding: 12px;
 }
 
