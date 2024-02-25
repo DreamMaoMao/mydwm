@@ -1753,6 +1753,9 @@ void focusstack(const Arg *arg) {
 void pointerfocuswin(Client *c) {
   if (c) {
     XWarpPointer(dpy, None, root, 0, 0, 0, 0, c->x + c->w / 2, c->y + c->h / 2);
+    if (c->mon != selmon) {
+      focusmon(c->mon);
+    }
     focus(c);
   } else
     XWarpPointer(dpy, None, root, 0, 0, 0, 0, selmon->wx + selmon->ww / 3,
@@ -4510,6 +4513,7 @@ void zoom(const Arg *arg) {
 
 Client *direction_select(const Arg *arg) {
   Client *tempClients[100];
+  Monitor *m;
   Client *c = NULL, *tc = selmon->sel;
   int last = -1, issingle = issinglewin(NULL);
   // int cur = 0;
@@ -4529,6 +4533,13 @@ Client *direction_select(const Arg *arg) {
       // cur = last;
     }
   }
+
+   for (m = mons; m; m = m->next) {
+    if(selmon && m != selmon && m->sel) {
+      last++;
+      tempClients[last] = m->sel;      
+    }
+   }
 
   if (last < 0)
     return NULL;
@@ -4661,7 +4672,7 @@ void focusdir(const Arg *arg) {
   } else {
     if (c) {
       pointerfocuswin(c);
-      restack(selmon);
+      restack(c->mon);
     }
   }
 }
