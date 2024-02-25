@@ -1753,9 +1753,6 @@ void focusstack(const Arg *arg) {
 void pointerfocuswin(Client *c) {
   if (c) {
     XWarpPointer(dpy, None, root, 0, 0, 0, 0, c->x + c->w / 2, c->y + c->h / 2);
-    if (c->mon != selmon) {
-      focusmon(c->mon);
-    }
     focus(c);
   } else
     XWarpPointer(dpy, None, root, 0, 0, 0, 0, selmon->wx + selmon->ww / 3,
@@ -4660,6 +4657,11 @@ Client *direction_select(const Arg *arg) {
 
 void focusdir(const Arg *arg) {
   Client *c = NULL;
+
+  if (!selmon->sel) {
+      focusmon(&(Arg){.i = +1});
+      return;
+  }
 
   c = direction_select(arg);
 
