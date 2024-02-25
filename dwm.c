@@ -4660,21 +4660,14 @@ Client *direction_select(const Arg *arg) {
 
 void focusdir(const Arg *arg) {
   Client *c = NULL;
-  int issingle = issinglewin(NULL);
 
   c = direction_select(arg);
 
-  if (issingle) {
-    if (c) {
-      hideotherwins(&(Arg){.v = c});
-    }
-      
-  } else {
-    if (c) {
-      pointerfocuswin(c);
-      restack(c->mon);
-    }
+  if (c) {
+    pointerfocuswin(c);
+    restack(c->mon);
   }
+
 }
 
 void exchange_two_client(Client *c1, Client *c2) {
