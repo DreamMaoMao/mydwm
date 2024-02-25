@@ -168,8 +168,8 @@ static Key keys[] = {
     { SuperMask,                XK_comma,        setmfact,         {.f = -0.05} },            /* super ,            |  缩小主工作区 */
     { SuperMask,                XK_period,       setmfact,         {.f = +0.05} },            /* super .            |  放大主工作区 */
 
-    { AltMask,                  XK_i,            hidewin,          {0} },                     /* super i            |  隐藏 窗口 */
-    { AltMask|ShiftMask,        XK_i,            restorewin,       {0} },                     /* super shift i      |  取消隐藏 窗口 */
+    { SuperMask,                  XK_i,            hidewin,          {0} },                     /* super i            |  隐藏 窗口 */
+    { SuperMask|ShiftMask,        XK_i,            restorewin,       {0} },                     /* super shift i      |  取消隐藏 窗口 */
 
     { AltMask,    XK_s,         zoom,             {0} },                                      /* alt s              |  将当前聚焦窗口置为主窗口 */
 
@@ -182,8 +182,8 @@ static Key keys[] = {
     { SuperMask,                XK_u,            toggleborder,     {0} },                     /* super u            |  开启/关闭 边框 */
     { SuperMask,                XK_e,            incnmaster,       {.i = +1} },               /* super e            |  改变主工作区窗口数量 (1 2中切换) */
 
-    { SuperMask,                XK_b,            focusmon,         {.i = +1} },               /* super b            |  光标移动到另一个显示器 */
-    { SuperMask|ShiftMask,      XK_b,            tagmon,           {.i = +1} },               /* super shift b      |  将聚焦窗口移动到另一个显示器 */
+    { SuperMask,                XK_j,            focusmon,         {.i = +1} },               /* super j            |  光标移动到另一个显示器 */
+    { SuperMask|ShiftMask,      XK_j,            tagmon,           {.i = +1} },               /* super shift j      |  将聚焦窗口移动到另一个显示器 */
 
     { ControlMask,              XK_0,            view,             {.ui= ~0} },               /* ctrl 0             |  显示所有workspace */
     { ControlMask,              XK_KP_0,         view,             {.ui= ~0} },               /* ctrl 0(右边数字键)   |  显示所有workspace */
