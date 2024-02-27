@@ -212,22 +212,16 @@ static Key keys[] = {
     { SuperMask|AltMask,        XK_Left,         resizewin,        {.ui = H_REDUCE} },        /* super alt left     |  调整窗口大小 */
     { SuperMask|AltMask,        XK_Right,        resizewin,        {.ui = H_EXPAND} },        /* super alt right    |  调整窗口大小 */
 
-  	// { AltMask,                  XK_k,            focusdir,         {.i = UP } },              /* alt k              | 二维聚焦窗口 */
-  	// { AltMask,                  XK_j,            focusdir,         {.i = DOWN } },            /* alt j              | 二维聚焦窗口 */
-  	// { AltMask,                  XK_h,            focusdir,         {.i = LEFT } },            /* alt h              | 二维聚焦窗口 */
-  	// { AltMask,                  XK_l,            focusdir,         {.i = RIGHT } },           /* alt l              | 二维聚焦窗口 */
+         /* alt l              | 二维聚焦窗口 */
     { AltMask,                  XK_Left,         focusdir,         {.i = LEFT } },            /* alt left           |  本tag内切换聚焦窗口 */
     { AltMask,                  XK_Right,        focusdir,         {.i = RIGHT } },           /* alt right          |  本tag内切换聚焦窗口 */
     { AltMask,                  XK_Up,           focusdir,         {.i = UP } },              /* alt up             |  本tag内切换聚焦窗口 */
     { AltMask,                  XK_Down,         focusdir,         {.i = DOWN } },            /* alt down           |  本tag内切换聚焦窗口 */
-    // { AltMask|ShiftMask,        XK_k,            exchange_client,  {.i = UP } },              /* alt shift k        | 二维交换窗口 (仅平铺) */
-    // { AltMask|ShiftMask,        XK_j,            exchange_client,  {.i = DOWN } },            /* alt shift j        | 二维交换窗口 (仅平铺) */
-    // { AltMask|ShiftMask,        XK_h,            exchange_client,  {.i = LEFT} },             /* alt shift h        | 二维交换窗口 (仅平铺) */
-    // { AltMask|ShiftMask,        XK_l,            exchange_client,  {.i = RIGHT } },           /* alt shift l        | 二维交换窗口 (仅平铺) */
-    { AltMask|ShiftMask,        XK_Up,           exchange_client,  {.i = UP } },              /* alt shift up       | 二维交换窗口 (仅平铺) */
-    { AltMask|ShiftMask,        XK_Down,         exchange_client,  {.i = DOWN } },            /* alt shift down     | 二维交换窗口 (仅平铺) */
-    { AltMask|ShiftMask,        XK_Left,         exchange_client,  {.i = LEFT} },             /* alt shift left     | 二维交换窗口 (仅平铺) */
-    { AltMask|ShiftMask,        XK_Right,        exchange_client,  {.i = RIGHT } },           /* alt shift right    | 二维交换窗口 (仅平铺) */
+
+    { SuperMask|ShiftMask,        XK_Up,           exchange_client,  {.i = UP } },              /* super shift up       | 二维交换窗口 (仅平铺) */
+    { SuperMask|ShiftMask,        XK_Down,         exchange_client,  {.i = DOWN } },            /* super shift down     | 二维交换窗口 (仅平铺) */
+    { SuperMask|ShiftMask,        XK_Left,         exchange_client,  {.i = LEFT} },             /* super shift left     | 二维交换窗口 (仅平铺) */
+    { SuperMask|ShiftMask,        XK_Right,        exchange_client,  {.i = RIGHT } },           /* super shift right    | 二维交换窗口 (仅平铺) */
 
     /* spawn + SHCMD 执行对应命令(已下部分建议完全自己重新定义) */
     { AltMask,                  XK_Return, spawn, SHCMD("xfce4-terminal") },  
