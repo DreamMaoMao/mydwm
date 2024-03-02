@@ -123,6 +123,7 @@ static const Rule rules[] = {
     {"Clash-verge",    NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1590,       892},       // clash            浮动
     {"Pavucontrol",                  NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // pavucontrol            浮动
     {"Dragon",    NULL,                 NULL,             0,            1,          0,          1,        -1,      5,            0,       0},       // dragon            noborder
+    {"qxdrag.py",    NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            400,       300},       // dragon            noborder
 
 
     /** 优先度低 越在上面优先度越低 */
@@ -242,8 +243,10 @@ static Key keys[] = {
     { AltMask|SuperMask,        XK_q,      spawn, SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") }, /* super alt q | 选中某个窗口并强制kill */
     { SuperMask,                XK_p,      spawn, SHCMD("bash $DWM/scripts/monitor.sh") },                              /* super p     | 关闭内部显示器 */
     { SuperMask|ControlMask,    XK_m,      spawn, SHCMD("$DWM/scripts/rofidwm.sh outopts") },
-    { AltMask|ControlMask,      XK_Return, spawn, SHCMD("konsole -e \"zellij -s temp --config /home/wrq/.config/zellij/tempconfigx11.kdl\"") },  /* super alt return | zellij 临时会话 */
+    // { AltMask|ControlMask,      XK_Return, spawn, SHCMD("konsole -e \"zellij -s temp --config /home/wrq/.config/zellij/tempconfigx11.kdl\"") },  /* super alt return | zellij 临时会话 */
+    { AltMask|ControlMask,      XK_Return, spawn, SHCMD("konsole -e \"~/tool/ter-multiplexer.sh\"") },  /* super alt return | zellij 临时会话 */
     { SuperMask,                XK_b,      spawn, SHCMD("systemctl suspend") },      /* super b     | 系统挂起 */ 
+    { AltMask|ControlMask,      XK_t,      spawn, SHCMD("bash ~/tool/shotTranslate.sh shot") },      /* ctrl alt t    | 截屏翻译 */ 
 
 
     /* alt key : 跳转到对应tag (可附加一条命令 若目标目录无窗口，则执行该命令) */

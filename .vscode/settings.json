@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "random": "c",
-        "*.ipp": "c"
+        "*.ipp": "c",
+        "cstdlib": "c"
     }
 }
