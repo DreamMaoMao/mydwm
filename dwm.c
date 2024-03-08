@@ -3604,11 +3604,18 @@ void togglewin(const Arg *arg) {
   if (c == selmon->sel)
     hide(c);
   else {
-    if (HIDDEN(c))
+    if (HIDDEN(c)) {
+      c->is_in_scratchpad = 0;
+      c->is_scratchpad_show = 0;
+      c->scratchpad_priority = 0;
       show(c);
+    }
     focus(c);
     restack(selmon);
   }
+  // 设置窗口的border
+  uint border_type = get_border_type(c);
+  XSetWindowBorder(dpy, c->win, scheme[border_type][ColBorder].pixel);
 }
 
 void toggleview(const Arg *arg) {

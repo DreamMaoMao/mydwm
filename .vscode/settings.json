@@ -9,6 +9,7 @@
         "list": "c",
         "string": "c",
         "vector": "c",
-        "valarray": "c"
+        "valarray": "c",
+        "xf86keysym.h": "c"
     }
 }
