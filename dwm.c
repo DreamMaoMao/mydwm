@@ -3561,6 +3561,9 @@ void restorewin(const Arg *arg) {
 			hiddenWinStack[i]->is_scratchpad_show = 0;
 			hiddenWinStack[i]->is_in_scratchpad = 0;
 			hiddenWinStack[i]->scratchpad_priority = 0;
+      // 设置窗口的border
+      uint border_type = get_border_type(hiddenWinStack[i]);
+      XSetWindowBorder(dpy, hiddenWinStack[i]->win, scheme[border_type][ColBorder].pixel);
       restack(selmon);
       // need set j<hiddenWinStackTop+1. Because show will reduce
       // hiddenWinStackTop value.
@@ -3571,6 +3574,7 @@ void restorewin(const Arg *arg) {
     }
     --i;
   }
+
 }
 
 void hidewin(const Arg *arg) {
