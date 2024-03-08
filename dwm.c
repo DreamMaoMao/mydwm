@@ -3490,12 +3490,14 @@ void show_scratchpad(Client *c) {
   focus(c);
   restack(selmon);
   clear_fullscreen_flag(c);
-  c->isfloating = 1;
-  c->w = selmon->ww * 0.5;
-  c->h = selmon->wh * 0.8;
-  c->x = selmon->wx + (selmon->ww - c->w) / 2;
-  c->y = selmon->wy + (selmon->wh - c->h) / 2;
-  resizeclient(c, c->x, c->y, c->w,c->h);
+  if(!c->isfloating) {
+    c->isfloating = 1;
+    c->w = selmon->ww * 0.5;
+    c->h = selmon->wh * 0.8;
+    c->x = selmon->wx + (selmon->ww - c->w) / 2;
+    c->y = selmon->wy + (selmon->wh - c->h) / 2;
+    resizeclient(c, c->x, c->y, c->w,c->h);
+  }
   arrange(selmon);
   pointerfocuswin(c);
 }
