@@ -92,6 +92,7 @@ enum {
   SchemeNorm,              // 普通
   SchemeSel,               // 选中的
   SchemeSelGlobal,         // 全局并选中的
+  SchemeSelScratchpad,     // 便签窗口
   SchemeSelFakeFull,       // 伪全屏并选中的
   SchemeSelFakeFullGLObal, // 伪全屏并全局并选中
   SchemeHid,               // 隐藏的
@@ -180,6 +181,9 @@ struct Client {
   Client *snext;
   Monitor *mon;
   Window win;
+	int is_in_scratchpad;
+	int is_scratchpad_show;
+	int scratchpad_priority;  
 };
 
 typedef struct {
@@ -313,6 +317,8 @@ static void hideotherwins(const Arg *arg);
 static void showonlyorall(const Arg *arg);
 static int issinglewin(const Arg *arg);
 static void restorewin(const Arg *arg);
+static void toggle_scratchpad(const Arg *arg);
+static void show_scratchpad(Client *c);
 
 static void incnmaster(const Arg *arg);
 static void keypress(XEvent *e);
@@ -365,6 +371,7 @@ static void fake_fullscreen(const Arg *arg);
 static void set_fake_fullscreen(Client *c);
 static void setmfact(const Arg *arg);
 
+static void tag_client(const Arg *arg,Client *target_client);
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void tagtoleft(const Arg *arg);
@@ -374,7 +381,6 @@ static void togglebar(const Arg *arg);
 static void togglesystray();
 static void togglefloating(const Arg *arg);
 static void toggleallfloating(const Arg *arg);
-// static void togglescratch(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void toggleoverview(const Arg *arg);
 static void togglewin(const Arg *arg);
@@ -411,6 +417,8 @@ static void addtoright(const Arg *arg);
 
 static void exchange_client(const Arg *arg);
 static void focusdir(const Arg *arg);
+static unsigned int get_tags_first_tag(unsigned int tags);
+
 
 static Client *wintoclient(Window w);
 static Monitor *wintomon(Window w);
@@ -513,6 +521,18 @@ void lognumtofile(unsigned int num) {
   sprintf(cmd, "echo '%x' >> ~/log", num);
   system(cmd);
 }
+
+//获取tags中最坐标的tag的tagmask
+unsigned int get_tags_first_tag(unsigned int tags){
+	unsigned int i,target,tag;
+	tag = 0;
+	for(i=0;!(tag & 1);i++){
+		tag = tags >> i;
+	}
+	target = 1 << (i-1);	
+	return target;
+}
+
 
 //获取窗口的进程pid
 unsigned long get_win_pid(Window win) {
@@ -1636,6 +1656,8 @@ void expose(XEvent *e) { // 窗口暴露事件,由不可见变成可见的时候
 uint get_border_type(Client *c) {  //判断border颜色
   if (c->isglobal && !c->isfullscreen) {
     return SchemeSelGlobal;
+  } else if (c->is_in_scratchpad) {
+    return SchemeSelScratchpad;
   } else if (c->isfullscreen && !c->isglobal) {
     return SchemeSelFakeFull;
   } else if (c->isglobal && c->isfullscreen) {
@@ -3072,7 +3094,10 @@ void fullscreen(const Arg *arg) {
   } else {
     setfullscreen(selmon->sel);
   }
-      
+
+	selmon->sel->is_scratchpad_show = 0;
+	selmon->sel->is_in_scratchpad = 0;
+	selmon->sel->scratchpad_priority = 0;
 }
 
 void fake_fullscreen(const Arg *arg) {
@@ -3088,6 +3113,10 @@ void fake_fullscreen(const Arg *arg) {
   } else {
     set_fake_fullscreen(selmon->sel);
   }
+
+	selmon->sel->is_scratchpad_show = 0;
+	selmon->sel->is_in_scratchpad = 0;
+	selmon->sel->scratchpad_priority = 0;
 }
 
 void selectlayout(const Arg *arg) {
@@ -3309,8 +3338,7 @@ void spawn(const Arg *arg) {
   }
 }
 
-void tag(const Arg *arg) {
-  Client *target_client = selmon->sel;
+void tag_client(const Arg *arg,Client *target_client) {
   if (target_client && !target_client->isglobal && arg->ui & TAGMASK) {
     target_client->tags = arg->ui & TAGMASK;
 
@@ -3334,6 +3362,11 @@ void tag(const Arg *arg) {
   }else {
     focus(target_client);
   }
+}
+
+void tag(const Arg *arg) {
+  if(selmon->sel)
+    tag_client(arg,selmon->sel);
 }
 
 void tagmon(const Arg *arg) {
@@ -3408,8 +3441,14 @@ void togglefloating(const Arg *arg) {
     selmon->sel->y = selmon->wy + selmon->wh / 6, managefloating(selmon->sel);
     resize(selmon->sel, selmon->sel->x, selmon->sel->y, selmon->ww / 3 * 2,
            selmon->wh / 3 * 2, 0);
+  } else {
+		selmon->sel->is_scratchpad_show = 0;
+		selmon->sel->is_in_scratchpad = 0;
+		selmon->sel->scratchpad_priority = 0;    
   }
 
+  uint border_type = get_border_type(selmon->sel);
+  XSetWindowBorder(dpy, selmon->sel->win, scheme[border_type][ColBorder].pixel);
   arrange(selmon);
   pointerfocuswin(selmon->sel);
 }
@@ -3443,31 +3482,73 @@ void toggleallfloating(const Arg *arg) {
   pointerfocuswin(selmon->sel);
 }
 
-// void togglescratch(const Arg *arg) {
-//   Client *c;
-//   Monitor *m;
-//   unsigned int found = 0;
 
-//   for (m = mons; m && !found; m = m->next)
-//     for (c = m->clients; c && !(found = c->isscratchpad); c = c->next)
-//       ;
-//   if (found) {
-//     if (c->mon == selmon) // 在同屏幕则toggle win状态
-//       togglewin(&(Arg){.v = c});
-//     else { // 不在同屏幕则将win移到当前屏幕 并显示
-//       sendmon(c, selmon);
-//       show(c);
-//       focus(c);
-//       if (c->isfloating) {
-//         resize(c, selmon->mx + (selmon->mw - selmon->sel->w) / 2,
-//                selmon->my + (selmon->mh - selmon->sel->h) / 2,
-//                selmon->sel->w, selmon->sel->h, 0);
-//       }
-//       pointerfocuswin(c);
-//     }
-//   } else
-//     spawn(arg);
-// }
+void show_scratchpad(Client *c) {
+	c->is_scratchpad_show = 1;
+  c->tags = selmon->tagset[selmon->seltags];
+  show(c);
+  focus(c);
+  restack(selmon);
+  clear_fullscreen_flag(c);
+  c->isfloating = 1;
+  c->w = selmon->ww * 0.5;
+  c->h = selmon->wh * 0.8;
+  c->x = selmon->wx + (selmon->ww - c->w) / 2;
+  c->y = selmon->wy + (selmon->wh - c->h) / 2;
+  resizeclient(c, c->x, c->y, c->w,c->h);
+  arrange(selmon);
+  pointerfocuswin(c);
+}
+
+void toggle_scratchpad(const Arg *arg) {
+	Client *c,*target_show_client=NULL;
+	Client *tempClients[100],*tempbackup; //只支持100个在便利签中的客户端
+	int  z,j,k,i = 0;
+	int is_hide_anction = 0;
+	for (c = selmon->clients; c; c = c->next) {
+		if(c->is_in_scratchpad && c->is_scratchpad_show && (selmon->tagset[selmon->seltags] & c->tags) == 0 ) {
+			unsigned int target = get_tags_first_tag(selmon->tagset[selmon->seltags]); 
+			tag_client(&(Arg){.ui = target},c);
+			return;
+		} else if (c->is_in_scratchpad && c->is_scratchpad_show && (selmon->tagset[selmon->seltags] & c->tags) != 0) {
+			c->is_scratchpad_show = 0;
+			c->scratchpad_priority = c->scratchpad_priority + 10;
+			hide(c);
+			is_hide_anction = 1;
+		} else if (c->is_in_scratchpad && !c->is_scratchpad_show) {
+			if (target_show_client != NULL) {
+				if (c->scratchpad_priority < target_show_client->scratchpad_priority)
+					target_show_client = c;
+			} else {
+				target_show_client = c;
+			}
+		} 
+
+		if(c->is_in_scratchpad) {
+			tempClients[i] = c;
+			i++;
+		}
+	}
+
+	if(is_hide_anction) {
+		for(j=0;j<i-1;j++) //把优先级从左到右排序
+			for(k=j+1;k<i;k++) {
+				if(tempClients[j]->scratchpad_priority > tempClients[k]->scratchpad_priority) {
+					tempbackup = tempClients[j];
+					tempClients[j] = tempClients[k];
+					tempClients[k] = tempbackup;
+				}
+			}
+		for(z=0;z<i;z++) { //重新根据排序设置优先级的值,以免上面优先级做加法过多溢出
+			tempClients[z]->scratchpad_priority = z;
+		}
+	} else {
+		if(!target_show_client)
+			return;
+		show_scratchpad(target_show_client);
+	}
+
+}
 
 void restorewin(const Arg *arg) {
   int i = hiddenWinStackTop;
@@ -3475,6 +3556,9 @@ void restorewin(const Arg *arg) {
     if (HIDDEN(hiddenWinStack[i]) && ISVISIBLE(hiddenWinStack[i])) {
       show(hiddenWinStack[i]);
       focus(hiddenWinStack[i]);
+			hiddenWinStack[i]->is_scratchpad_show = 0;
+			hiddenWinStack[i]->is_in_scratchpad = 0;
+			hiddenWinStack[i]->scratchpad_priority = 0;
       restack(selmon);
       // need set j<hiddenWinStackTop+1. Because show will reduce
       // hiddenWinStackTop value.
@@ -3491,6 +3575,8 @@ void hidewin(const Arg *arg) {
   if (!selmon->sel)
     return;
   Client *c = (Client *)selmon->sel;
+	c->is_in_scratchpad = 1;
+	c->is_scratchpad_show = 0;
   hide(c);
 }
 

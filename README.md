@@ -58,6 +58,7 @@ https://github.com/DreamMaoMao/mydwm/assets/30348075/d5a898ad-a50b-4206-b161-08c
 
 - 25.方向窗口焦点切换可以跨越显示器
 
+- 26.增加sway的便签功能
 
 
 # 运行需要的相关工具包

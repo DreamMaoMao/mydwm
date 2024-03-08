@@ -41,6 +41,7 @@ static const char *colors[][3] = {
     /* 颜色设置 ColFg, ColBg, ColBorder */
     [SchemeNorm] = {"#ffb871", "#3c2003", "#444444"},
     [SchemeSel] = {"#2d1802", "#ad741f", "#ad741f"},
+    [SchemeSelScratchpad] = {"#ffffff", "#37474F", "#516c93"},
     [SchemeSelGlobal] = {"#ffffff", "#37474F", "#b153a7"},
     [SchemeSelFakeFull] = {"#ffffff", "#37474F", "#5d8e5d"},
     [SchemeSelFakeFullGLObal] = {"#ffffff", "#37474F", "#881519"},
@@ -56,6 +57,7 @@ static const unsigned int alphas[][3] = {
     [SchemeNorm] = {OPAQUE, baralpha, borderalpha},
     [SchemeSel] = {OPAQUE, baralpha, borderalpha},
     [SchemeSelGlobal] = {OPAQUE, baralpha, borderalpha},
+    [SchemeSelScratchpad] = {OPAQUE, baralpha, borderalpha},
     [SchemeSelFakeFull] = {OPAQUE, baralpha, borderalpha},
     [SchemeSelFakeFullGLObal] = {OPAQUE, baralpha, borderalpha},
     [SchemeNormTag] = {OPAQUE, baralpha, borderalpha},
@@ -169,8 +171,9 @@ static Key keys[] = {
     { SuperMask,                XK_comma,        setmfact,         {.f = -0.05} },            /* super ,            |  缩小主工作区 */
     { SuperMask,                XK_period,       setmfact,         {.f = +0.05} },            /* super .            |  放大主工作区 */
 
-    { SuperMask,                  XK_i,            hidewin,          {0} },                     /* super i            |  隐藏 窗口 */
-    { SuperMask|ShiftMask,        XK_i,            restorewin,       {0} },                     /* super shift i      |  取消隐藏 窗口 */
+    { SuperMask,                  XK_i,            hidewin,                 {0} },                     /* super i            |  隐藏窗口,放入便签 */
+    { SuperMask|ShiftMask,        XK_i,            restorewin,              {0} },                     /* super shift i      |  取消隐藏 窗口 */
+    { AltMask,                    XK_z,            toggle_scratchpad,       {0} },                     /* alt z             |  标签的循环切换 */
 
     { AltMask,    XK_s,         zoom,             {0} },                                      /* alt s              |  将当前聚焦窗口置为主窗口 */
 

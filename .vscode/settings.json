@@ -2,6 +2,13 @@
     "files.associations": {
         "random": "c",
         "*.ipp": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "*.tcc": "c",
+        "deque": "c",
+        "forward_list": "c",
+        "list": "c",
+        "string": "c",
+        "vector": "c",
+        "valarray": "c"
     }
 }
