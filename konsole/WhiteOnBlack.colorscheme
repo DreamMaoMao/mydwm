@@ -14,7 +14,7 @@ Color=0,0,0
 Color=71,71,71
 
 [Color0Intense]
-Color=47,41,22
+Color=211,142,1
 
 [Color1]
 Color=178,24,24
@@ -26,7 +26,7 @@ Color=101,0,0
 Color=255,84,84
 
 [Color2]
-Color=24,178,24
+Color=12,93,12
 
 [Color2Faint]
 Color=0,101,0
@@ -62,7 +62,7 @@ Color=95,5,95
 Color=255,84,255
 
 [Color6]
-Color=210,210,210
+Color=209,184,142
 
 [Color6Faint]
 Color=24,178,178
@@ -71,7 +71,7 @@ Color=24,178,178
 Color=211,231,29
 
 [Color7]
-Color=209,209,209
+Color=209,184,142
 
 [Color7Faint]
 Color=255,85,0
@@ -83,10 +83,10 @@ Color=212,190,152
 Color=212,187,145
 
 [ForegroundFaint]
-Color=255,255,255
+Color=212,187,145
 
 [ForegroundIntense]
-Color=255,255,255
+Color=212,187,145
 
 [General]
 Anchor=0.5,0.5
