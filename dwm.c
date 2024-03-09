@@ -3019,7 +3019,6 @@ void setfullscreen(Client *c) {
 
 // 假全屏切换
 void set_fake_fullscreen(Client *c) {
-  uint border_type;
   if (!c->isfullscreen) {
     // XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
     //                 PropModeReplace, (unsigned char
@@ -3039,8 +3038,6 @@ void set_fake_fullscreen(Client *c) {
                  c->mon->ww - (gappo * 2) - gappo,
                  c->mon->wh - (gappo * 2) - gappo);
     XRaiseWindow(dpy, c->win);        // 提升窗口到顶层
-    border_type = get_border_type(c); // 确认窗口边框的颜色
-    XSetWindowBorder(dpy, c->win, scheme[border_type][ColBorder].pixel);
 
   } else {
     XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
@@ -3050,11 +3047,13 @@ void set_fake_fullscreen(Client *c) {
     c->bw = borderpx;
     resizeclient(c, c->fullscreen_backup_x, c->fullscreen_backup_y,
                  c->fullscreen_backup_w, c->fullscreen_backup_h);
-    border_type = get_border_type(c); // 确认窗口边框的颜色
-    XSetWindowBorder(dpy, c->win, scheme[border_type][ColBorder].pixel);
+
     arrange(c->mon);
 
   }
+
+  uint border_type = get_border_type(c); // 确认窗口边框的颜色
+  XSetWindowBorder(dpy, c->win, scheme[border_type][ColBorder].pixel);
 }
 
 unsigned int want_auto_fullscren(Client *c) {
@@ -3086,6 +3085,10 @@ void fullscreen(const Arg *arg) {
     return;
   }
 
+	selmon->sel->is_scratchpad_show = 0;
+	selmon->sel->is_in_scratchpad = 0;
+	selmon->sel->scratchpad_priority = 0;
+
   if (selmon->isoverview && want_auto_fullscren(selmon->sel) && !auto_fullscreen) {
 			toggleoverview(&(Arg){0});
       setfullscreen(selmon->sel);
@@ -3094,16 +3097,15 @@ void fullscreen(const Arg *arg) {
   } else {
     setfullscreen(selmon->sel);
   }
-
-	selmon->sel->is_scratchpad_show = 0;
-	selmon->sel->is_in_scratchpad = 0;
-	selmon->sel->scratchpad_priority = 0;
 }
 
 void fake_fullscreen(const Arg *arg) {
   if (!selmon->sel) { // 显示器有窗口
     return;
   }
+	selmon->sel->is_scratchpad_show = 0;
+	selmon->sel->is_in_scratchpad = 0;
+	selmon->sel->scratchpad_priority = 0;
 
   if (selmon->isoverview && want_auto_fullscren(selmon->sel) && !auto_fullscreen) {
 			toggleoverview(&(Arg){0});
@@ -3113,10 +3115,6 @@ void fake_fullscreen(const Arg *arg) {
   } else {
     set_fake_fullscreen(selmon->sel);
   }
-
-	selmon->sel->is_scratchpad_show = 0;
-	selmon->sel->is_in_scratchpad = 0;
-	selmon->sel->scratchpad_priority = 0;
 }
 
 void selectlayout(const Arg *arg) {
