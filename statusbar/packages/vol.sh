@@ -64,8 +64,8 @@ blueman() {
 click() {
     case "$1" in
         L) blueman                                           ;; # 仅通知
-        M) pactl set-sink-mute @DEFAULT_SINK@ toggle        ;; # 切换静音
-        R) killall pavucontrol || pavucontrol & ;; # 打开pavucontrol
+        M) killall pavucontrol || pavucontrol & ;; # 打开pavucontrol
+        R) pactl set-sink-mute @DEFAULT_SINK@ toggle        ;; # 切换静音
         U) amixer set Master 1%+;  ;; # 音量加
         D) amixer set Master 1%-; ;; # 音量减
     esac
