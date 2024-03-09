@@ -8,7 +8,6 @@ function fish_greeting
 end
 set -U fish_color_autosuggestion purple
 set -U fish_color_command 'D48E01'
-set -g fish_color_selection red
 
 alias ys='yay -Sy'
 alias yr='yay -R'
