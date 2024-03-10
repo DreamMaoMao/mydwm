@@ -71,9 +71,6 @@ static const unsigned int alphas[][3] = {
 static const char *autostartscript = "$DWM/autostart.sh";
 static const char *statusbarscript = "$DWM/statusbar/statusbar.sh";
 
-/* 自定义 scratchpad instance */
-static const char scratchpadname[] = "scratchpad";
-
 /* 自定义tag名称 */
 /* 自定义特定实例的显示状态 */
 

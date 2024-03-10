@@ -175,7 +175,7 @@ struct Client {
   int taskw, no_limit_taskw;
   unsigned int tags;
   int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen,
-      isglobal, isnoborder, isscratchpad, overview_isfullscreenbak,
+      isglobal, isnoborder, overview_isfullscreenbak,
       overview_isfloatingbak;
   Client *next;
   Client *snext;
@@ -631,7 +631,6 @@ void applyrules(Client *c) { // 读取config.h的窗口配置规则处理
   c->isfullscreen = 0;
   c->overview_isfullscreenbak = 0;
   c->isnoborder = 0;
-  c->isscratchpad = 0;
   c->tags = 0;
   XGetClassHint(dpy, c->win, &ch);
   class = ch.res_class ? ch.res_class : broken;
@@ -708,12 +707,7 @@ void applyrules(Client *c) { // 读取config.h的窗口配置规则处理
       break; // 有且只会匹配一个第一个符合的rule
     }
   }
-  if (!strcmp(c->name, scratchpadname) || !strcmp(class, scratchpadname) ||
-      !strcmp(instance, scratchpadname)) {
-    c->isscratchpad = 1;
-    c->isfloating = 1;
-    c->isglobal = 1; // scratchpad is default global
-  }
+
   if (ch.res_class)
     XFree(ch.res_class);
   if (ch.res_name)
@@ -3581,6 +3575,10 @@ void hidewin(const Arg *arg) {
   Client *c = (Client *)selmon->sel;
 	c->is_in_scratchpad = 1;
 	c->is_scratchpad_show = 0;
+  if (c->isglobal) {
+    c->isglobal = 0;
+    selmon->sel->tags = selmon->tagset[selmon->seltags];
+  }
   hide(c);
 }
 
@@ -3630,8 +3628,11 @@ void toggleview(const Arg *arg) {
 void toggleglobal(const Arg *arg) {
   if (!selmon->sel)
     return;
-  if (selmon->sel->isscratchpad) // is scratchpad always global
-    return;
+  if (selmon->sel->is_in_scratchpad) {
+    selmon->sel->is_in_scratchpad = 0;
+    selmon->sel->is_scratchpad_show = 0;
+    selmon->sel->scratchpad_priority = 0;
+  } 
   selmon->sel->isglobal ^= 1;
   selmon->sel->tags =
       selmon->sel->isglobal ? TAGMASK : selmon->tagset[selmon->seltags];
