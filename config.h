@@ -118,7 +118,7 @@ static const Rule rules[] = {
     {"QQ",                  NULL,                  NULL,             1 << 2,       0,          0,          0,        -1,      0,            0,       0},       // qq         tag3 
     {"flameshot",            NULL,                 NULL,             0,            1,          0,          0,        -1,      0,            0,       0},       // 火焰截图            浮动
     {"Blueman-manager",      NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // blueman            浮动
-    {"com.xunlei.download",              NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // 迅雷            浮动
+    {"com.xunlei.download",              NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            600,       900},       // 迅雷            浮动
     {"Clash-verge",    NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1590,       892},       // clash            浮动
     {"Pavucontrol",                  NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // pavucontrol            浮动
     {"Dragon",    NULL,                 NULL,             0,            1,          0,          1,        -1,      5,            0,       0},       // dragon            noborder
