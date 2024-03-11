@@ -183,7 +183,6 @@ struct Client {
   Window win;
 	int is_in_scratchpad;
 	int is_scratchpad_show;
-	int scratchpad_priority;  
 };
 
 typedef struct {
@@ -3081,7 +3080,6 @@ void fullscreen(const Arg *arg) {
 
 	selmon->sel->is_scratchpad_show = 0;
 	selmon->sel->is_in_scratchpad = 0;
-	selmon->sel->scratchpad_priority = 0;
 
   if (selmon->isoverview && want_auto_fullscren(selmon->sel) && !auto_fullscreen) {
 			toggleoverview(&(Arg){0});
@@ -3099,7 +3097,6 @@ void fake_fullscreen(const Arg *arg) {
   }
 	selmon->sel->is_scratchpad_show = 0;
 	selmon->sel->is_in_scratchpad = 0;
-	selmon->sel->scratchpad_priority = 0;
 
   if (selmon->isoverview && want_auto_fullscren(selmon->sel) && !auto_fullscreen) {
 			toggleoverview(&(Arg){0});
@@ -3436,7 +3433,6 @@ void togglefloating(const Arg *arg) {
   } else {
 		selmon->sel->is_scratchpad_show = 0;
 		selmon->sel->is_in_scratchpad = 0;
-		selmon->sel->scratchpad_priority = 0;    
   }
 
   uint border_type = get_border_type(selmon->sel);
@@ -3503,7 +3499,6 @@ void toggle_scratchpad(const Arg *arg) {
 			return;
 		} else if (c->is_in_scratchpad && c->is_scratchpad_show && (selmon->tagset[selmon->seltags] & c->tags) != 0) {
 			c->is_scratchpad_show = 0;
-			c->scratchpad_priority = c->scratchpad_priority + 10;
 			hide(c);
       detach(c);
       attach(c,0);
@@ -3524,7 +3519,6 @@ void restorewin(const Arg *arg) {
       focus(hiddenWinStack[i]);
 			hiddenWinStack[i]->is_scratchpad_show = 0;
 			hiddenWinStack[i]->is_in_scratchpad = 0;
-			hiddenWinStack[i]->scratchpad_priority = 0;
       // 设置窗口的border
       uint border_type = get_border_type(hiddenWinStack[i]);
       XSetWindowBorder(dpy, hiddenWinStack[i]->win, scheme[border_type][ColBorder].pixel);
@@ -3575,7 +3569,6 @@ void togglewin(const Arg *arg) {
     if (HIDDEN(c)) {
       c->is_in_scratchpad = 0;
       c->is_scratchpad_show = 0;
-      c->scratchpad_priority = 0;
       show(c);
     }
     focus(c);
@@ -3603,7 +3596,6 @@ void toggleglobal(const Arg *arg) {
   if (selmon->sel->is_in_scratchpad) {
     selmon->sel->is_in_scratchpad = 0;
     selmon->sel->is_scratchpad_show = 0;
-    selmon->sel->scratchpad_priority = 0;
   } 
   selmon->sel->isglobal ^= 1;
   selmon->sel->tags =
