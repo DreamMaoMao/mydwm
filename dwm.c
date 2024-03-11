@@ -266,7 +266,7 @@ static int applysizehints(Client *c, int *x, int *y, int *w, int *h,
                           int interact);
 static void arrange(Monitor *m);
 static void arrangemon(Monitor *m);
-static void attach(Client *c);
+static void attach(Client *c, int inserhead);
 static void attachstack(Client *c);
 static void buttonpress(XEvent *e);
 static void checkotherwm(void);
@@ -806,7 +806,7 @@ void arrangemon(Monitor *m) { // 确认选用的布局
 }
 
 
-void attach(Client *c) { // 新打开的窗口放入窗口链表中
+void attach(Client *c,int inserthead) { // 新打开的窗口放入窗口链表中
 
   Client **tc;
   for (tc = &c->mon->clients; *tc; tc = &(*tc)->next){
@@ -816,7 +816,7 @@ void attach(Client *c) { // 新打开的窗口放入窗口链表中
     }
   }
 
-  if (!newclientathead) {
+  if (!inserthead) {
     *tc = c;
     c->next = NULL;
   } else {
@@ -2228,7 +2228,7 @@ void manage(Window w, XWindowAttributes *wa) {
     c->isfloating = c->oldstate = trans != None || c->isfixed;
   if (c->isfloating)
     XRaiseWindow(dpy, c->win);
-  attach(c);
+  attach(c,newclientathead);
   attachstack(c);
   XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32,
                   PropModeAppend, (unsigned char *)&(c->win), 1);
@@ -2902,7 +2902,7 @@ void sendmon(Client *c, Monitor *m) {
   detachstack(c);
   c->mon = m;
   c->tags = m->tagset[m->seltags]; /* assign tags of target monitor */
-  attach(c);
+  attach(c,newclientathead);
   attachstack(c);
   focus(NULL);
   arrange(NULL);
@@ -3495,10 +3495,7 @@ void show_scratchpad(Client *c) {
 }
 
 void toggle_scratchpad(const Arg *arg) {
-	Client *c,*target_show_client=NULL;
-	Client *tempClients[100],*tempbackup; //只支持100个在便利签中的客户端
-	int  z,j,k,i = 0;
-	int is_hide_anction = 0;
+	Client *c;
 	for (c = selmon->clients; c; c = c->next) {
 		if(c->is_in_scratchpad && c->is_scratchpad_show && (selmon->tagset[selmon->seltags] & c->tags) == 0 ) {
 			unsigned int target = get_tags_first_tag(selmon->tagset[selmon->seltags]); 
@@ -3508,41 +3505,16 @@ void toggle_scratchpad(const Arg *arg) {
 			c->is_scratchpad_show = 0;
 			c->scratchpad_priority = c->scratchpad_priority + 10;
 			hide(c);
-			is_hide_anction = 1;
-		} else if (c->is_in_scratchpad && !c->is_scratchpad_show) {
-			if (target_show_client != NULL) {
-				if (c->scratchpad_priority < target_show_client->scratchpad_priority)
-					target_show_client = c;
-			} else {
-				target_show_client = c;
-			}
-		} 
-
-		if(c->is_in_scratchpad) {
-			tempClients[i] = c;
-			i++;
-		}
-	}
-
-	if(is_hide_anction) {
-		for(j=0;j<i-1;j++) //把优先级从左到右排序
-			for(k=j+1;k<i;k++) {
-				if(tempClients[j]->scratchpad_priority > tempClients[k]->scratchpad_priority) {
-					tempbackup = tempClients[j];
-					tempClients[j] = tempClients[k];
-					tempClients[k] = tempbackup;
-				}
-			}
-		for(z=0;z<i;z++) { //重新根据排序设置优先级的值,以免上面优先级做加法过多溢出
-			tempClients[z]->scratchpad_priority = z;
-		}
-	} else {
-		if(!target_show_client)
+      detach(c);
+      attach(c,0);
 			return;
-		show_scratchpad(target_show_client);
+		} else if ( c && c->is_in_scratchpad && !c->is_scratchpad_show) {
+			show_scratchpad(c);
+			return;
+		} 
 	}
-
 }
+
 
 void restorewin(const Arg *arg) {
   int i = hiddenWinStackTop;
@@ -3820,7 +3792,7 @@ int updategeom(void) {
           m->clients = c->next;
           detachstack(c);
           c->mon = mons;
-          attach(c);
+          attach(c,newclientathead);
           attachstack(c);
         }
         if (m == selmon)
