@@ -3480,7 +3480,7 @@ void show_scratchpad(Client *c) {
   clear_fullscreen_flag(c);
   if(!c->isfloating) {
     c->isfloating = 1;
-    c->w = selmon->ww * 0.5;
+    c->w = selmon->ww * 0.7;
     c->h = selmon->wh * 0.8;
     c->x = selmon->wx + (selmon->ww - c->w) / 2;
     c->y = selmon->wy + (selmon->wh - c->h) / 2;
