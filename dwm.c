@@ -3278,6 +3278,8 @@ void show(Client *c) {
 窗口所属的tag在当前监视器tag的右边就扔到右边隐藏,窗口所属的tag在当前监视器tag的左边就扔到左边隐藏
 */
 void showtag(Client *c) {
+  unsigned int all_monitor_width = 0;
+  Monitor *m;
   if (!c)
     return;
   if (ISVISIBLE(c)) {
@@ -3289,6 +3291,9 @@ void showtag(Client *c) {
     showtag(c->snext);
   } else {
     /* 将不可见的client移动到屏幕之外 */
+    for (m = mons; m; m = m->next) {
+      all_monitor_width = all_monitor_width + m->mw;
+    }
 
     showtag(c->snext);
 
@@ -3301,9 +3306,9 @@ void showtag(Client *c) {
     // 如果要移动的窗口只属于一个tag而且他在当前监视器所在tag的右边,就往右边隐藏
     if (c_is_one_tag == 1 &&
         get_tag_bit_position(c->tags) > c->mon->pertag->curtag) {
-      XMoveWindow(dpy, c->win, WIDTH(c) * 10, c->y);
+      XMoveWindow(dpy, c->win, all_monitor_width, c->y);
     } else {
-      XMoveWindow(dpy, c->win, WIDTH(c) * -10, c->y);
+      XMoveWindow(dpy, c->win, all_monitor_width * -1, c->y);
     }
   }
 }
