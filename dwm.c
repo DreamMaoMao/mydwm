@@ -4294,10 +4294,7 @@ void overview_restore(Client *c, const Arg *arg) {
   c->bw = c->overview_backup_bw;
   if (c->isfloating) {
     XRaiseWindow(dpy, c->win); // 提升悬浮窗口到顶层
-    resize(c, c->overview_backup_x, c->overview_backup_y, c->overview_backup_w,
-           c->overview_backup_h, 0);
-  }
-  if (c->isfullscreen) {
+  } else if (c->isfullscreen) {
     
     if(!want_restore_fullscreen(c)) {
        c->isfullscreen = c->overview_isfullscreenbak = 0;
@@ -4310,9 +4307,12 @@ void overview_restore(Client *c, const Arg *arg) {
                       (unsigned char *)&netatom[NetWMFullscreen],
                       1); // 设置窗口在x11状态
     }
-    resizeclient(c, c->overview_backup_x, c->overview_backup_y,
-                 c->overview_backup_w, c->overview_backup_h);
-  }
+  } 
+
+  //恢复进入overview前的大小和位置
+  resizeclient(c, c->overview_backup_x, c->overview_backup_y,
+               c->overview_backup_w, c->overview_backup_h);    
+  
 }
 
 // 栈底部入栈布局位置大小计算
