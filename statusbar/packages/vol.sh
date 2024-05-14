@@ -45,7 +45,7 @@ update() {
     	vol_icon=""
     else vol_icon="󱄡"; fi
 
-    icon=" $vol_icon"
+    icon="$vol_icon"
     text="$vol_text% "
 
     sed -i '/^export '$this'=.*$/d' $tempfile

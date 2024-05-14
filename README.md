@@ -1,8 +1,9 @@
-![2024-01-19_16-56](https://github.com/DreamMaoMao/mydwm/assets/30348075/e2f543b9-78ca-46ff-8ac9-4c5a34d4547d)
+
+![image](https://github.com/DreamMaoMao/mydwm/assets/30348075/7500aadc-9e58-4db2-8dbb-dfca5cf54356)
 
 
+https://github.com/DreamMaoMao/mydwm/assets/30348075/6d7d3499-7ebf-43fd-bb64-3fa2ca0e8b8c
 
-https://github.com/DreamMaoMao/mydwm/assets/30348075/d5a898ad-a50b-4206-b161-08c1b5892c06
 
 
 
@@ -14,7 +15,7 @@ https://github.com/DreamMaoMao/mydwm/assets/30348075/d5a898ad-a50b-4206-b161-08c
 
 - 3.动画优化，左tag的窗口会从左滑回来，右tag的窗口会从右边滑回来，原版都只能从左边滑回来
 
-- 4.bar栏优化，这个改动太多，不好说，直观就是外观颜色的变化和多了网速查看和亮度控制功能
+- 4.bar栏优化，外观颜色的变化和多了网速查看和亮度控制功能
 
 - 5.增加热区功能，鼠标移动到左下角可以全局触发预览视图，并且可以用鼠标左键点击窗口跳转到窗口所在tag，右键在overview下关闭窗口
 

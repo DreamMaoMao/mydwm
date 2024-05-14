@@ -17,11 +17,11 @@ with_temp() {
 	[ ! "$(command -v sensors)" ] && echo command not found: sensors && return
 
 	temp_text=$(sensors | grep Tctl | awk '{printf "%d°C", $2}')
-	text=" $cpu_text% $temp_text "
+	text=" $cpu_text%  $temp_text "
 }
 
 update() {
-	cpu_icon="󰻠"
+	cpu_icon=""
 	cpu_text=$(top -n 1 -b | sed -n '1p' | awk '{print $10}')
 	if [[ "$cpu_text" == "average:" ]];then
 		cpu_text=$(top -n 1 -b | sed -n '1p' | awk '{print $11}')
@@ -29,7 +29,7 @@ update() {
 		cpu_text=$(top -n 1 -b | sed -n '1p' | awk '{print $13}')
 	fi
 	cpu_text=${cpu_text::-1}
-	icon=" $cpu_icon"
+	icon="$cpu_icon"
 	text="$cpu_text "
 
 	with_temp
@@ -52,7 +52,7 @@ call_btop() {
 
 click() {
 	case "$1" in
-	L) /usr/bin/rofi -config ~/.config/rofi/themes/fullscreen-preview.rasi -show drun;;
+	L) ;;
 	M) ;;
 	R) gnome-system-monitor;;
 	U) ;;

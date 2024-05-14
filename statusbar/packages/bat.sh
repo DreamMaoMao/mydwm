@@ -5,8 +5,8 @@
 tempfile=$(cd $(dirname $0);cd ..;pwd)/temp
 
 this=_bat
-icon_color="^c#96d5dd^^b#4444440xff^"
-text_color="^c#96d5dd^^b#4444440xff^"
+icon_color="^c#dabc87^^b#4444440xff^"
+text_color="^c#dabc87^^b#4444440xff^"
 signal=$(echo "^s$this^" | sed 's/_//')
 
 get_by_acpi() {
@@ -43,7 +43,7 @@ update() {
     elif [ "$bat_text" -ge 10 ]; then bat_icon="";
     else bat_icon=""; fi
 
-    icon=" $charge_icon$bat_icon"
+    icon="$charge_icon$bat_icon"
     text="$bat_text% "
 
     sed -i '/^export '$this'=.*$/d' $tempfile

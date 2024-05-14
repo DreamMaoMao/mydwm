@@ -4,8 +4,8 @@
 tempfile=$(cd $(dirname $0);cd ..;pwd)/temp
 
 this=_mem
-icon_color="^c#e1b3d7^^b#4444440xff^"
-text_color="^c#e1b3d7^^b#4444440xff^"
+icon_color="^c#ce95f0^^b#4444440xff^"
+text_color="^c#ce95f0^^b#4444440xff^"
 signal=$(echo "^s$this^" | sed 's/_//')
 
 update() {
@@ -17,8 +17,8 @@ update() {
     men_usage_rate=$(((mem_total - mem_free - mem_buffers - mem_cached) * 100 / mem_total))
     mem_text=$(echo $men_usage_rate | awk '{printf "%02d%", $1}')
 
-    icon=" $mem_icon"
-    text="$mem_text% "
+    icon="$mem_icon"
+    text="$mem_text "
 
     sed -i '/^export '$this'=.*$/d' $tempfile
     printf "export %s='%s%s%s%s%s'\n" $this "$signal" "" "" "$text_color" "$icon$text" >> $tempfile

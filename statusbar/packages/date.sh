@@ -13,7 +13,7 @@ text_color="^c#d7c49f^^b#4444440xff^"
 signal=$(echo "^s$this^" | sed 's/_//')
 
 update() {
-	time_text="$(date '+%m/%d %H:%M')"
+	time_text="$(date '+%H:%M  %m/%d')"
 	case "$(date '+%I')" in
 	"01") time_icon="" ;;
 	"02") time_icon="" ;;
@@ -29,7 +29,7 @@ update() {
 	"12") time_icon="" ;;
 	esac
 
-	icon=" $time_icon"
+	icon="$time_icon"
 	text="$time_text "
 
 	sed -i '/^export '$this'=.*$/d' $tempfile

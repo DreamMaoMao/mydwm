@@ -4,8 +4,8 @@
 tempfile=$(cd $(dirname $0);cd ..;pwd)/temp
 
 this=_light
-icon_color="^c#c6a6ed^^b#4444440xff^"
-text_color="^c#c6a6ed^^b#4444440xff^"
+icon_color="^c#ce95f0^^b#4444440xff^"
+text_color="^c#ce95f0^^b#4444440xff^"
 signal=$(echo "^s$this^" | sed 's/_//')
 
 # check
@@ -20,7 +20,7 @@ update() {
         light_icon="󱩎"; 
     fi
 
-    icon=" $light_icon"
+    icon="$light_icon"
     text="$light_text% "
 
     sed -i '/^export '$this'=.*$/d' $tempfile
