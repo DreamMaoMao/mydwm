@@ -3,8 +3,8 @@
 tempfile=$(cd $(dirname $0);cd ..;pwd)/temp
 
 this=_wifi
-icon_color="^c#000080^^b#a6e3a10xff^"
-text_color="^c#000080^^b#a6e3a10xff^"
+icon_color="^c#dabc87^^b#4444440xff^"
+text_color="^c#dabc87^^b#4444440xff^"
 signal=$(echo "^s$this^" | sed 's/_//')
 
 # check
@@ -34,7 +34,7 @@ update() {
         if [[ ! -n $DEVICE ]]; then
             DEVICE=$(ls /sys/class/net | grep -v lo | head -1)
         fi
-        wifi_text=$( sar -n DEV 1 1 | grep $DEVICE |grep -E "Average|平均时间" | awk 'BEGIN{a="";b="";c=" ";d="KB/s"}{print  a""c""$5""d""c""b""c""$6""d }' )
+        wifi_text=$( sar -n DEV 1 1 | grep $DEVICE |grep -E "Average|平均时间" | awk 'BEGIN{a=" ";b="";c=" ";d="KB/s"}{print  a""c""$5""d""c""b""c""$6""d }' )
     else
         wifi_text=$(nmcli | grep "$wifi_grep_keyword" | awk -F "$wifi_grep_keyword" '{print $2}')
         [ "$wifi_text" = "" ] && wifi_text=$wifi_disconnected
@@ -49,7 +49,7 @@ update() {
         icon=" $wifi_icon"
         text="$wifi_text "
         sed -i '/^export '$this'=.*$/d' $tempfile
-        printf "export %s='%s%s%s%s%s'\n" $this "$signal" "" "" "$text_color" "$icon $text" >> $tempfile
+        printf "export %s='%s%s%s%s%s'\n" $this "$signal" "" "" "$text_color" "$icon$text" >> $tempfile
     fi
 }
 

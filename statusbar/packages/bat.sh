@@ -5,8 +5,8 @@
 tempfile=$(cd $(dirname $0);cd ..;pwd)/temp
 
 this=_bat
-icon_color="^c#0a4b55^^b#96d5dd0xff^"
-text_color="^c#0a4b55^^b#96d5dd0xff^"
+icon_color="^c#96d5dd^^b#4444440xff^"
+text_color="^c#96d5dd^^b#4444440xff^"
 signal=$(echo "^s$this^" | sed 's/_//')
 
 get_by_acpi() {

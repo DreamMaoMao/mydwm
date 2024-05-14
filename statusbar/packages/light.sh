@@ -4,8 +4,8 @@
 tempfile=$(cd $(dirname $0);cd ..;pwd)/temp
 
 this=_light
-icon_color="^c#442266^^b#dedbd40xff^"
-text_color="^c#442266^^b#dedbd40xff^"
+icon_color="^c#c6a6ed^^b#4444440xff^"
+text_color="^c#c6a6ed^^b#4444440xff^"
 signal=$(echo "^s$this^" | sed 's/_//')
 
 # check

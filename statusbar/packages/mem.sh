@@ -4,12 +4,12 @@
 tempfile=$(cd $(dirname $0);cd ..;pwd)/temp
 
 this=_mem
-icon_color="^c#3B001B^^b#cba6f70xff^"
-text_color="^c#3B001B^^b#cba6f70xff^"
+icon_color="^c#e1b3d7^^b#4444440xff^"
+text_color="^c#e1b3d7^^b#4444440xff^"
 signal=$(echo "^s$this^" | sed 's/_//')
 
 update() {
-	mem_icon="󰍛"
+	mem_icon="󰍛 "
     mem_total=$(cat /proc/meminfo | grep "MemTotal:"| awk '{print $2}')
     mem_free=$(cat /proc/meminfo | grep "MemFree:"| awk '{print $2}')
     mem_buffers=$(cat /proc/meminfo | grep "Buffers:"| awk '{print $2}')
@@ -21,7 +21,7 @@ update() {
     text="$mem_text% "
 
     sed -i '/^export '$this'=.*$/d' $tempfile
-    printf "export %s='%s%s%s%s%s'\n" $this "$signal" "" "" "$text_color" "$icon $text" >> $tempfile
+    printf "export %s='%s%s%s%s%s'\n" $this "$signal" "" "" "$text_color" "$icon$text" >> $tempfile
 }
 
 notify() {

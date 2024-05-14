@@ -8,8 +8,8 @@ tempfile=$(
 )/temp
 
 this=_date
-icon_color="^c#e4e1db^^b#a21d570xff^"
-text_color="^c#e4e1db^^b#a21d570xff^"
+icon_color="^c#d7c49f^^b#4444440xff^"
+text_color="^c#d7c49f^^b#4444440xff^"
 signal=$(echo "^s$this^" | sed 's/_//')
 
 update() {
