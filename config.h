@@ -293,6 +293,8 @@ static Button buttons[] = {
     { ClkClientWin,        SuperMask,       Button5,          viewtoright,{0} },                                      // super+鼠标滚轮下  |  鼠标滚轮 下  | 切换到下一个tag
     { ClkClientWin,        0,               Button1,          inner_overvew_toggleoverview,     {0} },                    //左键  |  overview视图点击窗口 |退出overview跳转到窗口所在tag 
     { ClkClientWin,        0,               Button3,          inner_overvew_killclient,       {0} },                    //右键  |  overview视图点击窗口 |关闭该窗口
+    { ClkClientWin,        AltMask,         Button1,          spawn, SHCMD("bash ~/tool/shotTranslate.sh shot") },      //alt + 左键  |  触发截图翻译 
+
 
     { ClkRootWin,          SuperMask,       Button4,          viewtoleft,{0} },                                       // super+鼠标滚轮上  |  鼠标滚轮上     | 切换到上一个tag    
     { ClkRootWin,          SuperMask,       Button5,          viewtoright,{0} },                                        // super+鼠标滚轮下  |  鼠标滚轮 下  | 切换到下一个tag

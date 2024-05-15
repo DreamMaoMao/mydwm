@@ -1373,7 +1373,7 @@ void drawbar(Monitor *m) { // 绘制bar
 
     if (w > empty_w) { // 如果当前TASK绘制后长度超过最大宽度
       w = empty_w;
-      x = drw_text(drw, x, 0, w, bh, lrpad / 2, "...", 0);
+      x = drw_text(drw, x, 0, w, bh, lrpad / 2, task_content, 0);
       c->taskw = w;
       tasks_w += w;
       break;
