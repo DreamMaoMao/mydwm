@@ -1086,7 +1086,13 @@ void clientmessage(XEvent *e) {
     if (!ISVISIBLE(c)) {
       view(&(Arg){.ui = c->tags});
     }
-  } else if(cme->message_type == atom_change_state) {
+  } else if(cme->message_type == atom_change_state) { //最小化
+	  c->is_in_scratchpad = 1;
+	  c->is_scratchpad_show = 0;
+    if (c->isglobal) {
+      c->isglobal = 0;
+      selmon->sel->tags = selmon->tagset[selmon->seltags];
+    }
     hide(c);
   } 
   // else{
