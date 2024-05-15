@@ -248,6 +248,7 @@ static Key keys[] = {
     { AltMask|ControlMask,      XK_Return, spawn, SHCMD("konsole -e \"~/tool/ter-multiplexer.sh\"") },  /* super alt return | zellij 临时会话 */
     { SuperMask,                XK_b,      spawn, SHCMD("systemctl suspend") },      /* super b     | 系统挂起 */ 
     { AltMask|ControlMask,      XK_t,      spawn, SHCMD("bash ~/tool/shotTranslate.sh shot") },      /* ctrl alt t    | 截屏翻译 */ 
+    { SuperMask,                XK_c,      spawn, SHCMD("rofi -theme  ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/history.py") },      /* super c    | 浏览器历史 */ 
 
 
     /* alt key : 跳转到对应tag (可附加一条命令 若目标目录无窗口，则执行该命令) */
