@@ -20,7 +20,7 @@ settings() {
 	cp ~/.config/zellij/configx11.kdl ~/.config/zellij/config.kdl
 	cp ~/.config/fcitx/dwm_profile ~/.config/fcitx/profile -f
 	# 开启输入法
-	fcitx &
+	fcitx5 &
 	# bash /opt/apps/com.baidu.fcitx-baidupinyin/files/bin/bd-qimpanel.watchdog.sh &	#百度拼音输入法
 	dunst -config ~/.config/dunst/dwm_dunstrc & # 开启通知server
 	systemctl --user unmask xdg-desktop-portal-gnome
