@@ -65,7 +65,7 @@ https://github.com/DreamMaoMao/mydwm/assets/30348075/d5a898ad-a50b-4206-b161-08c
 ```
 sudo pacman -S network-manager-applet
 sudo pacman -S rofi
-sudo pacman -S konsole
+sudo pacman -S kitty
 sudo pacman -S gnome-system-monitor 
 sudo pacman -S fcitx-qt5 fcitx fcitx-configtool
 sudo pacman -S xorg-xrdb
@@ -106,7 +106,6 @@ mv mydwm dwm && cd dwm
 cp rofi -r ~/.config/
 cp dunst -r ~/.config/
 cp fish -r ~/.config/
-cp konsole -r ~/.local/share/
 cp eww -r ~/.config/
 cp parcellite -r ~/.config/
 cp redshift.conf -r ~/.config/
@@ -116,7 +115,7 @@ sudo cp dwm.desktop /usr/share/xsessions/
 sudo make clean install
 ```
 
-# 终端设置(默认用的konsole)
+# 终端设置(默认用的kitty)
 ```
 chsh -s /usr/bin/fish
 

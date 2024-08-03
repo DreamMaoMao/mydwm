@@ -16,7 +16,6 @@ settings() {
 	# picom --config $DWM/scripts/config/picom.conf &
 	feh --randomize --bg-fill $DWM/wallpaper/caoyuan.jpg & # 壁纸
 	echo "Xft.dpi: 140" | xrdb -merge                      #dpi缩放
-	cp ~/.local/share/x11/konsole -r ~/.local/share/
 	cp ~/.config/zellij/configx11.kdl ~/.config/zellij/config.kdl
 	cp ~/.config/fcitx/dwm_profile ~/.config/fcitx/profile -f
 	# 开启输入法
