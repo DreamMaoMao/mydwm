@@ -66,7 +66,7 @@ https://github.com/DreamMaoMao/mydwm/assets/30348075/d5a898ad-a50b-4206-b161-08c
 sudo pacman -S network-manager-applet
 sudo pacman -S rofi
 sudo pacman -S kitty
-sudo pacman -S gnome-system-monitor 
+sudo pacman -S system-monitoring-center 
 sudo pacman -S fcitx-qt5 fcitx fcitx-configtool
 sudo pacman -S xorg-xrdb
 sudo pacman -S brightnessctl 
