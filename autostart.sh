@@ -32,7 +32,7 @@ settings() {
 	/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 	numlockx on
 	$_thisdir/statusbar/statusbar.sh cron & # 开启状态栏定时更新
-	[ -e /dev/sda1 ] && udisksctl mount -t ntfs -b /dev/sda4
+	[ -e /dev/sda4 ] && udisksctl mount -t ext4 -b /dev/sda4
 	python3 ~/tool/sign.py &
 	cp ~/.config/eww/System-Menu/eww.yuck.x11  ~/.config/eww/System-Menu/eww.yuck
 	eww daemon &
