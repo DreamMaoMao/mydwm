@@ -54,7 +54,7 @@ click() {
 	case "$1" in
 	L) /usr/bin/rofi -config ~/.config/rofi/themes/fullscreen-preview.rasi -show drun;;
 	M) ;;
-	R) system-monitoring-center;;
+	R) gnome-system-monitor;;
 	U) ;;
 	D) ;;
 	esac

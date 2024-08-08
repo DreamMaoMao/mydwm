@@ -17,7 +17,7 @@ static const Icon icons[] = {
     {"electron-netease-cloud-music"," 󰝚 "},
     {"yesplaymusic"," 󰝚 "},
     {"QQ","  "},
-    {"system-monitoring-center"," 󰻠 "},
+    {"gnome-system-monitor"," 󰻠 "},
     {"com.xunlei.download"," 󱗆 "},
     {"Microsoft-edge-dev","  "},
     {"alixby3","  "},
