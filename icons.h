@@ -2,7 +2,7 @@ static const char *default_icon = "";
 
 static const Icon icons[] = {
     {"Xfce4-terminal","  "},
-    {"kitty","  "},
+    {"terminal","  "},
     {"Google-chrome","  "},
     {"Microsoft-edge","  "},
     {"firefox","  "},

@@ -226,12 +226,12 @@ static Key keys[] = {
     { SuperMask|ShiftMask,        XK_Right,        exchange_client,  {.i = RIGHT } },           /* super shift right    | 二维交换窗口 (仅平铺) */
 
     /* spawn + SHCMD 执行对应命令(已下部分建议完全自己重新定义) */
-    { AltMask,                  XK_Return, spawn, SHCMD("kitty") },  
+    { AltMask,                  XK_Return, spawn, SHCMD("st") },  
     { SuperMask,                XK_Return, spawn, SHCMD("google-chrome") },
     { ControlMask,              XK_Return, spawn, SHCMD("bash ~/tool/clash.sh") },                                                                                              /* alt enter      | 打开终端             */
     { SuperMask,                XK_d,      spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show run") },                                                       /* super d          | rofi: 执行run          */
     { AltMask,                  XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show drun") },                                                      /* alt space        | rofi: 执行drun          */
-    { SuperMask|ControlMask,    XK_Return, spawn, SHCMD("kitty -e  yazi") },                                                                                                          /* ctrl win enter   | rofi: nautilus 文件浏览器          */
+    { SuperMask|ControlMask,    XK_Return, spawn, SHCMD("st -e  yazi") },                                                                                                          /* ctrl win enter   | rofi: nautilus 文件浏览器          */
     { ControlMask,              XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },              /* ctrl space       | rofi: 执行自定义脚本   */
     { SuperMask,                XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },     /* super space      | rofi: 执行自定义脚本   */
     { SuperMask|AltMask,        XK_Return, spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },     /* super space      | rofi: 执行自定义脚本   */
@@ -244,8 +244,8 @@ static Key keys[] = {
     { AltMask|SuperMask,        XK_q,      spawn, SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") }, /* super alt q | 选中某个窗口并强制kill */
     { SuperMask,                XK_p,      spawn, SHCMD("bash $DWM/scripts/monitor.sh") },                              /* super p     | 关闭内部显示器 */
     { SuperMask|ControlMask,    XK_m,      spawn, SHCMD("$DWM/scripts/rofidwm.sh outopts") },
-    // { AltMask|ControlMask,      XK_Return, spawn, SHCMD("kitty -e \"zellij -s temp --config /home/wrq/.config/zellij/tempconfigx11.kdl\"") },  /* super alt return | zellij 临时会话 */
-    { AltMask|ControlMask,      XK_Return, spawn, SHCMD("kitty -e ~/tool/ter-multiplexer.sh") },  /* super alt return | zellij 临时会话 */
+    // { AltMask|ControlMask,      XK_Return, spawn, SHCMD("st -e \"zellij -s temp --config /home/wrq/.config/zellij/tempconfigx11.kdl\"") },  /* super alt return | zellij 临时会话 */
+    { AltMask|ControlMask,      XK_Return, spawn, SHCMD("st -e ~/tool/ter-multiplexer.sh") },  /* super alt return | zellij 临时会话 */
     { SuperMask,                XK_b,      spawn, SHCMD("systemctl suspend") },      /* super b     | 系统挂起 */ 
     { AltMask|ControlMask,      XK_t,      spawn, SHCMD("bash ~/tool/shotTranslate.sh shot") },      /* ctrl alt t    | 截屏翻译 */ 
     { SuperMask,                XK_c,      spawn, SHCMD("rofi -theme  ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/history.py") },      /* super c    | 浏览器历史 */ 
