@@ -48,18 +48,12 @@
         (button :class "main-wifi-button ${network-class == "󰤨" ? "main-wifi-button-on" : "main-wifi-button-off"}" :onclick "System-Menu/scripts/network --toggle" "${network-icon}")
         (box :class "wifi-labels-box" :orientation "v" :space-evenly "false" :spacing 5
           (button :halign "start" :class "wifi-label-button ${network-class == "󰤨" ? "wifi-label-button-on" : "wifi-label-button-off"}" :onclick "System-Menu/scripts/network --toggle" "Wi-Fi")
-          (label :class "wifi-status-button ${network-class == "󰤨" ? "wifi-status-button-on" : "wifi-status-button-off"}" :limit-width "10" :text "${network-status}"))
-        (box :class "wifi-buttons-box" :orientation "h" :space-evenly "false"
-          (label :class "seperator" :text "")
-          (button :class "arrow" :onclick "System-Menu/scripts/launch wifi" "󰤨")))
+          (label :class "wifi-status-button ${network-class == "󰤨" ? "wifi-status-button-on" : "wifi-status-button-off"}" :limit-width "10" :text "${network-status}")))
       (box :orientation "h" :class "main-bluetooth-box ${bluetooth-class == "󰂯" ? "main-bluetooth-box-on" : "main-bluetooth-box-off"}" :space-evenly "false"
         (button :tooltip bluetooth-battery :class "main-bluetooth-button ${bluetooth-class == "󰂯" ? "main-bluetooth-button-on" : "main-bluetooth-button-off"}" :onclick "System-Menu/scripts/bluetooth --toggle" "${bluetooth-icon}")
         (box :class "bluetooth-labels-box" :orientation "v" :space-evenly "false" :spacing 5
           (button :halign "start" :tooltip bluetooth-battery :class "bluetooth-label-button ${bluetooth-class == "󰂯" ? "bluetooth-label-button-on" : "bluetooth-label-button-off"}" :onclick "System-Menu/scripts/bluetooth --toggle" "Bluetooth")
-          (label :halign "start" :tooltip bluetooth-battery :class "bluetooth-status-button ${bluetooth-class == "󰂯" ? "bluetooth-state-button-on" : "bluetooth-state-button-off"}" :limit-width "8" :text "${bluetooth-status}"))
-        (box :class "bluetooth-buttons-box" :orientation "h" :space-evenly "false"
-          (label :class "seperator" :text "")
-          (button :class "arrow" :onclick "blueman-manager" "󰂯")))
+          (label :halign "start" :tooltip bluetooth-battery :class "bluetooth-status-button ${bluetooth-class == "󰂯" ? "bluetooth-state-button-on" : "bluetooth-state-button-off"}" :limit-width "8" :text "${bluetooth-status}")))
       (box :orientation "h" :class "main-IdleInhibitPlus-box ${IdleInhibitPlus-icon == "󰀝" ? "main-IdleInhibitPlus-box-on" : "main-IdleInhibitPlus-box-off"}" :space-evenly "false"
         (button :class "main-IdleInhibitPlus-button ${IdleInhibitPlus-icon == "󰀝" ? "main-IdleInhibitPlus-button-on" : "main-IdleInhibitPlus-button-off"}" :onclick "System-Menu/scripts/inhibit --toggle" "${IdleInhibitPlus-icon}")
         (box :class "IdleInhibitPlus-labels-box" :orientation "v" :space-evenly "false" :spacing 5
@@ -122,6 +116,6 @@
   :windowtype "normal"
   :wm-ignore true
   :monitor 0
-  :geometry (geometry  :width 500 :height 300 :y 40 :x 1165)
+  :geometry (geometry  :width 500 :height 300 :y 10 :x 10 :anchor "top right")
   (system))
 
