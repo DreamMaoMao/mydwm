@@ -30,7 +30,7 @@ update() {
         wifi_text=" 0.00KB/s  0.00KB/s"
     elif [[ "$is_net" != "" ]];then
         # 获取网卡名
-        DEVICE=$(ls /sys/class/net | grep ^w)
+        DEVICE=$(ip route | grep default | awk '{print $5}')
         if [[ ! -n $DEVICE ]]; then
             DEVICE=$(ls /sys/class/net | grep -v lo | head -1)
         fi
