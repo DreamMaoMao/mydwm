@@ -4429,9 +4429,9 @@ void grid(Monitor *m, uint gappo, uint gappi) {
     c = nexttiled(m->clients);
     cw = (m->ww - 2 * gappo - gappi) / 2;
     ch = (m->wh - 2 * gappo) * 0.65;
-    resize(c, m->mx + cw + gappo + gappi, m->my + (m->mh - ch) / 2 + gappo,
-           cw - 2 * c->bw, ch - 2 * c->bw, 0);
-    resize(nexttiled(c->next), m->mx + gappo, m->my + (m->mh - ch) / 2 + gappo,
+    resize(nexttiled(c->next), m->mx + cw + gappo + gappi, m->my + (m->mh - ch) / 2 + gappo,
+           cw - 2 * nexttiled(c->next)->bw, ch - 2 * nexttiled(c->next)->bw, 0);
+    resize(c, m->mx + gappo, m->my + (m->mh - ch) / 2 + gappo,
            cw - 2 * c->bw, ch - 2 * c->bw, 0);
 
     return;
