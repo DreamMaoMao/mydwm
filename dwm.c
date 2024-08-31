@@ -4135,6 +4135,10 @@ void inner_overvew_killclient(const Arg *arg) {
 // 显示所有tag 或 跳转到聚焦窗口的tag
 void toggleoverview(const Arg *arg) {
 
+  if(selmon->clients == NULL && !selmon->isoverview){
+    return;
+  }
+
   uint target = selmon->sel && selmon->sel->tags != TAGMASK ? selmon->sel->tags
                                                             : selmon->seltags;
   selmon->isoverview ^= 1;
