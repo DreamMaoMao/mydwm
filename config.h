@@ -124,6 +124,7 @@ static const Rule rules[] = {
     {"Dragon",    NULL,                 NULL,             0,            1,          0,          1,        -1,      5,            0,       0},       // dragon            noborder
     {"qxdrag.py",    NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            400,       300},       // dragon            noborder
     {NULL,    NULL,                 "rofi - Networks",             0,            1,          0,          1,        -1,      5,            400,       300},       // dragon            noborder
+    {"Wofi",    NULL,                 NULL,             0,            1,          0,          1,        -1,      5,            0,       0},       // wofi            noborder
 
 
     /** 优先度低 越在上面优先度越低 */
@@ -230,7 +231,8 @@ static Key keys[] = {
     { SuperMask,                XK_Return, spawn, SHCMD("google-chrome") },
     { ControlMask,              XK_Return, spawn, SHCMD("bash ~/tool/clash.sh") },                                                                                              /* alt enter      | 打开终端             */
     { SuperMask,                XK_d,      spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show run") },                                                       /* super d          | rofi: 执行run          */
-    { AltMask,                  XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show drun") },                                                      /* alt space        | rofi: 执行drun          */
+    // { AltMask,                  XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show drun") },  
+    { AltMask,                  XK_space,  spawn, SHCMD("wofi --normal-window") },                                                      /* alt space        | rofi: 执行drun          */                                                    /* alt space        | rofi: 执行drun          */
     { SuperMask|ControlMask,    XK_Return, spawn, SHCMD("st -e  yazi") },                                                                                                          /* ctrl win enter   | rofi: nautilus 文件浏览器          */
     { ControlMask,              XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },              /* ctrl space       | rofi: 执行自定义脚本   */
     { SuperMask,                XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },     /* super space      | rofi: 执行自定义脚本   */
