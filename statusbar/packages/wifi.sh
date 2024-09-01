@@ -11,7 +11,7 @@ signal=$(echo "^s$this^" | sed 's/_//')
 [ ! "$(command -v nmcli)" ] && echo command not found: nmcli && exit
 
 #是否第一次执行网速
-is_first = false
+is_first=false
 
 # 中英文适配
 wifi_grep_keyword="已连接 到"
@@ -30,13 +30,14 @@ update() {
         wifi_text=" 0.00KB/s  0.00KB/s"
     elif [[ "$is_net" != "" ]];then
         # 获取网卡名
-        DEVICE=$(ip route | grep default | awk '{print $5}')
+        DEVICE=$(ip route | grep default | head -1 | awk '{print $5}')
         if [[ ! -n $DEVICE ]]; then
             DEVICE=$(ls /sys/class/net | grep -v lo | head -1)
         fi
+        wifi_icon=""
         wifi_text=$( sar -n DEV 1 1 | grep $DEVICE |grep -E "Average|平均时间" | awk 'BEGIN{a="";b="";c=" ";d="KB/s"}{print  a""c""$5""d""c""b""c""$6""d }' )
     else
-        wifi_text=$(nmcli | grep "$wifi_grep_keyword" | awk -F "$wifi_grep_keyword" '{print $2}')
+        wifi_text=$(nmcli | grep "$wifi_grep_keyword" | awk -F "$wifi_grep_keyword" '{print $2}' | tr -d " " |sed ':a;N;s/\n/‧/;ta')
         [ "$wifi_text" = "" ] && wifi_text=$wifi_disconnected
     fi
 
