@@ -36,7 +36,7 @@ settings() {
 	python3 ~/tool/sign.py &
 	cp ~/.config/eww/System-Menu/eww.yuck.x11  ~/.config/eww/System-Menu/eww.yuck
 	eww daemon &
-	plank &
+	# plank &
 }
 
 daemons() {
