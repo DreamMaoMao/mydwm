@@ -235,8 +235,8 @@ static Key keys[] = {
     { AltMask,                  XK_space,  spawn, SHCMD("wofi --normal-window") },                                                      /* alt space        | rofi: 执行drun          */                                                    /* alt space        | rofi: 执行drun          */
     { SuperMask|ControlMask,    XK_Return, spawn, SHCMD("st -e  yazi") },                                                                                                          /* ctrl win enter   | rofi: nautilus 文件浏览器          */
     { ControlMask,              XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },              /* ctrl space       | rofi: 执行自定义脚本   */
-    { SuperMask,                XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },     /* super space      | rofi: 执行自定义脚本   */
-    { SuperMask|AltMask,        XK_Return, spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },     /* super space      | rofi: 执行自定义脚本   */
+    // { SuperMask,                XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },     /* super space      | rofi: 执行自定义脚本   */
+    // { SuperMask|AltMask,        XK_Return, spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },     /* super space      | rofi: 执行自定义脚本   */
     { SuperMask,                XK_l,      spawn, SHCMD("$DWM/scripts/blurlock.sh") },                                   /* super l     | 锁定屏幕               */
     { AltMask,                  XK_period, spawn, SHCMD("$DWM/scripts/volume.sh up") },                                 /* alt >       | 音量加                 */
     { AltMask,                  XK_comma,  spawn, SHCMD("$DWM/scripts/volume.sh down") },                               /* alt <       | 音量减                 */
@@ -250,7 +250,7 @@ static Key keys[] = {
     { AltMask|ControlMask,      XK_Return, spawn, SHCMD("st -e ~/tool/ter-multiplexer.sh") },  /* super alt return | zellij 临时会话 */
     { SuperMask,                XK_b,      spawn, SHCMD("systemctl suspend") },      /* super b     | 系统挂起 */ 
     { AltMask|ControlMask,      XK_t,      spawn, SHCMD("bash ~/tool/shotTranslate.sh shot") },      /* ctrl alt t    | 截屏翻译 */ 
-    { SuperMask,                XK_c,      spawn, SHCMD("rofi -theme  ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/history.py") },      /* super c    | 浏览器历史 */ 
+    { SuperMask,                XK_space,      spawn, SHCMD("rofi -theme  ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/history.py") },      /* super c    | 浏览器历史 */ 
 
 
     /* alt key : 跳转到对应tag (可附加一条命令 若目标目录无窗口，则执行该命令) */
