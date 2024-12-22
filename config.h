@@ -125,6 +125,7 @@ static const Rule rules[] = {
     {"qxdrag.py",    NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            400,       300},       // dragon            noborder
     {NULL,    NULL,                 "rofi - Networks",             0,            1,          0,          1,        -1,      5,            400,       300},       // dragon            noborder
     {"Wofi",    NULL,                 NULL,             0,            1,          0,          1,        -1,      5,            0,       0},       // wofi            noborder
+    {"mpv",    NULL,                 NULL,             0,            0,          0,          0,        -1,      5,            0,       0},       // wofi            noborder
 
 
     /** 优先度低 越在上面优先度越低 */
@@ -237,6 +238,7 @@ static Key keys[] = {
     { ControlMask,              XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },              /* ctrl space       | rofi: 执行自定义脚本   */
     // { SuperMask,                XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },     /* super space      | rofi: 执行自定义脚本   */
     // { SuperMask|AltMask,        XK_Return, spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },     /* super space      | rofi: 执行自定义脚本   */
+    { SuperMask|AltMask,        XK_Return, spawn, SHCMD("mpv --player-operation-mode=pseudo-gui") },     /* super space      | rofi: 执行自定义脚本   */
     { SuperMask,                XK_l,      spawn, SHCMD("$DWM/scripts/blurlock.sh") },                                   /* super l     | 锁定屏幕               */
     { AltMask,                  XK_period, spawn, SHCMD("$DWM/scripts/volume.sh up") },                                 /* alt >       | 音量加                 */
     { AltMask,                  XK_comma,  spawn, SHCMD("$DWM/scripts/volume.sh down") },                               /* alt <       | 音量减                 */
