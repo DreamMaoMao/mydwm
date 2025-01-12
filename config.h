@@ -123,6 +123,7 @@ static const Rule rules[] = {
     {"Pavucontrol",                  NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // pavucontrol            浮动
     {"Dragon",    NULL,                 NULL,             0,            1,          0,          1,        -1,      5,            0,       0},       // dragon            noborder
     {"qxdrag.py",    NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            400,       300},       // dragon            noborder
+    {"Pot",    NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},       // dragon            noborder
     {NULL,    NULL,                 "rofi - Networks",             0,            1,          0,          1,        -1,      5,            400,       300},       // dragon            noborder
     {"Wofi",    NULL,                 NULL,             0,            1,          0,          1,        -1,      5,            0,       0},       // wofi            noborder
     {"mpv",    NULL,                 NULL,             0,            0,          0,          0,        -1,      5,            0,       0},       // wofi            noborder
