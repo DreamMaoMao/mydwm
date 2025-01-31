@@ -1,5 +1,6 @@
 #include <X11/XF86keysym.h>
 
+static unsigned int axis_bind_apply_timeout = 100; /*鼠标滚轮按键绑定延时*/
 static int const single_auto_exit_hide = 0; /*如果隐藏窗口是tag中唯一的窗口那么自动显示一个隐藏窗口*/
 static int const auto_fullscreen = 0; /* overview模式左键点击退出overview后自动假全屏窗口*/
 static int const mouse_move_toggle_focus = 1; /* 在非聚焦窗口移动鼠标是否触发聚焦,不启用的话只有从另一个窗口移动到当前窗口才聚焦*/

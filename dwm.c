@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
+#include <time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -485,6 +486,7 @@ static Monitor *mons, *selmon;
 static Window root, wmcheckwin;
 static int hiddenWinStackTop = -1;
 static Client *hiddenWinStack[100];
+static struct timespec axis_apply_time = {0};
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -835,18 +837,26 @@ void buttonpress(XEvent *e) { // 鼠标按键事件处理函数
   Monitor *m;
   XButtonPressedEvent *ev = &e->xbutton;
   Client *c = wintoclient(ev->window);
-
+  struct timespec now;
+  clock_gettime(CLOCK_MONOTONIC, &now);
+  long elapsed_ms = (now.tv_sec - axis_apply_time.tv_sec) * 1000 +
+                      (now.tv_nsec - axis_apply_time.tv_nsec) / 1000000;
   // 滚轮加按键事件直接操作,不进行下面鼠标位置判断
-  for (i = 0; i < LENGTH(buttons); i++) {
-    if (buttons[i].func && buttons[i].button == ev->button &&
-        (ev->button == Button4 || ev->button == Button5) &&
-        CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state) &&
-        CLEANMASK(buttons[i].mask) != 0) {
-
-      buttons[i].func(&buttons[i].arg);
-      return;
+    for (i = 0; i < LENGTH(buttons); i++) {
+      if (buttons[i].func && buttons[i].button == ev->button &&
+          (ev->button == Button4 || ev->button == Button5) &&
+          CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state) &&
+          CLEANMASK(buttons[i].mask) != 0) {
+        if (elapsed_ms > axis_bind_apply_timeout) {
+          buttons[i].func(&buttons[i].arg);
+          axis_apply_time = now; 
+          return;
+        } else
+          axis_apply_time = now; 
+          return;
+      }
     }
-  }
+
 
   // 判断鼠标点击的位置
   click = ClkRootWin;
