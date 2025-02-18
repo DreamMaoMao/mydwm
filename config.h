@@ -233,14 +233,10 @@ static Key keys[] = {
     { AltMask,                  XK_Return, spawn, SHCMD("st") },  
     { SuperMask,                XK_Return, spawn, SHCMD("google-chrome") },
     { ControlMask,              XK_Return, spawn, SHCMD("bash ~/tool/clash.sh") },                                                                                              /* alt enter      | 打开终端             */
-    { SuperMask,                XK_d,      spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show run") },                                                       /* super d          | rofi: 执行run          */
-    // { AltMask,                  XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show drun") },  
-    { AltMask,                  XK_space,  spawn, SHCMD("wofi --normal-window") },                                                      /* alt space        | rofi: 执行drun          */                                                    /* alt space        | rofi: 执行drun          */
+    { AltMask,                  XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/menu.rasi -show drun") },  
     { SuperMask|ControlMask,    XK_Return, spawn, SHCMD("st -e  yazi") },   
     { ShiftMask|ControlMask,    XK_Return, spawn, SHCMD("st -e  aerc") },                                                                                                          /* ctrl win enter   | rofi: nautilus 文件浏览器          */                                                                                                       /* ctrl win enter   | rofi: nautilus 文件浏览器          */
     { ControlMask,              XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },              /* ctrl space       | rofi: 执行自定义脚本   */
-    // { SuperMask,                XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/themes/trans.rasi -show website") },     /* super space      | rofi: 执行自定义脚本   */
-    // { SuperMask|AltMask,        XK_Return, spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/tool/movie.py") },     /* super space      | rofi: 执行自定义脚本   */
     { SuperMask|AltMask,        XK_Return, spawn, SHCMD("mpv --player-operation-mode=pseudo-gui") },     /* super space      | rofi: 执行自定义脚本   */
     { SuperMask,                XK_l,      spawn, SHCMD("$DWM/scripts/blurlock.sh") },                                   /* super l     | 锁定屏幕               */
     { AltMask,                  XK_period, spawn, SHCMD("$DWM/scripts/volume.sh up") },                                 /* alt >       | 音量加                 */
