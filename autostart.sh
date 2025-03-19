@@ -9,21 +9,23 @@ _thisdir=$(
 )
 
 settings() {
-	pkill -f xdg-desktop-portal-hyprland
-	pkill -f xdg-desktop-portal-gnome
-	pkill clash
+	# pkill -f xdg-desktop-portal-hyprland
+	# pkill -f xdg-desktop-portal-gnome
+	# pkill clash
 	picom --experimental-backends --config $DWM/scripts/config/picom.conf & # 开启picom
 	# picom --config $DWM/scripts/config/picom.conf &
-	feh --randomize --bg-fill $DWM/wallpaper/caoyuan.jpg & # 壁纸
-	echo "Xft.dpi: 140" | xrdb -merge                      #dpi缩放
-	cp ~/.config/zellij/configx11.kdl ~/.config/zellij/config.kdl
-	cp ~/.config/fcitx/dwm_profile ~/.config/fcitx/profile -f
+	# feh --randomize --bg-fill $DWM/wallpaper/caoyuan.jpg & # 壁纸
+	feh --randomize --bg-fill $DWM/wallpaper/room.png & # 壁纸
+	# echo "Xft.dpi: 140" | xrdb -merge                      #dpi缩放
+	xrdb -merge ~/.Xresources
+  # cp ~/.config/zellij/configx11.kdl ~/.config/zellij/config.kdl
+	# cp ~/.config/fcitx/dwm_profile ~/.config/fcitx/profile -f
 	# 开启输入法
 	fcitx5 &
 	# bash /opt/apps/com.baidu.fcitx-baidupinyin/files/bin/bd-qimpanel.watchdog.sh &	#百度拼音输入法
 	dunst -config ~/.config/dunst/dwm_dunstrc & # 开启通知server
-	systemctl --user unmask xdg-desktop-portal-gnome
-	systemctl --user mask xdg-desktop-portal-hyprland
+	# systemctl --user unmask xdg-desktop-portal-gnome
+	# systemctl --user mask xdg-desktop-portal-hyprland
 	/usr/libexec/xdg-desktop-portal &
 	redshift &
 	parcellite &
@@ -33,7 +35,7 @@ settings() {
 	numlockx on
 	$_thisdir/statusbar/statusbar.sh cron & # 开启状态栏定时更新
 	[ -e /dev/sda4 ] && udisksctl mount -t ext4 -b /dev/sda4
-	python3 ~/tool/sign.py &
+	# python3 ~/tool/sign.py &
 	cp ~/.config/eww/System-Menu/eww.yuck.x11  ~/.config/eww/System-Menu/eww.yuck
 	eww daemon &
 	# plank &

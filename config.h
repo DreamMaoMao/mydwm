@@ -41,7 +41,7 @@ static const char *fonts[] = {"JetBrainsMono Nerd Font:style=Bold:size=15",
 static const char *colors[][3] = {
     /* 颜色设置 ColFg, ColBg, ColBorder */
     [SchemeNorm] = {"#ffb871", "#3c2003", "#444444"},
-    [SchemeSel] = {"#2d1802", "#ad741f", "#ad741f"},
+    [SchemeSel] = {"#2d1802", "#e9812d", "#e9812d"},
     [SchemeSelScratchpad] = {"#ffffff", "#37474F", "#516c93"},
     [SchemeSelGlobal] = {"#ffffff", "#37474F", "#b153a7"},
     [SchemeSelFakeFull] = {"#ffffff", "#37474F", "#5d8e5d"},
@@ -49,8 +49,8 @@ static const char *colors[][3] = {
     [SchemeHid] = {"#462503", NULL, NULL},
     [SchemeSystray] = {NULL, "#dabb77", NULL},
     [SchemeUnderline] = {"#6f0d62", NULL, NULL},
-    [SchemeNormTag] = {"#a02a6b", "#d8cbba", NULL},
-    [SchemeSelTag] = {"#ffffff", "#a02a6b", NULL},
+    [SchemeNormTag] = {"#bd3d83", "#eee3d6", NULL},
+    [SchemeSelTag] = {"#ffffff", "#bd3d83", NULL},
     [SchemeBarEmpty] = {NULL, "#111111", NULL},
 };
 static const unsigned int alphas[][3] = {
@@ -113,6 +113,7 @@ static const Rule rules[] = {
     {"Microsoft-edge",               NULL,                 NULL,             1 << 4,       0,          0,          0,        -1,      0,            0,       0},       // chrome     tag4 
     {"qtmv",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1200,       800},  // music      浮动
     {"yesplaymusic",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1570,       1010},  // music      浮动
+    {"Sxiv",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1570,       1010},  // music      浮动
     {"electron-netease-cloud-music",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,     1200,   800},  // music      浮动
     {"baidunetdisk",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            0,       0},  // 百度云网盘      浮动
     {"alixby3",                NULL,                 NULL,             0,            1,          0,          0,        -1,      5,            1200,       800},  // 阿里云网盘      浮动
