@@ -14,7 +14,7 @@ static int const hotarea_size = 10;           /* 热区大小10x10 */
 static int const no_stack_show_border = 1;           /* 一个窗口也显示border */
 static int showsystray = 1;           /* 是否显示托盘栏 */
 static int newclientathead = 1; /* 定义新窗口在栈顶还是栈底 */
-static const unsigned int borderpx = 5; /* 窗口边框大小 */
+static const unsigned int borderpx = 4; /* 窗口边框大小 */
 static const unsigned int systraypinning =
     1; /* 托盘跟随的显示器 0代表不指定显示器 */
 static const unsigned int systrayspacing = 1;  /* 托盘间距 */
@@ -237,7 +237,7 @@ static Key keys[] = {
     { AltMask,                  XK_space,  spawn, SHCMD("/usr/bin/rofi -config ~/.config/rofi/menu.rasi -show drun") },  
     { SuperMask|ControlMask,    XK_Return, spawn, SHCMD("st -e  yazi") },   
     { ShiftMask|ControlMask,    XK_Return, spawn, SHCMD("st -e  aerc") },                                                                                                          /* ctrl win enter   | rofi: nautilus 文件浏览器          */                                                                                                       /* ctrl win enter   | rofi: nautilus 文件浏览器          */
-    { ControlMask,              XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },              /* ctrl space       | rofi: 执行自定义脚本   */
+    { ControlMask,              XK_space,  spawn, SHCMD("rofi -theme ~/.config/rofi/themes/gruvbox-dark-hard.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/search.py") },              /* ctrl space       | rofi: 执行自定义脚本   */
     { SuperMask|AltMask,        XK_Return, spawn, SHCMD("mpv --player-operation-mode=pseudo-gui") },     /* super space      | rofi: 执行自定义脚本   */
     { SuperMask,                XK_l,      spawn, SHCMD("$DWM/scripts/blurlock.sh") },                                   /* super l     | 锁定屏幕               */
     { AltMask,                  XK_period, spawn, SHCMD("$DWM/scripts/volume.sh up") },                                 /* alt >       | 音量加                 */
@@ -252,7 +252,7 @@ static Key keys[] = {
     { AltMask|ControlMask,      XK_Return, spawn, SHCMD("st -e ~/tool/ter-multiplexer.sh") },  /* super alt return | zellij 临时会话 */
     { SuperMask,                XK_b,      spawn, SHCMD("systemctl suspend") },      /* super b     | 系统挂起 */ 
     { AltMask|ControlMask,      XK_t,      spawn, SHCMD("bash ~/tool/shotTranslate.sh shot") },      /* ctrl alt t    | 截屏翻译 */ 
-    { SuperMask,                XK_space,      spawn, SHCMD("rofi -theme  ~/.config/rofi/themes/fancy2.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/history.py") },      /* super c    | 浏览器历史 */ 
+    { SuperMask,                XK_space,      spawn, SHCMD("rofi -theme  ~/.config/rofi/themes/gruvbox-dark-hard.rasi -modi blocks -show blocks -blocks-wrap ~/.config/rofi/history.py") },      /* super c    | 浏览器历史 */ 
 
 
     /* alt key : 跳转到对应tag (可附加一条命令 若目标目录无窗口，则执行该命令) */
