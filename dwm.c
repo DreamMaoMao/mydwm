@@ -4869,6 +4869,10 @@ int main(int argc, char *argv[]) {
     die("pledge");
 #endif /* __OpenBSD__ */
   scan();
+
+  setenv("XDG_SESSION_TYPE", "x11", 1);  // 1=覆盖已存在的变量
+  setenv("XDG_CURRENT_DESKTOP", "dwm", 1);  // 1=覆盖已存在的变量
+
   runAutostart();
   run();
   cleanup();
