@@ -83,7 +83,7 @@ sudo pacman -S gdm
 sudo pacman -S nemo nemo-fileroller
 sudo pacman -S ffmpegthumbnailer
 
-yay -S blueman acpi dunst jq alsa-utils polkit-gnome  rofi-blocks-git light numlockx  flameshot feh lm_sensors   mantablockscreen network-manager-applet playerctl python3 parcellite redshift upower xorg-xinit xprintidle xorg wmctrl xdotool tumbler pavucontrol ttf-jetbrains-mono-nerd eww-x11 cpufrequtils asciidoc xclip update-grub os-prober efibootmgr grub-customizer yazi xface4-terminal
+yay -S blueman acpi dunst jq alsa-utils polkit-gnome  rofi-blocks-git light numlockx  flameshot feh lm_sensors   mantablockscreen network-manager-applet playerctl python3 parcellite redshift upower xorg-xinit xprintidle xorg wmctrl xdotool tumbler pavucontrol ttf-jetbrains-mono-nerd eww cpufrequtils asciidoc xclip update-grub os-prober efibootmgr grub-customizer yazi xface4-terminal terminus-font
 
 
 ```
