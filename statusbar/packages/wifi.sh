@@ -3,8 +3,8 @@
 tempfile=$(cd $(dirname $0);cd ..;pwd)/temp
 
 this=_wifi
-icon_color="^c#000080^^b#a6e3a10xff^"
-text_color="^c#000080^^b#a6e3a10xff^"
+icon_color="^c#ddca9e^^b#201b140xff^"
+text_color="^c#ddca9e^^b#201b140xff^"
 signal=$(echo "^s$this^" | sed 's/_//')
 
 # check
@@ -50,7 +50,7 @@ update() {
         icon=" $wifi_icon"
         text="$wifi_text "
         sed -i '/^export '$this'=.*$/d' $tempfile
-        printf "export %s='%s%s%s%s%s'\n" $this "$signal" "" "" "$text_color" "$icon $text" >> $tempfile
+        printf "export %s='%s%s%s%s%s'\n" $this "$signal" "" "" "$text_color" "|$icon $text|" >> $tempfile
     fi
 }
 

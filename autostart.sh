@@ -15,7 +15,7 @@ settings() {
 	# picom --experimental-backends --config $DWM/scripts/config/picom.conf & # 开启picom
 	picom --config $DWM/scripts/config/picom.conf &
 	# feh --randomize --bg-fill $DWM/wallpaper/caoyuan.jpg & # 壁纸
-	feh --randomize --bg-fill $DWM/wallpaper/boat.jpg & # 壁纸
+	feh --randomize --bg-fill $DWM/wallpaper/car.jpeg & # 壁纸
 	# echo "Xft.dpi: 140" | xrdb -merge                      #dpi缩放
 	xrdb -merge ~/.Xresources
   # cp ~/.config/zellij/configx11.kdl ~/.config/zellij/config.kdl

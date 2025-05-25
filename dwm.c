@@ -1365,7 +1365,7 @@ void drawbar(Monitor *m) { // 绘制bar
     if (!ISVISIBLE(c))
       continue;
     if (m->sel == c)
-      scm = SchemeSel;
+      scm = SchemeNormTag;
     else if (HIDDEN(c))
       scm = SchemeHid;
     else

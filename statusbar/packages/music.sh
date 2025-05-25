@@ -4,8 +4,8 @@
 tempfile=$(cd $(dirname $0);cd ..;pwd)/temp
 
 this=_music
-icon_color="^c#3B102B^^b#6873790x88^"
-text_color="^c#3B102B^^b#6873790x99^"
+icon_color="^c#ddca9e^^b#201b140xff^"
+text_color="^c#ddca9e^^b#201b140xff^"
 signal=$(echo "^s$this^" | sed 's/_//')
 
 [ ! "$(command -v mpc)" ] && echo command not found: mpc && return

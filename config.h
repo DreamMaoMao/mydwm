@@ -19,12 +19,12 @@ static const unsigned int systraypinning =
     1; /* 托盘跟随的显示器 0代表不指定显示器 */
 static const unsigned int systrayspacing = 1;  /* 托盘间距 */
 static const unsigned int systrayspadding = 1; /* 托盘和状态栏的间隙 */
-static int gappi = 10; /* 窗口与窗口 缝隙大小 */
-static int gappo = 10; /* 窗口与边缘 缝隙大小 */
+static int gappi = 5; /* 窗口与窗口 缝隙大小 */
+static int gappo = 5; /* 窗口与边缘 缝隙大小 */
 static const int _gappo =
-    10; /* 窗口与窗口 缝隙大小 不可变 用于恢复时的默认值 */
+    5; /* 窗口与窗口 缝隙大小 不可变 用于恢复时的默认值 */
 static const int _gappi =
-    10; /* 窗口与边缘 缝隙大小 不可变 用于恢复时的默认值 */
+    5; /* 窗口与边缘 缝隙大小 不可变 用于恢复时的默认值 */
 static const int vertpad = 5;        /* vertical padding of bar */
 static const int sidepad = 5;        /* horizontal padding of bar */
 static const int overviewgappi = 24; /* overview时 窗口与边缘 缝隙大小 */
@@ -41,16 +41,16 @@ static const char *fonts[] = {"JetBrainsMono Nerd Font:style=Bold:size=15",
 static const char *colors[][3] = {
     /* 颜色设置 ColFg, ColBg, ColBorder */
     [SchemeNorm] = {"#ffb871", "#3c2003", "#444444"},
-    [SchemeSel] = {"#2d1802", "#c9b890", "#c9b890"},
+    [SchemeSel] = {"#2d1802", "#a39a82", "#a39a82"},
     [SchemeSelScratchpad] = {"#ffffff", "#37474F", "#516c93"},
     [SchemeSelGlobal] = {"#ffffff", "#37474F", "#b153a7"},
     [SchemeSelFakeFull] = {"#ffffff", "#37474F", "#5d8e5d"},
     [SchemeSelFakeFullGLObal] = {"#ffffff", "#37474F", "#881519"},
     [SchemeHid] = {"#462503", "#516c93", NULL},
-    [SchemeSystray] = {NULL, "#dabb77", NULL},
+    [SchemeSystray] = {NULL, "#201b14", NULL},
     [SchemeUnderline] = {"#6f0d62", NULL, NULL},
-    [SchemeNormTag] = {"#bd3d83", "#eee3d6", NULL},
-    [SchemeSelTag] = {"#ffffff", "#bd3d83", NULL},
+    [SchemeNormTag] = {"#ddca9e", "#201b14", NULL},
+    [SchemeSelTag] = {"#000000", "#a39a82", NULL},
     [SchemeBarEmpty] = {NULL, "#111111", NULL},
 };
 static const unsigned int alphas[][3] = {

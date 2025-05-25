@@ -8,8 +8,8 @@ tempfile=$(
 )/temp
 
 this=_date
-icon_color="^c#e4e1db^^b#a21d570xff^"
-text_color="^c#e4e1db^^b#a21d570xff^"
+icon_color="^c#ddca9e^^b#201b140xff^"
+text_color="^c#ddca9e^^b#201b140xff^"
 signal=$(echo "^s$this^" | sed 's/_//')
 
 update() {
@@ -33,7 +33,7 @@ update() {
 	text="$time_text "
 
 	sed -i '/^export '$this'=.*$/d' $tempfile
-	printf "export %s='%s%s%s%s%s'\n" $this "$signal" "" "" "$text_color" "$icon $text" >>$tempfile
+	printf "export %s='%s%s%s%s%s'\n" $this "$signal" "" "" "$text_color" "$icon $text|" >>$tempfile
 }
 
 notify() {

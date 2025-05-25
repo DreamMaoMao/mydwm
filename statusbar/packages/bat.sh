@@ -5,8 +5,8 @@
 tempfile=$(cd $(dirname $0);cd ..;pwd)/temp
 
 this=_bat
-icon_color="^c#0a4b55^^b#96d5dd0xff^"
-text_color="^c#0a4b55^^b#96d5dd0xff^"
+icon_color="^c#ddca9e^^b#201b140xff^"
+text_color="^c#ddca9e^^b#201b140xff^"
 signal=$(echo "^s$this^" | sed 's/_//')
 
 get_by_acpi() {
@@ -47,7 +47,7 @@ update() {
     text="$bat_text% "
 
     sed -i '/^export '$this'=.*$/d' $tempfile
-    printf "export %s='%s%s%s%s%s'\n" $this "$signal" "" "" "$text_color" "$icon $text" >> $tempfile
+    printf "export %s='%s%s%s%s%s'\n" $this "$signal" "" "" "$text_color" "$icon $text|" >> $tempfile
 }
 
 notify() {

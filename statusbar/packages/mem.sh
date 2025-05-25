@@ -4,8 +4,8 @@
 tempfile=$(cd $(dirname $0);cd ..;pwd)/temp
 
 this=_mem
-icon_color="^c#3B001B^^b#cba6f70xff^"
-text_color="^c#3B001B^^b#cba6f70xff^"
+icon_color="^c#ddca9e^^b#201b140xff^"
+text_color="^c#ddca9e^^b#201b140xff^"
 signal=$(echo "^s$this^" | sed 's/_//')
 
 update() {
@@ -21,7 +21,7 @@ update() {
     text="$mem_text% "
 
     sed -i '/^export '$this'=.*$/d' $tempfile
-    printf "export %s='%s%s%s%s%s'\n" $this "$signal" "" "" "$text_color" "$icon $text" >> $tempfile
+    printf "export %s='%s%s%s%s%s'\n" $this "$signal" "" "" "$text_color" "$icon $text|" >> $tempfile
 }
 
 notify() {
