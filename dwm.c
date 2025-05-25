@@ -1315,6 +1315,8 @@ void drawbar(Monitor *m) { // 绘制bar
 
   // 判断tag显示数量
   for (c = m->clients; c; c = c->next) {
+    if (c->is_in_scratchpad && !c->is_scratchpad_show)
+      continue;
     if (ISVISIBLE(c))
       n++;
     occ |= c->tags == TAGMASK ? 0 : c->tags;
@@ -3652,6 +3654,9 @@ void unmanage(Client *c, int destroyed) {
   Monitor *m = c->mon;
   XWindowChanges wc;
 
+  Client *xc;
+  uint client_num = 0;
+  
   // 从窗口栈中移除
   detach(c);
   detachstack(c);
@@ -3675,7 +3680,16 @@ void unmanage(Client *c, int destroyed) {
   focus(NULL);
   updateclientlist();
   arrange(m);
-  if(selmon->clients == NULL){
+
+  for (xc = selmon->clients; xc; xc = xc->next) {
+    if(xc->is_in_scratchpad && !xc->is_scratchpad_show ) {
+      continue;
+    } else {
+      client_num++;
+    }
+  }
+
+  if(client_num == 0 ){
 		if(selmon->isoverview){
 			Arg arg = {0};
 			toggleoverview(&arg);
@@ -4145,7 +4159,18 @@ void inner_overvew_killclient(const Arg *arg) {
 // 显示所有tag 或 跳转到聚焦窗口的tag
 void toggleoverview(const Arg *arg) {
 
-  if(selmon->clients == NULL && !selmon->isoverview){
+  Client *xc;
+  uint client_num = 0;
+
+  for (xc = selmon->clients; xc; xc = xc->next) {
+    if(xc->is_in_scratchpad && !xc->is_scratchpad_show ) {
+      continue;
+    } else {
+      client_num++;
+    }
+  }
+
+  if(client_num == 0 && !selmon->isoverview){
     return;
   }
 
@@ -4199,7 +4224,7 @@ void viewtoleft(const Arg *arg) {
       circle = 0; // 只重新找一次
     }
     for (c = selmon->clients; c; c = c->next) {
-      if (c->isglobal && c->tags == TAGMASK)
+      if ((c->isglobal && c->tags == TAGMASK) || (c->is_in_scratchpad && !c->is_scratchpad_show))
         continue;
       if (c->tags & target &&
           __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1 &&
@@ -4238,7 +4263,7 @@ void viewtoright(const Arg *arg) {
       circle = 0; // 只重新找一次
     }
     for (c = selmon->clients; c; c = c->next) {
-      if (c->isglobal && c->tags == TAGMASK)
+      if ((c->isglobal && c->tags == TAGMASK) || (c->is_in_scratchpad && !c->is_scratchpad_show))
         continue;
       if (c->tags & target &&
           __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1 &&
