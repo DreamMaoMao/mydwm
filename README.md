@@ -83,18 +83,9 @@ sudo pacman -S gdm
 sudo pacman -S nemo nemo-fileroller
 sudo pacman -S ffmpegthumbnailer
 
-yay -S blueman acpi dunst jq alsa-utils polkit-gnome  rofi-blocks-git light numlockx  flameshot feh lm_sensors   mantablockscreen network-manager-applet playerctl python3 parcellite redshift upower xorg-xinit xprintidle xorg wmctrl xdotool tumbler pavucontrol ttf-jetbrains-mono-nerd eww cpufrequtils asciidoc xclip update-grub os-prober efibootmgr grub-customizer yazi xface4-terminal terminus-font power-profiles-daemon
+yay -S picom blueman acpi dunst jq alsa-utils polkit-gnome  rofi-blocks-git light numlockx  flameshot feh lm_sensors   mantablockscreen network-manager-applet playerctl python3 parcellite redshift upower xorg-xinit xprintidle xorg wmctrl xdotool tumbler pavucontrol ttf-jetbrains-mono-nerd eww cpufrequtils asciidoc xclip update-grub os-prober efibootmgr grub-customizer yazi xface4-terminal terminus-font power-profiles-daemon
 
 ```
-# 安装特定版本的picom
-```
-cd ~/Downloads
-git clone https://github.com/DreamMaoMao/mypicom.git
-cd mypicom/
-meson --buildtype=release . build --prefix=/usr 
-sudo ninja -C build install
-```
-
 
 # 安装dwm
 ```
